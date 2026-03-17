@@ -84,6 +84,7 @@ export default function SignupScreen() {
           {/* Form */}
           <View className="gap-4">
             <TextInput
+              testID="signup_name_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Display Name"
               placeholderTextColor="#6b7280"
@@ -93,6 +94,7 @@ export default function SignupScreen() {
               autoComplete="name"
             />
             <TextInput
+              testID="signup_email_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Email"
               placeholderTextColor="#6b7280"
@@ -103,6 +105,7 @@ export default function SignupScreen() {
               autoComplete="email"
             />
             <TextInput
+              testID="signup_password_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Password (min 6 characters)"
               placeholderTextColor="#6b7280"
@@ -113,6 +116,7 @@ export default function SignupScreen() {
             />
 
             <TouchableOpacity
+              testID="signup_submit"
               className="bg-accent rounded-xl py-4 items-center mt-2"
               onPress={handleSignup}
               disabled={loading || googleLoading}

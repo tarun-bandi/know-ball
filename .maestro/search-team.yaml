@@ -1,0 +1,40 @@
+appId: ${APP_ID}
+---
+# Search: select a team from the grid and browse games
+
+- launchApp
+
+- assertVisible:
+    id: "tab_search"
+    timeout: 8000
+- tapOn:
+    id: "tab_search"
+
+- waitForAnimationToEnd
+
+# Verify search input is visible
+- assertVisible:
+    id: "search_input"
+
+# Verify mode toggles
+- assertVisible:
+    id: "search_mode_games"
+- assertVisible:
+    id: "search_mode_users"
+- assertVisible:
+    id: "search_mode_players"
+
+# Team grid should be visible in games mode
+- assertVisible:
+    id: "team_grid"
+
+# Tap on a team (the grid is visible by default)
+- tapOn:
+    id: "team_grid"
+    index: 0
+
+- waitForAnimationToEnd
+
+# Should see selected teams bar after picking a team
+- assertVisible:
+    id: "selected_teams_bar"

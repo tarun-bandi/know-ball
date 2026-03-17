@@ -1,0 +1,36 @@
+appId: ${APP_ID}
+---
+# Signup flow: navigate to signup and fill form
+
+- launchApp:
+    clearState: true
+
+- waitForAnimationToEnd
+
+# Navigate to signup
+- assertVisible:
+    id: "auth_signup_link"
+    timeout: 5000
+- tapOn:
+    id: "auth_signup_link"
+
+# Fill signup form
+- assertVisible:
+    id: "signup_name_input"
+    timeout: 3000
+
+- tapOn:
+    id: "signup_name_input"
+- inputText: "Test User"
+
+- tapOn:
+    id: "signup_email_input"
+- inputText: ${TEST_SIGNUP_EMAIL}
+
+- tapOn:
+    id: "signup_password_input"
+- inputText: ${TEST_PASSWORD}
+
+# Submit
+- tapOn:
+    id: "signup_submit"

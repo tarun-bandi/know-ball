@@ -222,6 +222,7 @@ export default function LoginScreen() {
           {/* Form */}
           <Animated.View style={[{ gap: 14 }, fadeSlide(formAnim)]}>
             <TextInput
+              testID="auth_email_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Email"
               placeholderTextColor="#6b7280"
@@ -232,6 +233,7 @@ export default function LoginScreen() {
               autoComplete="email"
             />
             <TextInput
+              testID="auth_password_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Password"
               placeholderTextColor="#6b7280"
@@ -242,6 +244,7 @@ export default function LoginScreen() {
             />
 
             <TouchableOpacity
+              testID="auth_login_submit"
               className="bg-accent rounded-xl py-4 items-center mt-1"
               onPress={handleLogin}
               disabled={loading || googleLoading}
@@ -265,6 +268,7 @@ export default function LoginScreen() {
 
             {/* Google Sign In */}
             <TouchableOpacity
+              testID="auth_google_signin"
               className="bg-surface border border-border rounded-xl py-4 items-center mt-3"
               onPress={handleGoogleSignIn}
               disabled={loading || googleLoading}
@@ -284,7 +288,7 @@ export default function LoginScreen() {
           <Animated.View style={[{ marginTop: 32 }, fadeSlide(footerAnim)]}>
             <View className="flex-row">
               <Text className="text-muted">Don't have an account? </Text>
-              <Link href="/(auth)/signup">
+              <Link href="/(auth)/signup" testID="auth_signup_link">
                 <Text className="text-accent font-semibold">Sign Up</Text>
               </Link>
             </View>

@@ -1,0 +1,25 @@
+appId: ${APP_ID}
+---
+# Feed: scroll through game cards and interact
+
+- launchApp
+
+# Ensure we're on the feed tab
+- assertVisible:
+    id: "tab_feed"
+    timeout: 8000
+- tapOn:
+    id: "tab_feed"
+
+- waitForAnimationToEnd
+
+# Scroll down past Today's Games banner
+- scroll:
+    direction: "DOWN"
+
+# Pull to refresh
+- scroll:
+    direction: "UP"
+
+# Verify feed loaded (either game cards or empty state)
+- waitForAnimationToEnd

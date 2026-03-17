@@ -24,11 +24,13 @@ export default function TabsLayout() {
         name="feed"
         options={{
           title: 'Feed',
+          tabBarTestID: 'tab_feed',
           tabBarIcon: ({ color, size }) => (
             <Home color={color} size={size} />
           ),
           headerRight: () => (
             <TouchableOpacity
+              testID="notifications_bell"
               onPress={() => router.push('/notifications')}
               style={{ marginRight: 16 }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -42,6 +44,7 @@ export default function TabsLayout() {
         name="discover"
         options={{
           title: 'Discover',
+          tabBarTestID: 'tab_discover',
           tabBarIcon: ({ color, size }) => (
             <Compass color={color} size={size} />
           ),
@@ -51,6 +54,7 @@ export default function TabsLayout() {
         name="search"
         options={{
           title: 'Search',
+          tabBarTestID: 'tab_search',
           tabBarIcon: ({ color, size }) => (
             <Search color={color} size={size} />
           ),
@@ -60,6 +64,7 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Profile',
+          tabBarTestID: 'tab_profile',
           tabBarIcon: ({ color, size }) => (
             <User color={color} size={size} />
           ),

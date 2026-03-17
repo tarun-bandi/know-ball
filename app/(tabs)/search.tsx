@@ -276,6 +276,7 @@ export default function SearchScreen() {
         <View className="flex-row items-center bg-surface border border-border rounded-xl px-3 gap-2">
           <SearchIcon size={18} color="#6b7280" />
           <TextInput
+            testID="search_input"
             className="flex-1 py-3.5 text-white text-base"
             placeholder={
               searchMode === 'games'
@@ -303,6 +304,7 @@ export default function SearchScreen() {
         {(['games', 'users', 'players'] as const).map((mode) => (
           <TouchableOpacity
             key={mode}
+            testID={`search_mode_${mode}`}
             onPress={() => {
               setSearchMode(mode);
               if (mode !== 'games') {

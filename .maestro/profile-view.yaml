@@ -1,0 +1,36 @@
+appId: ${APP_ID}
+---
+# Profile: view profile sections and navigate
+
+- launchApp
+
+- assertVisible:
+    id: "tab_profile"
+    timeout: 8000
+- tapOn:
+    id: "tab_profile"
+
+- waitForAnimationToEnd
+
+# Verify profile header loaded
+- assertVisible:
+    id: "profile_avatar"
+- assertVisible:
+    id: "profile_display_name"
+
+# Verify stats section
+- assertVisible:
+    id: "profile_stats"
+
+# Scroll to see more sections
+- scroll:
+    direction: "DOWN"
+
+# Verify key sections exist
+- assertVisible: "Favorite Teams"
+- assertVisible: "My Lists"
+
+# Scroll more to see recent logs
+- scroll:
+    direction: "DOWN"
+- assertVisible: "Recent Logs"

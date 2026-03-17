@@ -31,7 +31,7 @@ export default function SelectedTeamsBar({
   onPickOpponent,
 }: SelectedTeamsBarProps) {
   return (
-    <View className="flex-row items-center px-4 py-2 gap-2 flex-wrap">
+    <View testID="selected_teams_bar" className="flex-row items-center px-4 py-2 gap-2 flex-wrap">
       <TeamChip team={team1} onClear={onClearTeam1} />
       {team2 ? (
         <>

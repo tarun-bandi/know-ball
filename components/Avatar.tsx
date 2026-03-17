@@ -6,6 +6,7 @@ interface AvatarProps {
   url?: string | null;
   name: string;
   size: number;
+  testID?: string;
 }
 
 function getInitials(name: string): string {
@@ -24,12 +25,13 @@ function hashColor(name: string): string {
   return COLORS[Math.abs(hash) % COLORS.length];
 }
 
-export default function Avatar({ url, name, size }: AvatarProps) {
+export default function Avatar({ url, name, size, testID }: AvatarProps) {
   const [failed, setFailed] = useState(false);
 
   if (url && !failed) {
     return (
       <Image
+        testID={testID}
         source={{ uri: url }}
         style={{ width: size, height: size, borderRadius: size / 2 }}
         onError={() => setFailed(true)}
@@ -44,6 +46,7 @@ export default function Avatar({ url, name, size }: AvatarProps) {
 
   return (
     <View
+      testID={testID}
       style={{
         width: size,
         height: size,

@@ -1,0 +1,50 @@
+appId: ${APP_ID}
+---
+# Smoke test: verify app launches and core navigation works
+# Assumes user is already logged in (not cleared state)
+
+- launchApp
+
+# Wait for either login screen or feed to appear
+- waitForAnimationToEnd
+
+# If we're on the login screen, sign in first
+- runFlow:
+    when:
+      visible:
+        id: "auth_email_input"
+    file: auth-login.yaml
+
+# Verify tab bar is present
+- assertVisible:
+    id: "tab_feed"
+    timeout: 8000
+- assertVisible:
+    id: "tab_discover"
+- assertVisible:
+    id: "tab_search"
+- assertVisible:
+    id: "tab_profile"
+
+# Navigate through each tab
+- tapOn:
+    id: "tab_discover"
+- waitForAnimationToEnd
+- assertVisible: "Most Logged This Week"
+
+- tapOn:
+    id: "tab_search"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "search_input"
+
+- tapOn:
+    id: "tab_profile"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "profile_avatar"
+
+# Return to feed
+- tapOn:
+    id: "tab_feed"
+- waitForAnimationToEnd

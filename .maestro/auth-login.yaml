@@ -1,0 +1,31 @@
+appId: ${APP_ID}
+---
+# Login flow: enter credentials and verify feed loads
+
+- launchApp:
+    clearState: true
+
+- waitForAnimationToEnd
+
+# Wait for login screen
+- assertVisible:
+    id: "auth_email_input"
+    timeout: 5000
+
+# Enter credentials
+- tapOn:
+    id: "auth_email_input"
+- inputText: ${TEST_EMAIL}
+
+- tapOn:
+    id: "auth_password_input"
+- inputText: ${TEST_PASSWORD}
+
+# Submit
+- tapOn:
+    id: "auth_login_submit"
+
+# Verify we land on the feed
+- assertVisible:
+    id: "tab_feed"
+    timeout: 8000

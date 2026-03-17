@@ -13,7 +13,10 @@
     "backfill:pbp:nba": "python scripts/backfill_nba_playbyplay.py",
     "backfill:pbp:nfl": "python scripts/backfill_nba_playbyplay.py --sport nfl",
     "scrape:boxscores": "python scripts/scrape_box_scores.py",
-    "scrape:players": "python scripts/scrape_players.py"
+    "scrape:players": "python scripts/scrape_players.py",
+    "e2e": "maestro test -e APP_ID=com.tarunbandi.nbaletterbox .maestro/",
+    "e2e:smoke": "maestro test -e APP_ID=com.tarunbandi.nbaletterbox .maestro/smoke-test.yaml",
+    "e2e:auth": "maestro test -e APP_ID=com.tarunbandi.nbaletterbox .maestro/auth-login.yaml"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

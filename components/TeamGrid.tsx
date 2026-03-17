@@ -90,7 +90,7 @@ export default function TeamGrid({ query, onSelectTeam, excludeTeamId }: TeamGri
   );
 
   return (
-    <View className="flex-1">
+    <View testID="team_grid" className="flex-1">
       {/* Sport tabs */}
       <View className="flex-row px-4 mb-2 gap-2">
         {SPORT_TABS.map((tab) => (

@@ -185,12 +185,13 @@ export default function ProfileScreen() {
         <View className="flex-row justify-between items-start">
           <View className="flex-row items-center gap-3 flex-1">
             <Avatar
+              testID="profile_avatar"
               url={profile.avatar_url}
               name={profile.display_name}
               size={64}
             />
             <View className="flex-1">
-              <Text className="text-white text-2xl font-bold">
+              <Text testID="profile_display_name" className="text-white text-2xl font-bold">
                 {profile.display_name}
               </Text>
               <Text className="text-muted mt-0.5">@{profile.handle}</Text>
@@ -229,7 +230,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Stats */}
-        <View className="flex-row mt-4 gap-6">
+        <View testID="profile_stats" className="flex-row mt-4 gap-6">
           <View>
             <Text className="text-accent text-xl font-bold">{stats.count}</Text>
             <Text className="text-muted text-xs mt-0.5">Games</Text>

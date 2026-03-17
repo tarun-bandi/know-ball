@@ -1,0 +1,43 @@
+appId: ${APP_ID}
+---
+# Full tab navigation test: verify all tabs load correctly
+
+- launchApp
+
+- assertVisible:
+    id: "tab_feed"
+    timeout: 8000
+
+# Feed tab
+- tapOn:
+    id: "tab_feed"
+- waitForAnimationToEnd
+
+# Discover tab
+- tapOn:
+    id: "tab_discover"
+- waitForAnimationToEnd
+- assertVisible: "Most Logged This Week"
+
+# Search tab
+- tapOn:
+    id: "tab_search"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "search_input"
+
+# Profile tab
+- tapOn:
+    id: "tab_profile"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "profile_avatar"
+
+# Notifications
+- tapOn:
+    id: "tab_feed"
+- waitForAnimationToEnd
+- tapOn:
+    id: "notifications_bell"
+- waitForAnimationToEnd
+- back

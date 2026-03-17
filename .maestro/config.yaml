@@ -1,0 +1,5 @@
+# Maestro E2E Test Configuration
+# Usage: maestro test -e APP_ID=com.tarunbandi.nbaletterbox .maestro/
+
+# Default app ID (override with -e APP_ID=...)
+appId: ${APP_ID}
