@@ -17,10 +17,15 @@ interface EspnPlay {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { gameId } = req.query;
+  const gameId =
+    typeof req.query.providerGameId === 'string'
+      ? req.query.providerGameId
+      : typeof req.query.gameId === 'string'
+        ? req.query.gameId
+        : null;
 
-  if (!gameId || typeof gameId !== 'string') {
-    return res.status(400).json({ error: 'Missing required query param: gameId' });
+  if (!gameId) {
+    return res.status(400).json({ error: 'Missing required query param: providerGameId or gameId' });
   }
 
   try {

@@ -725,10 +725,9 @@ function getHighlightsUrl(game: GameWithTeams): string {
 
 function PlayByPlaySection({ game }: { game: GameWithTeams }) {
   const sport: Sport = game.sport ?? 'nba';
-  const gameDate = game.game_date_utc?.slice(0, 10);
   const { data, isLoading, error } = usePlayByPlay(
-    game.home_team.abbreviation,
-    gameDate,
+    game.id,
+    game.provider_game_id,
     game.status,
     sport,
   );

@@ -1,102 +1,162 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
+import { parseEspnPlayByPlayActions } from '../../lib/espnPlayByPlay';
+import { resolveEspnNbaEventId } from '../../lib/espnGameResolver';
 
-const SCOREBOARD_URL =
-  'https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json';
-const PBP_URL_PREFIX =
-  'https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_';
+const ESPN_NBA_SUMMARY = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary';
 
-interface NbaAction {
-  actionNumber: number;
-  clock: string;
-  period: number;
-  teamTricode: string;
-  playerNameI: string;
-  description: string;
-  actionType: string;
-  scoreHome: string;
-  scoreAway: string;
-  isFieldGoal: number;
-  shotResult?: string;
+interface GameMeta {
+  provider: string;
+  provider_game_id: number;
+  game_date_utc: string;
+  home_team: { abbreviation: string } | null;
+  away_team: { abbreviation: string } | null;
 }
 
-function parseClock(iso: string): string {
-  // "PT05M30.00S" → "5:30"
-  const match = iso.match(/PT(\d+)M([\d.]+)S/);
-  if (!match) return iso;
-  const min = parseInt(match[1], 10);
-  const sec = Math.floor(parseFloat(match[2]));
-  return `${min}:${sec.toString().padStart(2, '0')}`;
+function parseIntParam(value: string | null | undefined): number | null {
+  if (!value) return null;
+  const parsed = parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { homeTeam, date } = req.query;
+  const internalGameId = typeof req.query.gameId === 'string' ? req.query.gameId : null;
+  const providerGameIdFromQuery = parseIntParam(
+    typeof req.query.providerGameId === 'string' ? req.query.providerGameId : null,
+  );
+  const gameStatus = typeof req.query.status === 'string' ? req.query.status : null;
+  const isLive = gameStatus === 'live';
 
-  if (!homeTeam || !date || typeof homeTeam !== 'string' || typeof date !== 'string') {
-    return res.status(400).json({ error: 'Missing required query params: homeTeam, date' });
+  if (!internalGameId && !providerGameIdFromQuery) {
+    return res.status(400).json({ error: 'Missing required query param: gameId or providerGameId' });
   }
 
+  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabase =
+    supabaseUrl && serviceRoleKey ? createClient(supabaseUrl, serviceRoleKey) : null;
+
+  let resolvedGameId: string | null = internalGameId;
+  let resolvedProviderGameId: number | null = internalGameId ? null : providerGameIdFromQuery;
+  let gameMeta: GameMeta | null = null;
+
   try {
-    // 1. Fetch NBA.com scoreboard to find the game ID
-    const scoreboardRes = await fetch(SCOREBOARD_URL, {
+    if (supabase) {
+      if (resolvedGameId) {
+        const { data } = await supabase
+          .from('games')
+          .select(`
+            provider,
+            provider_game_id,
+            game_date_utc,
+            home_team:teams!games_home_team_id_fkey (abbreviation),
+            away_team:teams!games_away_team_id_fkey (abbreviation)
+          `)
+          .eq('id', resolvedGameId)
+          .eq('sport', 'nba')
+          .maybeSingle();
+
+        gameMeta = (data as unknown as GameMeta | null) ?? null;
+      } else if (providerGameIdFromQuery) {
+        const { data } = await supabase
+          .from('games')
+          .select('id')
+          .eq('provider', 'espn')
+          .eq('provider_game_id', providerGameIdFromQuery)
+          .eq('sport', 'nba')
+          .maybeSingle();
+
+        resolvedGameId = data?.id ?? null;
+        resolvedProviderGameId = providerGameIdFromQuery;
+      }
+
+      if (!isLive) {
+        let cacheQuery = supabase
+          .from('game_play_by_play')
+          .select('actions, provider_game_id')
+          .eq('sport', 'nba')
+          .limit(1);
+
+        if (resolvedGameId) {
+          cacheQuery = cacheQuery.eq('game_id', resolvedGameId);
+        } else if (resolvedProviderGameId) {
+          cacheQuery = cacheQuery.eq('provider_game_id', resolvedProviderGameId);
+        }
+
+        const { data: cachedRow } = await cacheQuery.maybeSingle();
+        if (cachedRow) {
+          const cachedActions = Array.isArray(cachedRow.actions) ? cachedRow.actions : [];
+          res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=3600');
+          return res.status(200).json({
+            gameId: String(cachedRow?.provider_game_id ?? resolvedProviderGameId ?? ''),
+            actions: cachedActions,
+            source: 'cache',
+          });
+        }
+      }
+
+      if (!resolvedProviderGameId && gameMeta) {
+        if (gameMeta.provider === 'espn') {
+          resolvedProviderGameId = gameMeta.provider_game_id;
+        } else {
+          const homeAbbr = gameMeta.home_team?.abbreviation;
+          const awayAbbr = gameMeta.away_team?.abbreviation;
+          if (homeAbbr && awayAbbr) {
+            resolvedProviderGameId = await resolveEspnNbaEventId(
+              gameMeta.game_date_utc,
+              homeAbbr,
+              awayAbbr,
+            );
+          }
+        }
+      }
+    } else if (!resolvedProviderGameId) {
+      resolvedProviderGameId = providerGameIdFromQuery;
+    }
+
+    if (!resolvedProviderGameId) {
+      return res.status(404).json({ error: 'Could not resolve ESPN event id for this game' });
+    }
+
+    const summaryRes = await fetch(`${ESPN_NBA_SUMMARY}?event=${resolvedProviderGameId}`, {
       headers: { 'User-Agent': 'know-ball/1.0' },
     });
 
-    if (!scoreboardRes.ok) {
-      return res.status(502).json({ error: `NBA scoreboard returned ${scoreboardRes.status}` });
+    if (!summaryRes.ok) {
+      return res.status(502).json({ error: `ESPN summary returned ${summaryRes.status}` });
     }
 
-    const scoreboard = await scoreboardRes.json();
-    const games = scoreboard?.scoreboard?.games ?? [];
+    const summaryJson = await summaryRes.json();
+    const actions = parseEspnPlayByPlayActions(summaryJson);
 
-    // Match by home team tricode and date (gameCode starts with "YYYYMMDD/")
-    const target = homeTeam.toUpperCase();
-    const dateCompact = date.replace(/-/g, '');
+    if (supabase && resolvedGameId) {
+      await supabase
+        .from('game_play_by_play')
+        .upsert(
+          {
+            game_id: resolvedGameId,
+            provider: 'espn',
+            provider_game_id: resolvedProviderGameId,
+            sport: 'nba',
+            actions,
+            action_count: actions.length,
+            fetched_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'game_id' },
+        );
+    }
 
-    const matched = games.find(
-      (g: any) =>
-        g.homeTeam?.teamTricode === target &&
-        g.gameCode?.startsWith(dateCompact + '/'),
+    res.setHeader(
+      'Cache-Control',
+      isLive ? 's-maxage=20, stale-while-revalidate=30' : 's-maxage=300, stale-while-revalidate=3600',
     );
-
-    if (!matched) {
-      return res.status(404).json({
-        error: 'Game not found on NBA.com scoreboard',
-        hint: 'Play-by-play is only available for today\'s games',
-      });
-    }
-
-    const nbaGameId: string = matched.gameId;
-
-    // 2. Fetch play-by-play
-    const pbpRes = await fetch(`${PBP_URL_PREFIX}${nbaGameId}.json`, {
-      headers: { 'User-Agent': 'know-ball/1.0' },
+    return res.status(200).json({
+      gameId: String(resolvedProviderGameId),
+      actions,
+      source: 'espn',
     });
-
-    if (!pbpRes.ok) {
-      return res.status(502).json({ error: `NBA play-by-play returned ${pbpRes.status}` });
-    }
-
-    const pbpData = await pbpRes.json();
-    const rawActions: NbaAction[] = pbpData?.game?.actions ?? [];
-
-    // 3. Simplify actions
-    const actions = rawActions.map((a) => ({
-      actionNumber: a.actionNumber,
-      clock: parseClock(a.clock),
-      period: a.period,
-      teamTricode: a.teamTricode || '',
-      playerName: a.playerNameI || '',
-      description: a.description,
-      actionType: a.actionType,
-      scoreHome: a.scoreHome,
-      scoreAway: a.scoreAway,
-      isFieldGoal: !!a.isFieldGoal,
-      shotResult: a.shotResult,
-    }));
-
-    res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
-    return res.status(200).json({ gameId: nbaGameId, actions });
-  } catch (err) {
+  } catch {
     return res.status(500).json({ error: 'Failed to fetch play-by-play data' });
   }
 }

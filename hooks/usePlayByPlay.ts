@@ -18,16 +18,21 @@ export interface PlayByPlayAction {
 interface PlayByPlayResponse {
   gameId: string;
   actions: PlayByPlayAction[];
+  source?: 'cache' | 'espn';
 }
 
 async function fetchPlayByPlay(
   sport: Sport,
-  homeTeam: string,
-  date: string,
+  gameId: string,
+  providerGameId: number,
+  status: string,
 ): Promise<PlayByPlayResponse> {
-  const res = await fetch(
-    `/api/playbyplay/${sport}?homeTeam=${encodeURIComponent(homeTeam)}&date=${encodeURIComponent(date)}`,
-  );
+  const params = new URLSearchParams({
+    gameId,
+    providerGameId: String(providerGameId),
+    status,
+  });
+  const res = await fetch(`/api/playbyplay/${sport}?${params.toString()}`);
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error ?? `Play-by-play fetch failed (${res.status})`);
@@ -36,17 +41,17 @@ async function fetchPlayByPlay(
 }
 
 export function usePlayByPlay(
-  homeTeamAbbr: string | undefined,
-  gameDate: string | undefined,
+  gameId: string | undefined,
+  providerGameId: number | undefined,
   gameStatus: string | undefined,
   sport: Sport = 'nba',
 ) {
   const isActiveGame = gameStatus === 'live' || gameStatus === 'final';
 
   return useQuery({
-    queryKey: ['play-by-play', sport, homeTeamAbbr, gameDate],
-    queryFn: () => fetchPlayByPlay(sport, homeTeamAbbr!, gameDate!),
-    enabled: !!homeTeamAbbr && !!gameDate && isActiveGame,
+    queryKey: ['play-by-play', sport, gameId, providerGameId, gameStatus],
+    queryFn: () => fetchPlayByPlay(sport, gameId!, providerGameId!, gameStatus!),
+    enabled: !!gameId && !!providerGameId && isActiveGame,
     refetchInterval: gameStatus === 'live' ? 60_000 : false,
     staleTime: gameStatus === 'live' ? 0 : 5 * 60 * 1000,
   });

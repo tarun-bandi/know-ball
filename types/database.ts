@@ -469,6 +469,37 @@ export interface Database {
         };
         Update: Record<string, never>;
       };
+      game_play_by_play: {
+        Row: {
+          game_id: string;
+          provider: string;
+          provider_game_id: number;
+          sport: Sport;
+          actions: Json;
+          action_count: number;
+          fetched_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          game_id: string;
+          provider?: string;
+          provider_game_id: number;
+          sport?: Sport;
+          actions?: Json;
+          action_count?: number;
+          fetched_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          provider?: string;
+          provider_game_id?: number;
+          sport?: Sport;
+          actions?: Json;
+          action_count?: number;
+          fetched_at?: string;
+          updated_at?: string;
+        };
+      };
       box_scores: {
         Row: {
           id: string;
@@ -620,6 +651,7 @@ export type Comment = Database['public']['Tables']['comments']['Row'];
 export type List = Database['public']['Tables']['lists']['Row'];
 export type ListItem = Database['public']['Tables']['list_items']['Row'];
 export type BoxScore = Database['public']['Tables']['box_scores']['Row'];
+export type GamePlayByPlay = Database['public']['Tables']['game_play_by_play']['Row'];
 export type Watchlist = Database['public']['Tables']['watchlist']['Row'];
 export type FavoritePlayer = Database['public']['Tables']['user_favorite_players']['Row'];
 // Joined types used in UI

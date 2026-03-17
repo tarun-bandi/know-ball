@@ -9,6 +9,9 @@
     "web": "expo start --web",
     "seed": "npx ts-node --project tsconfig.scripts.json scripts/seed.ts",
     "seed:games": "npx ts-node --project tsconfig.scripts.json scripts/seed.ts --games-only",
+    "backfill:pbp": "python scripts/backfill_nba_playbyplay.py",
+    "backfill:pbp:nba": "python scripts/backfill_nba_playbyplay.py",
+    "backfill:pbp:nfl": "python scripts/backfill_nba_playbyplay.py --sport nfl",
     "scrape:boxscores": "python scripts/scrape_box_scores.py",
     "scrape:players": "python scripts/scrape_players.py"
   },
