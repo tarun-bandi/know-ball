@@ -155,11 +155,15 @@ export default function FeedScreen() {
         data={allLogs}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <GameCard log={item} showUser />}
-        ListHeaderComponent={<TodaysGames />}
+        ListHeaderComponent={
+          <View style={{ marginBottom: 8 }}>
+            <TodaysGames />
+          </View>
+        }
         contentContainerStyle={
           allLogs.length === 0
             ? { flex: 1, justifyContent: 'center', alignItems: 'center' }
-            : { paddingVertical: 8, paddingHorizontal: 16 }
+            : { paddingTop: 4, paddingBottom: 24, paddingHorizontal: 16 }
         }
         ListEmptyComponent={
           <View className="px-6 items-center">

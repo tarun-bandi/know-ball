@@ -63,7 +63,7 @@ function BrandedLoader() {
 
 export function GameCardSkeleton() {
   return (
-    <View className="bg-surface border border-border rounded-2xl p-4 mb-3">
+    <View className="bg-surface border border-border rounded-2xl p-4 mb-4">
       {/* Matchup row */}
       <View className="flex-row items-center justify-center gap-2">
         <Skeleton width={24} height={24} borderRadius={12} />
@@ -84,7 +84,7 @@ export function GameCardSkeleton() {
       <Skeleton width="100%" height={12} borderRadius={4} className="mt-3" />
       <Skeleton width="65%" height={12} borderRadius={4} className="mt-2" />
       {/* Action bar */}
-      <View className="flex-row items-center justify-end gap-5 mt-4 pt-3 border-t border-border">
+      <View className="flex-row items-center justify-end gap-5 mt-5 pt-3 border-t border-border">
         <Skeleton width={20} height={20} borderRadius={4} />
         <Skeleton width={20} height={20} borderRadius={4} />
         <Skeleton width={20} height={20} borderRadius={4} />

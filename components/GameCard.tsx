@@ -493,7 +493,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
         )}
 
         {/* Team-tinted divider */}
-        <View className="mb-2" style={{ position: 'relative' }}>
+        <View className="mb-3" style={{ position: 'relative' }}>
           <View className="flex-row h-[1.5px] overflow-hidden rounded-full">
             <View style={{ flex: 1, backgroundColor: withAlpha(awayAccent, 0.5) }} />
             <View style={{ flex: 1, backgroundColor: withAlpha(homeAccent, 0.5) }} />
@@ -504,7 +504,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
         {showUser && log.user_profile && (
           <TouchableOpacity
             onPress={() => router.push(`/user/${log.user_profile!.handle}`)}
-            className="flex-row items-center gap-2 mb-2"
+            className="flex-row items-center gap-2 mb-3"
           >
             <View
               style={{
@@ -613,7 +613,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
         )}
 
         {/* Actions: share + comments + reactions */}
-        <View className="flex-row items-center justify-end gap-4 mt-3 pt-2 border-t border-border">
+        <View className="flex-row items-center justify-end gap-4 mt-4 pt-3 border-t border-border">
           <Animated.View style={shareButtonAnimStyle}>
             <TouchableOpacity
               className="flex-row items-center gap-1.5"
@@ -701,7 +701,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
     return (
       <div style={tiltStyle as any} {...tiltHandlers}>
         <Pressable
-          className="bg-surface rounded-2xl p-4 mb-3"
+          className="bg-surface rounded-2xl p-4 mb-4"
           style={({ pressed, hovered }: any) => {
             const scale = pressed ? 0.988 : 1;
             const borderColor = pressed
@@ -753,7 +753,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
   return (
     <GestureDetector gesture={composed}>
       <Animated.View
-        className="bg-surface border border-border rounded-2xl p-4 mb-3"
+        className="bg-surface border border-border rounded-2xl p-4 mb-4"
         style={{ position: 'relative', overflow: 'hidden' }}
       >
         {cardContent}

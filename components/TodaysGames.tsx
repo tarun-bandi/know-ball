@@ -298,8 +298,8 @@ export default function TodaysGames() {
           }}
         />
 
-        <View className="pt-3 pb-2">
-          <View className="flex-row justify-between items-center px-4 mb-2">
+        <View className="pt-3.5 pb-3">
+          <View className="flex-row justify-between items-center px-4 mb-3">
             <View className="flex-row items-center gap-2">
               <Text
                 style={{
