@@ -264,7 +264,7 @@ export default function DiscoverScreen() {
     >
       <PageContainer>
       {/* Find Friends */}
-      <View className="px-4 pt-4">
+      <View className="px-4 pt-5">
         <TouchableOpacity
           className="bg-accent/10 border border-accent/30 rounded-xl p-4 flex-row items-center gap-3"
           onPress={() => setShowFindFriends(true)}
@@ -280,7 +280,7 @@ export default function DiscoverScreen() {
 
       {/* People to Follow */}
       {showSuggestions && (
-        <View className="px-4 pt-4">
+        <View className="px-4 pt-5">
           <Text className="text-white text-lg font-bold mb-3">
             People to Follow
           </Text>
@@ -346,7 +346,7 @@ export default function DiscoverScreen() {
       )}
 
       {/* Most Logged This Week */}
-      <View className="px-4 pt-4">
+      <View className="px-4 pt-6">
         <Text className="text-white text-lg font-bold mb-3">
           Most Logged This Week
         </Text>
@@ -390,7 +390,7 @@ export default function DiscoverScreen() {
       </View>
 
       {/* Popular Reviewers */}
-      <View className="px-4 pt-4 pb-8">
+      <View className="px-4 pt-5 pb-8">
         <Text className="text-white text-lg font-bold mb-3">
           Active Reviewers
         </Text>

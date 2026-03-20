@@ -223,12 +223,12 @@ export default function StatsScreen() {
     >
       <PageContainer>
       {/* Quick Stats Grid */}
-      <View className="px-4 pt-4">
+      <View className="px-4 pt-5">
         <View className="flex-row gap-3 mb-3">
           <StatCard label="Total Games" value={String(data.totalGames)} />
           <StatCard label="Most Active" value={data.mostActiveMonth ?? '—'} />
         </View>
-        <View className="flex-row gap-3 mb-4">
+        <View className="flex-row gap-3 mb-3">
           <StatCard
             label="Watch Mode"
             value={
@@ -242,7 +242,7 @@ export default function StatsScreen() {
 
       {/* Prediction Accuracy */}
       {data.predictionAccuracy && (
-        <View className="px-4 mb-4">
+        <View className="px-4 pt-1 mb-3">
           <View className="flex-row gap-3">
             <View className="flex-1 bg-surface border border-border rounded-xl p-4 items-center">
               <Text className="text-accent text-2xl font-bold">
@@ -258,7 +258,7 @@ export default function StatsScreen() {
       )}
 
       {/* Logging Streak & Teams Coverage */}
-      <View className="px-4 flex-row gap-3 mb-4">
+      <View className="px-4 flex-row gap-3 mb-3">
         <View className="flex-1 bg-surface border border-border rounded-xl p-4">
           <Text className="text-accent text-3xl font-bold text-center">
             {data.loggingStreak}
@@ -285,7 +285,7 @@ export default function StatsScreen() {
       </View>
 
       {/* Games by Month */}
-      <View className="px-4 mb-4">
+      <View className="px-4 pt-3 mb-5">
         <Text className="text-white font-semibold text-base mb-3">
           Games by Month
         </Text>
@@ -295,7 +295,7 @@ export default function StatsScreen() {
       </View>
 
       {/* Most Watched Teams */}
-      <View className="px-4 mb-8">
+      <View className="px-4 pb-8">
         <Text className="text-white font-semibold text-base mb-3">
           Most Watched Teams
         </Text>
