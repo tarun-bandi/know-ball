@@ -46,14 +46,14 @@ function LivePulseDot() {
       Animated.sequence([
         Animated.parallel([
           Animated.timing(scale, {
-            toValue: 1.35,
-            duration: 650,
+            toValue: 1.2,
+            duration: 700,
             easing: Easing.out(Easing.quad),
             useNativeDriver: true,
           }),
           Animated.timing(opacity, {
-            toValue: 0.35,
-            duration: 650,
+            toValue: 0.45,
+            duration: 700,
             easing: Easing.out(Easing.quad),
             useNativeDriver: true,
           }),
@@ -108,12 +108,12 @@ function TeamLogoWithGlow({
           width: 18,
           height: 18,
           borderRadius: 999,
-          backgroundColor: withAlpha(accent, 0.34),
+          backgroundColor: withAlpha(accent, 0.15),
           shadowColor: accent,
-          shadowOpacity: 0.45,
-          shadowRadius: 6,
+          shadowOpacity: 0.18,
+          shadowRadius: 3,
           shadowOffset: { width: 0, height: 0 },
-          elevation: 4,
+          elevation: 2,
         }}
       />
       <TeamLogo
@@ -234,7 +234,7 @@ export default function TodaysGames() {
           <View
             style={{
               flex: 1,
-              backgroundColor: withAlpha('#132548', 0.44),
+              backgroundColor: withAlpha('#132548', 0.25),
             }}
           />
           {/* Animated shimmer overlay (web only) */}
@@ -244,7 +244,7 @@ export default function TodaysGames() {
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: `linear-gradient(105deg, transparent 30%, ${withAlpha('#c9a84c', 0.06)} 50%, transparent 70%)`,
+                background: `linear-gradient(105deg, transparent 30%, ${withAlpha('#c9a84c', 0.03)} 50%, transparent 70%)`,
               } as any}
             />
           )}
@@ -267,10 +267,10 @@ export default function TodaysGames() {
             position: 'absolute',
             top: -72,
             right: -52,
-            width: 180,
-            height: 180,
+            width: 160,
+            height: 160,
             borderRadius: 999,
-            backgroundColor: withAlpha('#1D428A', 0.18),
+            backgroundColor: withAlpha('#1D428A', 0.08),
           }}
         />
         <View
@@ -279,10 +279,10 @@ export default function TodaysGames() {
             position: 'absolute',
             bottom: -40,
             left: -30,
-            width: 120,
-            height: 120,
+            width: 100,
+            height: 100,
             borderRadius: 999,
-            backgroundColor: withAlpha('#c9a84c', 0.06),
+            backgroundColor: withAlpha('#c9a84c', 0.03),
           }}
         />
         {/* Top edge highlight */}
@@ -294,7 +294,7 @@ export default function TodaysGames() {
             left: 24,
             right: 24,
             height: 1,
-            backgroundColor: withAlpha('#c9a84c', 0.15),
+            backgroundColor: withAlpha('#c9a84c', 0.08),
           }}
         />
 
@@ -304,28 +304,28 @@ export default function TodaysGames() {
               <Text
                 style={{
                   color: '#ffffff',
-                  fontSize: 17,
-                  fontWeight: '700',
-                  letterSpacing: -0.3,
+                  fontSize: 16,
+                  fontWeight: '600',
+                  letterSpacing: -0.2,
                 }}
               >
                 Today's Games
               </Text>
               <View
                 style={{
-                  backgroundColor: withAlpha('#c9a84c', 0.15),
+                  backgroundColor: withAlpha('#c9a84c', 0.1),
                   borderRadius: 10,
                   paddingHorizontal: 7,
                   paddingVertical: 2,
                   borderWidth: 1,
-                  borderColor: withAlpha('#c9a84c', 0.25),
+                  borderColor: withAlpha('#c9a84c', 0.15),
                 }}
               >
                 <Text
                   style={{
                     color: '#c9a84c',
                     fontSize: 11,
-                    fontWeight: '700',
+                    fontWeight: '600',
                   }}
                 >
                   {gameCount}
@@ -382,10 +382,10 @@ export default function TodaysGames() {
                   style={({ pressed, hovered }: any) => {
                     const scale = pressed ? 0.975 : hovered ? 1.015 : 1;
                     const borderTint = pressed
-                      ? withAlpha(cardAccent, 0.55)
+                      ? withAlpha(cardAccent, 0.35)
                       : hovered
-                        ? withAlpha(cardAccent, 0.38)
-                        : withAlpha('#ffffff', 0.14);
+                        ? withAlpha(cardAccent, 0.22)
+                        : withAlpha('#ffffff', 0.1);
 
                     return [
                       {
@@ -403,21 +403,21 @@ export default function TodaysGames() {
                           backdropFilter: 'blur(10px)',
                           WebkitBackdropFilter: 'blur(10px)',
                           boxShadow: pressed
-                            ? `0 8px 18px ${withAlpha('#000000', 0.45)}, 0 0 0 1px ${withAlpha(cardAccent, 0.2)}`
+                            ? `0 6px 14px ${withAlpha('#000000', 0.3)}, 0 0 0 1px ${withAlpha(cardAccent, 0.1)}`
                             : hovered
-                              ? `0 14px 30px ${withAlpha('#000000', 0.5)}, 0 0 0 1px ${withAlpha(cardAccent, 0.28)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.14)}`
-                              : `0 10px 24px ${withAlpha('#000000', 0.42)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.1)}`,
+                              ? `0 10px 22px ${withAlpha('#000000', 0.35)}, 0 0 0 1px ${withAlpha(cardAccent, 0.16)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.08)}`
+                              : `0 6px 16px ${withAlpha('#000000', 0.28)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.06)}`,
                         } as any)
                         : Platform.OS === 'ios'
                           ? {
                             shadowColor: '#000000',
-                            shadowOffset: { width: 0, height: pressed ? 7 : 10 },
-                            shadowOpacity: pressed ? 0.28 : 0.36,
-                            shadowRadius: pressed ? 10 : 14,
-                            elevation: pressed ? 5 : 8,
+                            shadowOffset: { width: 0, height: pressed ? 4 : 6 },
+                            shadowOpacity: pressed ? 0.18 : 0.24,
+                            shadowRadius: pressed ? 6 : 10,
+                            elevation: pressed ? 3 : 5,
                           }
                           : {
-                            elevation: pressed ? 6 : 9,
+                            elevation: pressed ? 4 : 6,
                           },
                       isFav
                         ? {
@@ -434,10 +434,10 @@ export default function TodaysGames() {
                       position: 'absolute',
                       top: -24,
                       left: -18,
-                      width: 84,
-                      height: 84,
+                      width: 72,
+                      height: 72,
                       borderRadius: 999,
-                      backgroundColor: withAlpha(awayAccent, 0.2),
+                      backgroundColor: withAlpha(awayAccent, 0.08),
                     }}
                   />
                   <View
@@ -446,10 +446,10 @@ export default function TodaysGames() {
                       position: 'absolute',
                       bottom: -28,
                       right: -18,
-                      width: 88,
-                      height: 88,
+                      width: 76,
+                      height: 76,
                       borderRadius: 999,
-                      backgroundColor: withAlpha(homeAccent, 0.18),
+                      backgroundColor: withAlpha(homeAccent, 0.07),
                     }}
                   />
 
@@ -479,8 +479,8 @@ export default function TodaysGames() {
                   </View>
 
                   <View className="flex-row h-px mb-2 overflow-hidden rounded-full">
-                    <View style={{ flex: 1, backgroundColor: withAlpha(awayAccent, 0.38) }} />
-                    <View style={{ flex: 1, backgroundColor: withAlpha(homeAccent, 0.38) }} />
+                    <View style={{ flex: 1, backgroundColor: withAlpha(awayAccent, 0.2) }} />
+                    <View style={{ flex: 1, backgroundColor: withAlpha(homeAccent, 0.2) }} />
                   </View>
 
                   <View className="flex-row items-center justify-between mb-1.5">

@@ -135,24 +135,24 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
   const reactionButtonAnimStyle = useAnimatedStyle(() => ({
     transform: [{ scale: reactionButtonScale.value }],
     shadowColor: '#c9a84c',
-    shadowOpacity: reactionGlow.value * 0.45,
-    shadowRadius: 10,
+    shadowOpacity: reactionGlow.value * 0.25,
+    shadowRadius: 6,
     shadowOffset: { width: 0, height: 0 },
   }));
 
   const shareButtonAnimStyle = useAnimatedStyle(() => ({
     transform: [{ scale: shareScale.value }],
     shadowColor: '#5fa3ff',
-    shadowOpacity: shareGlow.value * 0.45,
-    shadowRadius: 8,
+    shadowOpacity: shareGlow.value * 0.25,
+    shadowRadius: 5,
     shadowOffset: { width: 0, height: 0 },
   }));
 
   const commentButtonAnimStyle = useAnimatedStyle(() => ({
     transform: [{ scale: commentScale.value }],
     shadowColor: '#7fd0ff',
-    shadowOpacity: commentGlow.value * 0.42,
-    shadowRadius: 8,
+    shadowOpacity: commentGlow.value * 0.22,
+    shadowRadius: 5,
     shadowOffset: { width: 0, height: 0 },
   }));
 
@@ -247,8 +247,8 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
   const animateIconTap = (scale: typeof shareScale, glow: typeof shareGlow) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     scale.value = withSequence(
-      withSpring(1.18, { damping: 5, stiffness: 360 }),
-      withSpring(1, { damping: 8, stiffness: 240 }),
+      withSpring(1.1, { damping: 12, stiffness: 280 }),
+      withSpring(1, { damping: 14, stiffness: 220 }),
     );
     glow.value = withSequence(
       withTiming(1, { duration: 120 }),
@@ -259,8 +259,8 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
   const handleReaction = useCallback((reactionType: ReactionType) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     reactionButtonScale.value = withSequence(
-      withSpring(1.3, { damping: 4, stiffness: 300 }),
-      withSpring(1, { damping: 8, stiffness: 200 }),
+      withSpring(1.15, { damping: 10, stiffness: 260 }),
+      withSpring(1, { damping: 12, stiffness: 200 }),
     );
     reactionGlow.value = withSequence(
       withTiming(1, { duration: 120 }),
@@ -390,7 +390,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 width: 76,
                 height: 76,
                 borderRadius: 999,
-                backgroundColor: withAlpha(awayAccent, 0.2),
+                backgroundColor: withAlpha(awayAccent, 0.08),
               }}
             />
             <View
@@ -402,7 +402,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 width: 76,
                 height: 76,
                 borderRadius: 999,
-                backgroundColor: withAlpha(homeAccent, 0.2),
+                backgroundColor: withAlpha(homeAccent, 0.08),
               }}
             />
             <View className="flex-row items-center justify-center gap-2">
@@ -411,10 +411,10 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                   borderRadius: 999,
                   padding: 1,
                   shadowColor: awayAccent,
-                  shadowOpacity: 0.45,
-                  shadowRadius: 6,
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
                   shadowOffset: { width: 0, height: 0 },
-                  elevation: 3,
+                  elevation: 2,
                 }}
               >
                 <TeamLogo abbreviation={game.away_team.abbreviation} sport={game.sport ?? 'nba'} size={24} />
@@ -422,9 +422,9 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               <Text
                 className="font-bold text-sm"
                 style={{
-                  color: withAlpha(ensureTextContrast(awayAccent), 0.98),
-                  textShadowColor: withAlpha(awayAccent, 0.35),
-                  textShadowRadius: 6,
+                  color: withAlpha(ensureTextContrast(awayAccent), 0.9),
+                  textShadowColor: withAlpha(awayAccent, 0.15),
+                  textShadowRadius: 4,
                 }}
               >
                 {game.away_team.abbreviation}
@@ -447,9 +447,9 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               <Text
                 className="font-bold text-sm"
                 style={{
-                  color: withAlpha(ensureTextContrast(homeAccent), 0.98),
-                  textShadowColor: withAlpha(homeAccent, 0.35),
-                  textShadowRadius: 6,
+                  color: withAlpha(ensureTextContrast(homeAccent), 0.9),
+                  textShadowColor: withAlpha(homeAccent, 0.15),
+                  textShadowRadius: 4,
                 }}
               >
                 {game.home_team.abbreviation}
@@ -459,10 +459,10 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                   borderRadius: 999,
                   padding: 1,
                   shadowColor: homeAccent,
-                  shadowOpacity: 0.45,
-                  shadowRadius: 6,
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
                   shadowOffset: { width: 0, height: 0 },
-                  elevation: 3,
+                  elevation: 2,
                 }}
               >
                 <TeamLogo abbreviation={game.home_team.abbreviation} sport={game.sport ?? 'nba'} size={24} />
@@ -494,34 +494,10 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
 
         {/* Team-tinted divider */}
         <View className="mb-2" style={{ position: 'relative' }}>
-          <View className="flex-row h-[2px] overflow-hidden rounded-full">
-            <View style={{ flex: 1, backgroundColor: withAlpha(awayAccent, 0.82) }} />
-            <View style={{ flex: 1, backgroundColor: withAlpha(homeAccent, 0.82) }} />
+          <View className="flex-row h-[1.5px] overflow-hidden rounded-full">
+            <View style={{ flex: 1, backgroundColor: withAlpha(awayAccent, 0.5) }} />
+            <View style={{ flex: 1, backgroundColor: withAlpha(homeAccent, 0.5) }} />
           </View>
-          <View
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: -2,
-              width: '50%',
-              height: 6,
-              borderRadius: 999,
-              backgroundColor: withAlpha(awayAccent, 0.26),
-            }}
-          />
-          <View
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: -2,
-              width: '50%',
-              height: 6,
-              borderRadius: 999,
-              backgroundColor: withAlpha(homeAccent, 0.26),
-            }}
-          />
         </View>
 
         {/* User info (feed mode) */}
@@ -537,10 +513,10 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 borderWidth: 1.5,
                 borderColor: avatarRingColor,
                 shadowColor: avatarRingColor,
-                shadowOpacity: 0.4,
-                shadowRadius: 4,
+                shadowOpacity: 0.18,
+                shadowRadius: 3,
                 shadowOffset: { width: 0, height: 0 },
-                elevation: 3,
+                elevation: 2,
               }}
             >
               <Avatar
@@ -729,20 +705,20 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
           style={({ pressed, hovered }: any) => {
             const scale = pressed ? 0.988 : 1;
             const borderColor = pressed
-              ? withAlpha(homeAccent, 0.5)
+              ? withAlpha(homeAccent, 0.3)
               : hovered
-                ? withAlpha(homeAccent, 0.36)
-                : withAlpha('#ffffff', 0.1);
+                ? withAlpha(homeAccent, 0.2)
+                : withAlpha('#ffffff', 0.08);
             const bgTint = hovered ? withAlpha('#1a2233', 0.9) : withAlpha('#1a2233', 0.82);
 
             // Dynamic shadow: shift opposite to tilt direction
             const ox = Math.round(shadowOffset.x);
             const oy = Math.round(shadowOffset.y);
             const shadow = pressed
-              ? `${ox}px ${10 + oy}px 24px ${withAlpha('#000000', 0.45)}, 0 0 0 1px ${withAlpha(homeAccent, 0.22)}, 0 0 24px ${withAlpha(awayAccent, 0.14)}`
+              ? `${ox}px ${8 + oy}px 18px ${withAlpha('#000000', 0.35)}, 0 0 0 1px ${withAlpha(homeAccent, 0.12)}`
               : hovered
-                ? `${ox}px ${20 + oy}px 42px ${withAlpha('#000000', 0.56)}, 0 0 0 1px ${withAlpha(homeAccent, 0.3)}, 0 0 32px ${withAlpha(awayAccent, 0.2)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.14)}`
-                : `0 12px 28px ${withAlpha('#000000', 0.44)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.08)}`;
+                ? `${ox}px ${14 + oy}px 30px ${withAlpha('#000000', 0.4)}, 0 0 0 1px ${withAlpha(homeAccent, 0.18)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.08)}`
+                : `0 8px 20px ${withAlpha('#000000', 0.3)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.06)}`;
 
             return [
               {
