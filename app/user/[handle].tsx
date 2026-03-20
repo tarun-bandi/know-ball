@@ -179,9 +179,9 @@ export default function UserProfileScreen() {
     >
       <PageContainer>
       {/* Header */}
-      <View className="bg-surface border-b border-border px-6 py-6">
+      <View className="bg-surface border-b border-border px-6 pt-6 pb-7">
         <View className="flex-row justify-between items-start">
-          <View className="flex-row items-center gap-3 flex-1">
+          <View className="flex-row items-center gap-4 flex-1">
             <Avatar
               url={profile.avatar_url}
               name={profile.display_name}
@@ -191,11 +191,11 @@ export default function UserProfileScreen() {
               <Text className="text-white text-2xl font-bold">
                 {profile.display_name}
               </Text>
-              <Text className="text-muted mt-0.5">@{profile.handle}</Text>
+              <Text className="text-muted mt-1">@{profile.handle}</Text>
               {profile.bio ? (
-                <Text className="text-white mt-2 text-sm">{profile.bio}</Text>
+                <Text className="text-white mt-2.5 text-sm leading-relaxed">{profile.bio}</Text>
               ) : null}
-              <Text className="text-muted text-xs mt-1">
+              <Text className="text-muted text-xs mt-1.5">
                 Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               </Text>
             </View>
@@ -249,7 +249,7 @@ export default function UserProfileScreen() {
         </View>
 
         {/* Stats */}
-        <View className="flex-row mt-4 gap-6">
+        <View className="flex-row mt-5 gap-6">
           <View>
             <Text className="text-accent text-xl font-bold">{stats.count}</Text>
             <Text className="text-muted text-xs mt-0.5">Games</Text>
@@ -274,7 +274,7 @@ export default function UserProfileScreen() {
       </View>
 
       {/* Logs */}
-      <View className="px-4 pt-4">
+      <View className="px-4 pt-6 pb-8">
         <Text className="text-white font-semibold text-base mb-3">Logs</Text>
         {logs.length === 0 ? (
           <View className="items-center py-8">
