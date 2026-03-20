@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabase';
 import { enrichLogs } from '@/lib/enrichLogs';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useRouter } from 'expo-router';
-import { Plus, Lock, Heart, Bookmark, ChevronRight } from 'lucide-react-native';
+import { Plus, Lock, Bookmark, ChevronRight } from 'lucide-react-native';
 import Avatar from '@/components/Avatar';
 import GameCard from '@/components/GameCard';
 import EditProfileModal from '@/components/EditProfileModal';
@@ -236,11 +236,11 @@ export default function ProfileScreen() {
             <Text className="text-muted text-xs mt-0.5">Games</Text>
           </View>
           <TouchableOpacity onPress={() => setShowFollowList('followers')}>
-            <Text className="text-accent text-xl font-bold">{followerCount}</Text>
+            <Text className="text-white text-xl font-bold">{followerCount}</Text>
             <Text className="text-muted text-xs mt-0.5">Followers</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowFollowList('following')}>
-            <Text className="text-accent text-xl font-bold">{followingCount}</Text>
+            <Text className="text-white text-xl font-bold">{followingCount}</Text>
             <Text className="text-muted text-xs mt-0.5">Following</Text>
           </TouchableOpacity>
           {predictionAccuracy && (
@@ -300,9 +300,7 @@ export default function ProfileScreen() {
           </Text>
           <TouchableOpacity
             onPress={() => setShowFavoriteTeams(true)}
-            className="flex-row items-center gap-1"
           >
-            <Heart size={14} color="#c9a84c" />
             <Text className="text-accent text-sm font-medium">Edit</Text>
           </TouchableOpacity>
         </View>
@@ -341,9 +339,7 @@ export default function ProfileScreen() {
           </Text>
           <TouchableOpacity
             onPress={() => setShowFavoritePlayers(true)}
-            className="flex-row items-center gap-1"
           >
-            <Heart size={14} color="#c9a84c" />
             <Text className="text-accent text-sm font-medium">Edit</Text>
           </TouchableOpacity>
         </View>
@@ -436,7 +432,7 @@ export default function ProfileScreen() {
           activeOpacity={0.7}
         >
           <View className="flex-row items-center gap-3">
-            <Bookmark size={18} color="#c9a84c" />
+            <Bookmark size={18} color="#6b7280" />
             <Text className="text-white font-medium text-base">Watchlist</Text>
           </View>
           <View className="flex-row items-center gap-2">
@@ -448,7 +444,7 @@ export default function ProfileScreen() {
 
       {/* Recent Logs */}
       <View className="px-4 pt-6 pb-8">
-        <Text className="text-white font-semibold text-base mb-3">
+        <Text className="text-accent font-semibold text-base mb-3">
           Recent Logs
         </Text>
         {logs.length === 0 ? (

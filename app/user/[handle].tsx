@@ -255,11 +255,11 @@ export default function UserProfileScreen() {
             <Text className="text-muted text-xs mt-0.5">Games</Text>
           </View>
           <TouchableOpacity onPress={() => setShowFollowList('followers')}>
-            <Text className="text-accent text-xl font-bold">{followerCount}</Text>
+            <Text className="text-white text-xl font-bold">{followerCount}</Text>
             <Text className="text-muted text-xs mt-0.5">Followers</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowFollowList('following')}>
-            <Text className="text-accent text-xl font-bold">{followingCount}</Text>
+            <Text className="text-white text-xl font-bold">{followingCount}</Text>
             <Text className="text-muted text-xs mt-0.5">Following</Text>
           </TouchableOpacity>
           {predictionAccuracy && (
@@ -275,7 +275,7 @@ export default function UserProfileScreen() {
 
       {/* Logs */}
       <View className="px-4 pt-6 pb-8">
-        <Text className="text-white font-semibold text-base mb-3">Logs</Text>
+        <Text className="text-accent font-semibold text-base mb-3">Logs</Text>
         {logs.length === 0 ? (
           <View className="items-center py-8">
             <Text className="text-muted">No games logged yet.</Text>
