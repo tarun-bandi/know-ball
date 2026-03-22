@@ -12,7 +12,7 @@ import {
   Dimensions,
   useWindowDimensions,
 } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { supabase } from '@/lib/supabase';
 import { signInWithGoogle } from '@/lib/googleAuth';
@@ -96,6 +96,7 @@ function ScatteredLogos() {
 }
 
 export default function LoginScreen() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -292,6 +293,17 @@ export default function LoginScreen() {
                 <Text className="text-accent font-semibold">Sign Up</Text>
               </Link>
             </View>
+
+            {/* Play Codenames without signing in */}
+            <TouchableOpacity
+              className="mt-5"
+              onPress={() => router.push('/codenames')}
+              activeOpacity={0.7}
+            >
+              <Text className="text-muted text-sm">
+                Or <Text className="text-accent font-semibold">play NBA Codenames</Text> without an account
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         </PageContainer>
       </View>
