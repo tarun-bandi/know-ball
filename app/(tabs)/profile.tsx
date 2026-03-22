@@ -184,111 +184,106 @@ export default function ProfileScreen() {
       <View style={{ backgroundColor: '#141416', overflow: 'hidden' }}>
         {/* Ambient gold glow behind avatar */}
         <View style={{
-          position: 'absolute', top: -40, left: -20,
-          width: 160, height: 160, borderRadius: 80,
+          position: 'absolute', top: -30, left: -10,
+          width: 140, height: 140, borderRadius: 70,
           backgroundColor: '#d4a843', opacity: 0.04,
         }} />
-        <View className="px-6 pt-6 pb-7">
-          <View className="flex-row justify-between items-start">
-            <View className="flex-row items-center gap-4 flex-1">
-              <View style={{
-                borderRadius: 40, padding: 2,
-                borderWidth: 2, borderColor: 'rgba(212, 168, 67, 0.3)',
-              }}>
-                <Avatar
-                  testID="profile_avatar"
-                  url={profile.avatar_url}
-                  name={profile.display_name}
-                  size={72}
-                />
-              </View>
-              <View className="flex-1">
-                <Text testID="profile_display_name" className="text-white font-bold" style={{ fontSize: 26 }}>
-                  {profile.display_name}
-                </Text>
-                <Text className="text-muted mt-0.5" style={{ fontSize: 14 }}>@{profile.handle}</Text>
-                {profile.bio ? (
-                  <Text className="text-white mt-2.5 text-sm leading-relaxed" style={{ opacity: 0.85 }}>{profile.bio}</Text>
-                ) : null}
-                <Text className="text-muted text-xs mt-1.5">
-                  Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                </Text>
-              </View>
+        <View className="px-5 pt-5 pb-5">
+          {/* Row 1: Avatar + Name + Settings gear */}
+          <View className="flex-row items-center gap-4">
+            <View style={{
+              borderRadius: 44, padding: 2,
+              borderWidth: 2, borderColor: 'rgba(212, 168, 67, 0.3)',
+            }}>
+              <Avatar
+                testID="profile_avatar"
+                url={profile.avatar_url}
+                name={profile.display_name}
+                size={80}
+              />
             </View>
-            <View className="flex-row items-center gap-1">
-              <TouchableOpacity
-                onPress={() => {
-                  const url = userUrl(profile.handle);
-                  const message = `Follow me on Know Ball!\n${url}`;
-                  RNShare.share(Platform.OS === 'ios' ? { message, url } : { message });
-                }}
-                className="p-2"
-              >
-                <Share size={20} color="#7a7d88" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setShowEditProfile(true)}
-                className="p-2"
-              >
-                <Pencil size={20} color="#d4a843" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => router.push('/settings')}
-                className="p-2"
-              >
-                <Settings size={22} color="#7a7d88" />
-              </TouchableOpacity>
+            <View className="flex-1">
+              <Text testID="profile_display_name" className="text-white font-bold" style={{ fontSize: 28, letterSpacing: -0.5 }}>
+                {profile.display_name}
+              </Text>
+              {profile.bio ? (
+                <Text className="text-muted mt-1 text-sm leading-relaxed" numberOfLines={2}>{profile.bio}</Text>
+              ) : null}
             </View>
-          </View>
-
-          {/* Stats — bolder counters */}
-          <View testID="profile_stats" className="flex-row mt-6" style={{ gap: 24 }}>
-            <View className="items-center">
-              <Text className="text-accent font-bold" style={{ fontSize: 24 }}>{stats.count}</Text>
-              <Text className="text-muted font-medium" style={{ fontSize: 11, letterSpacing: 0.5 }}>GAMES</Text>
-            </View>
-            <TouchableOpacity className="items-center" onPress={() => setShowFollowList('followers')}>
-              <Text className="text-white font-bold" style={{ fontSize: 24 }}>{followerCount}</Text>
-              <Text className="text-muted font-medium" style={{ fontSize: 11, letterSpacing: 0.5 }}>FOLLOWERS</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="items-center" onPress={() => setShowFollowList('following')}>
-              <Text className="text-white font-bold" style={{ fontSize: 24 }}>{followingCount}</Text>
-              <Text className="text-muted font-medium" style={{ fontSize: 11, letterSpacing: 0.5 }}>FOLLOWING</Text>
-            </TouchableOpacity>
-            {predictionAccuracy && (
-              <View className="items-center">
-                <Text className="text-accent font-bold" style={{ fontSize: 24 }}>
-                  {Math.round((predictionAccuracy.correct / predictionAccuracy.total) * 100)}%
-                </Text>
-                <Text className="text-muted font-medium" style={{ fontSize: 11, letterSpacing: 0.5 }}>ACCURACY</Text>
-              </View>
-            )}
-          </View>
-
-          {/* View Stats + My Rankings */}
-          <View className="flex-row gap-3 mt-5">
             <TouchableOpacity
-              className="flex-1 rounded-xl py-3.5 flex-row items-center justify-center gap-2"
-              style={{ backgroundColor: 'rgba(212, 168, 67, 0.12)', borderWidth: 1, borderColor: 'rgba(212, 168, 67, 0.25)' }}
+              onPress={() => router.push('/settings')}
+              className="p-2"
+            >
+              <Settings size={22} color="#7a7d88" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Row 2: Stats + Edit Profile button */}
+          <View testID="profile_stats" className="flex-row items-center mt-5" style={{ gap: 20 }}>
+            <View>
+              <Text className="text-accent font-bold" style={{ fontSize: 22 }}>{stats.count}</Text>
+              <Text className="text-muted" style={{ fontSize: 12 }}>Games Logged</Text>
+            </View>
+            <TouchableOpacity onPress={() => setShowFollowList('followers')}>
+              <Text className="text-white font-bold" style={{ fontSize: 22 }}>{followerCount}</Text>
+              <Text className="text-muted" style={{ fontSize: 12 }}>Followers</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowFollowList('following')}>
+              <Text className="text-white font-bold" style={{ fontSize: 22 }}>{followingCount}</Text>
+              <Text className="text-muted" style={{ fontSize: 12 }}>Following</Text>
+            </TouchableOpacity>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => setShowEditProfile(true)}
+              activeOpacity={0.7}
+              style={{
+                borderWidth: 1,
+                borderColor: 'rgba(212, 168, 67, 0.4)',
+                borderRadius: 10,
+                paddingHorizontal: 14,
+                paddingVertical: 8,
+              }}
+            >
+              <Text className="text-accent font-semibold" style={{ fontSize: 13 }}>Edit Profile</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Row 3: Quick actions */}
+          <View className="flex-row gap-2 mt-4">
+            <TouchableOpacity
+              className="flex-1 rounded-xl py-3 flex-row items-center justify-center gap-2"
+              style={{ backgroundColor: 'rgba(212, 168, 67, 0.1)', borderWidth: 1, borderColor: 'rgba(212, 168, 67, 0.2)' }}
               onPress={() => router.push('/stats')}
               activeOpacity={0.7}
             >
-              <BarChart3 size={17} color="#d4a843" strokeWidth={2.5} />
+              <BarChart3 size={16} color="#d4a843" strokeWidth={2.5} />
               <Text className="text-accent font-bold text-sm">Stats</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="flex-1 rounded-xl py-3.5 flex-row items-center justify-center gap-2"
-              style={{ backgroundColor: 'rgba(212, 168, 67, 0.12)', borderWidth: 1, borderColor: 'rgba(212, 168, 67, 0.25)' }}
+              className="flex-1 rounded-xl py-3 flex-row items-center justify-center gap-2"
+              style={{ backgroundColor: 'rgba(212, 168, 67, 0.1)', borderWidth: 1, borderColor: 'rgba(212, 168, 67, 0.2)' }}
               onPress={() => router.push('/rankings' as any)}
               activeOpacity={0.7}
             >
-              <Trophy size={17} color="#d4a843" strokeWidth={2.5} />
+              <Trophy size={16} color="#d4a843" strokeWidth={2.5} />
               <Text className="text-accent font-bold text-sm">Rankings</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="rounded-xl py-3 px-4 flex-row items-center justify-center gap-2"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)' }}
+              onPress={() => {
+                const url = userUrl(profile.handle);
+                const message = `Follow me on Know Ball!\n${url}`;
+                RNShare.share(Platform.OS === 'ios' ? { message, url } : { message });
+              }}
+              activeOpacity={0.7}
+            >
+              <Share size={16} color="#7a7d88" />
             </TouchableOpacity>
           </View>
         </View>
-        {/* Bottom gold accent line */}
-        <View style={{ height: 0.5, backgroundColor: '#d4a843', opacity: 0.15 }} />
+        {/* Bottom accent line */}
+        <View style={{ height: 0.5, backgroundColor: '#d4a843', opacity: 0.12 }} />
       </View>
 
       {/* Diary */}
