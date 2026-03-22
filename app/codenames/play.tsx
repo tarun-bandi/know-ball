@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
@@ -23,11 +23,18 @@ import ScoreBar from '@/components/codenames/ScoreBar';
 import ClueDisplay from '@/components/codenames/ClueDisplay';
 import WaitingOverlay from '@/components/codenames/WaitingOverlay';
 import GameOverModal from '@/components/codenames/GameOverModal';
+import TeamPanel from '@/components/codenames/TeamPanel';
+import ClueHistory from '@/components/codenames/ClueHistory';
 import type { Team } from '@/lib/codenamesEngine';
+
+const DESKTOP_BREAKPOINT = 900;
+const DESKTOP_BOARD_MAX_WIDTH = 520;
 
 export default function CodenamesPlay() {
   const router = useRouter();
   const { code } = useLocalSearchParams<{ code?: string }>();
+  const { width: windowWidth } = useWindowDimensions();
+  const isDesktop = windowWidth > DESKTOP_BREAKPOINT;
   const user = useAuthStore((s) => s.user);
   const { roomId, myUserId, myTeam, myRole, isHost, reset, setRoom, setMyPlayer, setMyUserId } = useCodenamesMultiplayerStore();
   const [rejoining, setRejoining] = useState(false);
@@ -67,7 +74,7 @@ export default function CodenamesPlay() {
   const { gameState, isLoading } = useCodenamesGame(roomId);
 
   // Subscribe to room channel for presence tracking (host rotation, stale cleanup)
-  const { room: roomData } = useCodenamesRoom(roomId);
+  const { room: roomData, players: roomPlayers, onlineUserIds } = useCodenamesRoom(roomId);
 
   // Keep isHost in sync when host_id changes (host rotation)
   useEffect(() => {
@@ -85,6 +92,7 @@ export default function CodenamesPlay() {
   const guessesRemaining = gameState?.guesses_remaining ?? 0;
   const winner = gameState?.winner as Team | null;
   const winReason = gameState?.win_reason as 'cards' | 'assassin' | null;
+  const clueHistory = (Array.isArray(gameState?.clue_history) ? gameState.clue_history : []) as unknown as CluePayload[];
 
   const isSpymaster = myRole === 'spymaster';
   const isMyTeamTurn = myTeam === currentTeam;
@@ -95,6 +103,9 @@ export default function CodenamesPlay() {
 
   const redRemaining = cards.filter((c) => c.role === 'red' && !c.revealed).length;
   const blueRemaining = cards.filter((c) => c.role === 'blue' && !c.revealed).length;
+
+  const redPlayers = roomPlayers.filter((p) => p.team === 'red');
+  const bluePlayers = roomPlayers.filter((p) => p.team === 'blue');
 
   const handleCardPress = useCallback(async (index: number) => {
     if (!roomId || !isMyTurn || phase !== 'guessing') return;
@@ -165,6 +176,107 @@ export default function CodenamesPlay() {
   const showSpymasterKeyMap = isSpymaster;
   const canTapCards = phase === 'guessing' && isMyTeamTurn && !isSpymaster;
 
+  const controlsBlock = (
+    <View className="px-4 pb-3" style={isDesktop ? { paddingHorizontal: 0, paddingBottom: 0 } : undefined}>
+      {phase === 'spymaster_clue' && isSpymaster && isMyTeamTurn && (
+        <ClueInput team={currentTeam} onSubmit={handleSubmitClue} />
+      )}
+
+      {phase === 'spymaster_clue' && !isMyTurn && (
+        <WaitingOverlay team={currentTeam} waitingFor="spymaster" />
+      )}
+
+      {phase === 'guessing' && currentClue && (
+        <View style={{ gap: 8 }}>
+          <ClueDisplay
+            clue={currentClue}
+            guessesRemaining={guessesRemaining}
+            team={currentTeam}
+          />
+          {canTapCards && (
+            <TouchableOpacity
+              onPress={handleEndTurn}
+              className="bg-surface border border-border rounded-xl py-3 items-center"
+              activeOpacity={0.7}
+            >
+              <Text className="text-white font-semibold">End Turn</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
+      {phase === 'guessing' && !isMyTeamTurn && !currentClue && (
+        <WaitingOverlay team={currentTeam} waitingFor="guessers" />
+      )}
+    </View>
+  );
+
+  // Desktop: 3-column layout
+  if (isDesktop) {
+    return (
+      <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+        <View className="flex-1 flex-row px-4 py-3" style={{ gap: 16 }}>
+          {/* Left panel — Blue team */}
+          <View style={{ width: 220 }}>
+            <TeamPanel
+              team="blue"
+              players={bluePlayers}
+              myUserId={myUserId}
+              onlineUserIds={onlineUserIds}
+              isCurrentTeam={currentTeam === 'blue'}
+              remaining={blueRemaining}
+            />
+          </View>
+
+          {/* Center — Board + controls */}
+          <View className="flex-1 items-center" style={{ gap: 12 }}>
+            {/* Turn banner + score */}
+            <View
+              className="flex-row items-center px-4 py-2.5 rounded-xl w-full"
+              style={{
+                backgroundColor: (currentTeam === 'red' ? '#E03A3E' : '#1D428A') + '08',
+                maxWidth: DESKTOP_BOARD_MAX_WIDTH,
+              }}
+            >
+              <TurnBanner team={currentTeam} phase={phase} isMyTurn={isMyTurn} />
+              <ScoreBar redRemaining={redRemaining} blueRemaining={blueRemaining} />
+            </View>
+
+            {/* Board */}
+            <View className="justify-center">
+              <CodenamesBoard
+                cards={cards}
+                isSpymasterView={showSpymasterKeyMap}
+                onCardPress={handleCardPress}
+                disabled={!canTapCards}
+                maxWidth={DESKTOP_BOARD_MAX_WIDTH}
+              />
+            </View>
+
+            {/* Controls */}
+            <View style={{ width: '100%', maxWidth: DESKTOP_BOARD_MAX_WIDTH }}>
+              {controlsBlock}
+            </View>
+          </View>
+
+          {/* Right panel — Red team + Clue history */}
+          <View style={{ width: 220, gap: 12 }}>
+            <TeamPanel
+              team="red"
+              players={redPlayers}
+              myUserId={myUserId}
+              onlineUserIds={onlineUserIds}
+              isCurrentTeam={currentTeam === 'red'}
+              remaining={redRemaining}
+            />
+            <ClueHistory clueHistory={clueHistory} />
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Mobile: original vertical layout
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
       {/* Game status header: turn + score in one row */}
@@ -184,38 +296,7 @@ export default function CodenamesPlay() {
       </View>
 
       {/* Bottom area — consistent padding across all states */}
-      <View className="px-4 pb-3">
-        {phase === 'spymaster_clue' && isSpymaster && isMyTeamTurn && (
-          <ClueInput team={currentTeam} onSubmit={handleSubmitClue} />
-        )}
-
-        {phase === 'spymaster_clue' && !isMyTurn && (
-          <WaitingOverlay team={currentTeam} waitingFor="spymaster" />
-        )}
-
-        {phase === 'guessing' && currentClue && (
-          <View style={{ gap: 8 }}>
-            <ClueDisplay
-              clue={currentClue}
-              guessesRemaining={guessesRemaining}
-              team={currentTeam}
-            />
-            {canTapCards && (
-              <TouchableOpacity
-                onPress={handleEndTurn}
-                className="bg-surface border border-border rounded-xl py-3 items-center"
-                activeOpacity={0.7}
-              >
-                <Text className="text-white font-semibold">End Turn</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-
-        {phase === 'guessing' && !isMyTeamTurn && !currentClue && (
-          <WaitingOverlay team={currentTeam} waitingFor="guessers" />
-        )}
-      </View>
+      {controlsBlock}
     </SafeAreaView>
   );
 }

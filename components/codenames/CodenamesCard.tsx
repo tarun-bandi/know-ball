@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { TouchableOpacity, Text, View, Dimensions } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withSequence,
   interpolate,
@@ -8,8 +8,6 @@ import { Skull } from 'lucide-react-native';
 import TeamLogo from '@/components/TeamLogo';
 import type { GameStateCards } from '@/lib/codenamesApi';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const CARD_SIZE = (SCREEN_WIDTH - 16) / 5;
 const GAP = 2;
 
 const ROLE_COLORS: Record<string, string> = {
@@ -32,9 +30,11 @@ interface Props {
   isSpymasterView: boolean;
   onPress: (index: number) => void;
   disabled: boolean;
+  cardSize: number;
 }
 
-export default function CodenamesCard({ card, index, isSpymasterView, onPress, disabled }: Props) {
+export default function CodenamesCard({ card, index, isSpymasterView, onPress, disabled, cardSize }: Props) {
+  const CARD_SIZE = cardSize;
   const flipProgress = useSharedValue(card.revealed ? 1 : 0);
   const scale = useSharedValue(1);
 
