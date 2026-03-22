@@ -30,26 +30,24 @@ export default function TurnBanner({ team, phase, isMyTurn }: Props) {
   }));
 
   const phaseLabel = phase === 'spymaster_clue'
-    ? 'Spymaster giving clue'
+    ? 'Giving clue...'
     : phase === 'guessing'
-      ? 'Guessers picking cards'
+      ? 'Picking cards...'
       : '';
 
   return (
-    <View className="px-4 py-4" style={{ backgroundColor: color + '10' }}>
-      <View className="flex-row items-center gap-2">
-        <Animated.View
-          style={[dotStyle, {
-            width: 10, height: 10, borderRadius: 5, backgroundColor: color,
-          }]}
-        />
-        <Text className="text-white font-bold text-xl">
-          {TEAM_LABEL[team]} Team
-          {isMyTurn ? ' — Your Turn' : "'s Turn"}
-        </Text>
-      </View>
+    <View className="flex-row items-center gap-2 flex-1">
+      <Animated.View
+        style={[dotStyle, {
+          width: 8, height: 8, borderRadius: 4, backgroundColor: color,
+        }]}
+      />
+      <Text className="text-white font-bold text-base">
+        {TEAM_LABEL[team]}
+        {isMyTurn ? ' — Your Turn' : "'s Turn"}
+      </Text>
       {phaseLabel ? (
-        <Text className="text-muted text-sm mt-0.5 ml-5">{phaseLabel}</Text>
+        <Text className="text-muted text-xs">{phaseLabel}</Text>
       ) : null}
     </View>
   );

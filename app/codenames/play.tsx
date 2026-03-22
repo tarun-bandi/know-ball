@@ -115,13 +115,13 @@ export default function CodenamesPlay() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
-      {/* Turn banner */}
-      <TurnBanner team={currentTeam} phase={phase} isMyTurn={isMyTurn} />
+      {/* Game status header: turn + score in one row */}
+      <View className="flex-row items-center px-4 py-2.5" style={{ backgroundColor: (currentTeam === 'red' ? '#E03A3E' : '#1D428A') + '08' }}>
+        <TurnBanner team={currentTeam} phase={phase} isMyTurn={isMyTurn} />
+        <ScoreBar redRemaining={redRemaining} blueRemaining={blueRemaining} />
+      </View>
 
-      {/* Score bar */}
-      <ScoreBar redRemaining={redRemaining} blueRemaining={blueRemaining} />
-
-      {/* Board */}
+      {/* Board — the hero */}
       <View className="flex-1 justify-center">
         <CodenamesBoard
           cards={cards}
@@ -131,25 +131,24 @@ export default function CodenamesPlay() {
         />
       </View>
 
-      {/* Bottom area — depends on role + phase */}
-      {phase === 'spymaster_clue' && isSpymaster && isMyTeamTurn && (
-        <ClueInput team={currentTeam} onSubmit={handleSubmitClue} />
-      )}
+      {/* Bottom area — consistent padding across all states */}
+      <View className="px-4 pb-3">
+        {phase === 'spymaster_clue' && isSpymaster && isMyTeamTurn && (
+          <ClueInput team={currentTeam} onSubmit={handleSubmitClue} />
+        )}
 
-      {phase === 'spymaster_clue' && !isMyTurn && (
-        <WaitingOverlay team={currentTeam} waitingFor="spymaster" />
-      )}
+        {phase === 'spymaster_clue' && !isMyTurn && (
+          <WaitingOverlay team={currentTeam} waitingFor="spymaster" />
+        )}
 
-      {phase === 'guessing' && currentClue && (
-        <View>
-          <ClueDisplay
-            clue={currentClue}
-            guessesRemaining={guessesRemaining}
-            team={currentTeam}
-          />
-          {/* End turn button — only for guessers on the active team */}
-          {canTapCards && (
-            <View className="px-4 pb-3">
+        {phase === 'guessing' && currentClue && (
+          <View style={{ gap: 8 }}>
+            <ClueDisplay
+              clue={currentClue}
+              guessesRemaining={guessesRemaining}
+              team={currentTeam}
+            />
+            {canTapCards && (
               <TouchableOpacity
                 onPress={handleEndTurn}
                 className="bg-surface border border-border rounded-xl py-3 items-center"
@@ -157,14 +156,14 @@ export default function CodenamesPlay() {
               >
                 <Text className="text-white font-semibold">End Turn</Text>
               </TouchableOpacity>
-            </View>
-          )}
-        </View>
-      )}
+            )}
+          </View>
+        )}
 
-      {phase === 'guessing' && !isMyTeamTurn && !currentClue && (
-        <WaitingOverlay team={currentTeam} waitingFor="guessers" />
-      )}
+        {phase === 'guessing' && !isMyTeamTurn && !currentClue && (
+          <WaitingOverlay team={currentTeam} waitingFor="guessers" />
+        )}
+      </View>
     </SafeAreaView>
   );
 }

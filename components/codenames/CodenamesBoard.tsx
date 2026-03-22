@@ -13,7 +13,7 @@ export default function CodenamesBoard({ cards, isSpymasterView, onCardPress, di
   const rows = [0, 1, 2, 3, 4];
 
   return (
-    <View className="items-center px-2">
+    <View className="items-center px-1">
       {rows.map((row) => (
         <View key={row} className="flex-row">
           {cards.slice(row * 5, row * 5 + 5).map((card, col) => (

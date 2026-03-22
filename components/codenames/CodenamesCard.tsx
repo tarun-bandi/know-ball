@@ -9,8 +9,8 @@ import TeamLogo from '@/components/TeamLogo';
 import type { GameStateCards } from '@/lib/codenamesApi';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const CARD_SIZE = (SCREEN_WIDTH - 32) / 5;
-const GAP = 3;
+const CARD_SIZE = (SCREEN_WIDTH - 16) / 5;
+const GAP = 2;
 
 const ROLE_COLORS: Record<string, string> = {
   red: 'rgba(224, 58, 62, 0.9)',

@@ -30,13 +30,13 @@ export default function ClueInput({ team, onSubmit }: Props) {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View className="px-4 py-3">
-        <Text className="text-white text-base font-bold mb-2">
+      <View style={{ gap: 10 }}>
+        <Text className="text-white text-sm font-bold">
           <Text style={{ color }}>{TEAM_LABEL[team]}</Text> Spymaster — Give a Clue
         </Text>
 
         <TextInput
-          className="bg-surface border border-border rounded-xl px-4 py-3 text-white text-lg mb-3"
+          className="bg-surface border border-border rounded-xl px-4 py-3 text-white text-lg"
           placeholder="One word clue"
           placeholderTextColor="#7a7d88"
           value={word}
@@ -46,7 +46,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
         />
 
         {/* Number pills */}
-        <View className="flex-row justify-between mb-3">
+        <View className="flex-row justify-between">
           {NUMBERS.map((n) => (
             <TouchableOpacity
               key={n}
@@ -56,7 +56,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
                 backgroundColor: number === n ? color : '#141416',
                 borderWidth: 1,
                 borderColor: number === n ? color : '#2a2a30',
-                width: 36, height: 36, borderRadius: 18,
+                width: 34, height: 34, borderRadius: 17,
                 alignItems: 'center', justifyContent: 'center',
               }}
             >
@@ -69,7 +69,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
           onPress={handleSubmit}
           disabled={!canSubmit}
           activeOpacity={0.7}
-          className="rounded-xl py-3.5 items-center"
+          className="rounded-xl py-3 items-center"
           style={{ backgroundColor: canSubmit ? color : '#2a2a30' }}
         >
           <Text className="text-white font-bold text-base">
@@ -77,7 +77,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
           </Text>
         </TouchableOpacity>
 
-        <Text className="text-muted text-xs mt-1.5 text-center">
+        <Text className="text-muted text-xs text-center">
           One word only. Number = how many cards match.
         </Text>
       </View>
