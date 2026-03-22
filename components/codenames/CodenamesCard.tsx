@@ -21,14 +21,14 @@ const ROLE_COLORS: Record<string, string> = {
 const SPYMASTER_BG: Record<string, string> = {
   red: 'rgba(224, 58, 62, 0.18)',
   blue: 'rgba(29, 66, 138, 0.22)',
-  neutral: 'rgba(107, 114, 128, 0.12)',
+  neutral: 'rgba(220, 220, 220, 0.18)',
   assassin: 'rgba(0, 0, 0, 0.6)',
 };
 
 const SPYMASTER_BORDER: Record<string, string> = {
   red: 'rgba(224, 58, 62, 0.4)',
   blue: 'rgba(29, 66, 138, 0.45)',
-  neutral: '#2a2a30',
+  neutral: 'rgba(220, 220, 220, 0.35)',
   assassin: 'rgba(255, 255, 255, 0.15)',
 };
 
