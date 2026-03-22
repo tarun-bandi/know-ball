@@ -297,7 +297,7 @@ export default function LoginScreen() {
             {/* Play Codenames without signing in */}
             <TouchableOpacity
               className="mt-5"
-              onPress={() => router.push('/codenames')}
+              onPress={() => router.replace('/codenames')}
               activeOpacity={0.7}
             >
               <Text className="text-muted text-sm">

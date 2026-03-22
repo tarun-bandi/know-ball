@@ -28,6 +28,7 @@ function useProtectedRoute() {
   const { session, isLoading, onboardingCompleted } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
+  const hasNavigated = useRef(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -36,7 +37,10 @@ function useProtectedRoute() {
     const inOnboarding = segments[0] === 'onboarding';
     const inPublicPage = segments[0] === 'privacy' || segments[0] === 'support' || segments[0] === 'codenames';
 
-    if (!session && !inAuthGroup && !inPublicPage) {
+    // Don't redirect away from public pages
+    if (inPublicPage) return;
+
+    if (!session && !inAuthGroup) {
       router.replace('/(auth)/login');
     } else if (session && inAuthGroup) {
       if (onboardingCompleted === false) {
