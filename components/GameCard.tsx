@@ -701,24 +701,23 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
     return (
       <div style={tiltStyle as any} {...tiltHandlers}>
         <Pressable
-          className="bg-surface rounded-2xl p-4 mb-4"
+          className="rounded-2xl p-4 mb-5"
           style={({ pressed, hovered }: any) => {
             const scale = pressed ? 0.988 : 1;
             const borderColor = pressed
-              ? withAlpha(homeAccent, 0.3)
+              ? withAlpha(homeAccent, 0.35)
               : hovered
-                ? withAlpha(homeAccent, 0.2)
-                : withAlpha('#ffffff', 0.08);
-            const bgTint = hovered ? withAlpha('#1a2233', 0.9) : withAlpha('#1a2233', 0.82);
+                ? withAlpha(homeAccent, 0.25)
+                : withAlpha('#ffffff', 0.1);
 
             // Dynamic shadow: shift opposite to tilt direction
             const ox = Math.round(shadowOffset.x);
             const oy = Math.round(shadowOffset.y);
             const shadow = pressed
-              ? `${ox}px ${8 + oy}px 18px ${withAlpha('#000000', 0.35)}, 0 0 0 1px ${withAlpha(homeAccent, 0.12)}`
+              ? `${ox}px ${8 + oy}px 18px ${withAlpha('#000000', 0.4)}, 0 0 0 1px ${withAlpha(homeAccent, 0.15)}`
               : hovered
-                ? `${ox}px ${14 + oy}px 30px ${withAlpha('#000000', 0.4)}, 0 0 0 1px ${withAlpha(homeAccent, 0.18)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.08)}`
-                : `0 8px 20px ${withAlpha('#000000', 0.3)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.06)}`;
+                ? `${ox}px ${14 + oy}px 30px ${withAlpha('#000000', 0.45)}, 0 0 0 1px ${withAlpha(homeAccent, 0.22)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.06)}`
+                : `0 8px 24px ${withAlpha('#000000', 0.35)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.05)}`;
 
             return [
               {
@@ -727,11 +726,9 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 borderWidth: 1,
                 borderColor,
                 transform: [{ scale }],
-                backgroundColor: bgTint,
+                backgroundColor: '#151518',
               },
               {
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
                 boxShadow: shadow,
                 transitionDuration: '180ms',
                 transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
@@ -753,8 +750,14 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
   return (
     <GestureDetector gesture={composed}>
       <Animated.View
-        className="bg-surface border border-border rounded-2xl p-4 mb-4"
-        style={{ position: 'relative', overflow: 'hidden' }}
+        className="rounded-2xl p-4 mb-5"
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          backgroundColor: '#151518',
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.1)',
+        }}
       >
         {cardContent}
       </Animated.View>

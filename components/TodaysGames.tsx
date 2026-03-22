@@ -300,32 +300,35 @@ export default function TodaysGames() {
 
         <View className="pt-3.5 pb-3">
           <View className="flex-row justify-between items-center px-4 mb-3">
-            <View className="flex-row items-center gap-2">
+            <View className="flex-row items-center gap-2.5">
+              <Text style={{ fontSize: 18 }}>{'\u{1F3C0}'}</Text>
               <Text
                 style={{
                   color: '#ffffff',
-                  fontSize: 16,
-                  fontWeight: '600',
-                  letterSpacing: -0.2,
+                  fontSize: 18,
+                  fontWeight: '700',
+                  letterSpacing: -0.3,
                 }}
               >
                 Today's Games
               </Text>
               <View
                 style={{
-                  backgroundColor: withAlpha('#d4a843', 0.1),
+                  backgroundColor: withAlpha('#d4a843', 0.15),
                   borderRadius: 10,
+                  minWidth: 24,
+                  alignItems: 'center',
                   paddingHorizontal: 7,
-                  paddingVertical: 2,
+                  paddingVertical: 2.5,
                   borderWidth: 1,
-                  borderColor: withAlpha('#d4a843', 0.15),
+                  borderColor: withAlpha('#d4a843', 0.25),
                 }}
               >
                 <Text
                   style={{
                     color: '#d4a843',
-                    fontSize: 11,
-                    fontWeight: '600',
+                    fontSize: 12,
+                    fontWeight: '700',
                   }}
                 >
                   {gameCount}
@@ -334,7 +337,7 @@ export default function TodaysGames() {
             </View>
             <Text
               style={{
-                color: withAlpha('#ffffff', 0.4),
+                color: withAlpha('#ffffff', 0.35),
                 fontSize: 12,
                 fontWeight: '500',
                 letterSpacing: 0.3,
