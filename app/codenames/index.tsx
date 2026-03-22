@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,13 +8,6 @@ import Animated, {
   FadeIn,
   FadeInDown,
   FadeInUp,
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  withDelay,
-  withSequence,
-  Easing,
 } from 'react-native-reanimated';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useCodenamesMultiplayerStore, getAnonId } from '@/lib/store/codenamesMultiplayerStore';
@@ -33,13 +26,13 @@ const GRID_COLORS = [
 ];
 
 function MiniBoard() {
-  const CARD_SIZE = (SCREEN_WIDTH - 80) / 5;
+  const CARD_SIZE = (SCREEN_WIDTH - 64) / 5;
   const GAP = 3;
 
   return (
     <Animated.View
       entering={FadeIn.delay(200).duration(800)}
-      style={{ opacity: 0.12 }}
+      style={{ opacity: 0.18 }}
     >
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', width: (CARD_SIZE + GAP) * 5, gap: GAP }}>
         {GRID_COLORS.map((color, i) => (
@@ -55,40 +48,6 @@ function MiniBoard() {
         ))}
       </View>
     </Animated.View>
-  );
-}
-
-function PulsingDot({ color, delay: d }: { color: string; delay: number }) {
-  const opacity = useSharedValue(0.3);
-
-  useEffect(() => {
-    opacity.value = withDelay(
-      d,
-      withRepeat(
-        withSequence(
-          withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.3, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-        ),
-        -1,
-        false,
-      ),
-    );
-  }, []);
-
-  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
-
-  return (
-    <Animated.View
-      style={[
-        {
-          width: 6,
-          height: 6,
-          borderRadius: 3,
-          backgroundColor: color,
-        },
-        style,
-      ]}
-    />
   );
 }
 
@@ -149,60 +108,38 @@ export default function CodenamesLanding() {
 
       <View className="flex-1 justify-center items-center">
         {/* Background mini board */}
-        <View style={{ position: 'absolute', top: '8%', alignSelf: 'center' }}>
+        <View style={{ position: 'absolute', top: '10%', alignSelf: 'center' }}>
           <MiniBoard />
         </View>
 
         {/* Title block */}
-        <View className="items-center px-8 mb-12">
+        <View className="items-center px-8 mb-10">
           <Animated.View
-            entering={FadeInDown.delay(100).duration(500).springify().damping(14)}
-            className="flex-row items-center gap-2 mb-3"
+            entering={FadeInDown.delay(150).duration(600).springify().damping(12)}
+            className="flex-row items-center"
+            style={{ gap: 10 }}
           >
-            <PulsingDot color="#E03A3E" delay={0} />
+            {/* Red accent line */}
+            <View style={{ width: 24, height: 3, backgroundColor: '#E03A3E', borderRadius: 2 }} />
+
             <Text
-              className="text-muted uppercase tracking-[6px] text-xs"
-              style={{ letterSpacing: 6 }}
+              className="text-white text-center font-bold"
+              style={{ fontSize: 44, lineHeight: 46, letterSpacing: -1 }}
             >
-              MULTIPLAYER
+              NBA{'\n'}CODENAMES
             </Text>
-            <PulsingDot color="#1D428A" delay={600} />
+
+            {/* Blue accent line */}
+            <View style={{ width: 24, height: 3, backgroundColor: '#1D428A', borderRadius: 2 }} />
           </Animated.View>
 
           <Animated.Text
-            entering={FadeInDown.delay(200).duration(600).springify().damping(12)}
-            className="text-white text-center font-bold"
-            style={{ fontSize: 48, lineHeight: 50, letterSpacing: -1 }}
-          >
-            CODE{'\n'}NAMES
-          </Animated.Text>
-
-          <Animated.View
-            entering={FadeInDown.delay(350).duration(500).springify().damping(14)}
-            style={{
-              marginTop: 12,
-              borderTopWidth: 1,
-              borderTopColor: '#D4A843',
-              paddingTop: 12,
-              width: 160,
-              alignItems: 'center',
-            }}
-          >
-            <Text
-              className="text-center"
-              style={{ color: '#D4A843', fontSize: 13, letterSpacing: 4, fontWeight: '600' }}
-            >
-              NBA EDITION
-            </Text>
-          </Animated.View>
-
-          <Animated.Text
-            entering={FadeIn.delay(500).duration(600)}
+            entering={FadeIn.delay(400).duration(600)}
             className="text-muted text-center mt-5"
             style={{ fontSize: 15, lineHeight: 22 }}
           >
-            Two teams. One spymaster each.{'\n'}
-            Guess the players. Don't hit the assassin.
+            Guess the players. Don't hit the assassin.{'\n'}
+            Two teams, one spymaster each.
           </Animated.Text>
         </View>
 
@@ -211,7 +148,7 @@ export default function CodenamesLanding() {
           {mode === 'landing' ? (
             <View className="items-center" style={{ gap: 12 }}>
               <Animated.View
-                entering={FadeInUp.delay(500).duration(500).springify().damping(14)}
+                entering={FadeInUp.delay(450).duration(500).springify().damping(14)}
                 className="w-full"
               >
                 <TouchableOpacity
@@ -223,17 +160,17 @@ export default function CodenamesLanding() {
                     borderRadius: 14,
                     paddingVertical: 18,
                     alignItems: 'center',
-                    shadowColor: '#D4A843',
+                    shadowColor: '#000',
                     shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 12,
-                    elevation: 8,
+                    shadowOpacity: 0.25,
+                    shadowRadius: 8,
+                    elevation: 6,
                   }}
                 >
                   {creating ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
-                    <Text className="text-white font-bold" style={{ fontSize: 17, letterSpacing: 2 }}>
+                    <Text className="text-white font-bold" style={{ fontSize: 17, letterSpacing: 1.5 }}>
                       CREATE ROOM
                     </Text>
                   )}
@@ -241,7 +178,7 @@ export default function CodenamesLanding() {
               </Animated.View>
 
               <Animated.View
-                entering={FadeInUp.delay(600).duration(500).springify().damping(14)}
+                entering={FadeInUp.delay(550).duration(500).springify().damping(14)}
                 className="w-full"
               >
                 <TouchableOpacity
@@ -256,28 +193,20 @@ export default function CodenamesLanding() {
                     backgroundColor: '#141416',
                   }}
                 >
-                  <Text style={{ color: '#9a9aa0', fontSize: 17, letterSpacing: 2, fontWeight: '600' }}>
+                  <Text style={{ color: '#9a9aa0', fontSize: 17, letterSpacing: 1.5, fontWeight: '600' }}>
                     JOIN ROOM
                   </Text>
                 </TouchableOpacity>
               </Animated.View>
 
-              {/* Team indicators */}
-              <Animated.View
-                entering={FadeIn.delay(800).duration(600)}
-                className="flex-row items-center justify-center mt-4"
-                style={{ gap: 20 }}
+              {/* Practical info */}
+              <Animated.Text
+                entering={FadeIn.delay(700).duration(600)}
+                className="text-center mt-3"
+                style={{ color: '#444', fontSize: 12 }}
               >
-                <View className="flex-row items-center" style={{ gap: 6 }}>
-                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#E03A3E' }} />
-                  <Text style={{ color: '#555', fontSize: 12, fontWeight: '500' }}>RED TEAM</Text>
-                </View>
-                <Text style={{ color: '#2a2a30', fontSize: 12 }}>vs</Text>
-                <View className="flex-row items-center" style={{ gap: 6 }}>
-                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#1D428A' }} />
-                  <Text style={{ color: '#555', fontSize: 12, fontWeight: '500' }}>BLUE TEAM</Text>
-                </View>
-              </Animated.View>
+                4–8 players · ~15 min
+              </Animated.Text>
             </View>
           ) : (
             <Animated.View entering={FadeIn.duration(300)}>

@@ -33,7 +33,7 @@ export default function JoinRoomInput({ onJoin, onCancel }: Props) {
   };
 
   return (
-    <View className="items-center w-full px-8">
+    <View className="items-center w-full">
       <Text className="text-white text-lg font-bold mb-4">Enter Room Code</Text>
       <TextInput
         ref={inputRef}
