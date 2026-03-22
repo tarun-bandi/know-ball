@@ -116,7 +116,7 @@ export default function CodenamesLanding() {
           activeOpacity={0.7}
         >
           <ChevronLeft size={24} color="#ffffff" />
-          <Text className="text-white text-base">Back</Text>
+          <Text style={{ color: '#ffffff', fontSize: 16 }}>Back</Text>
         </TouchableOpacity>
       </Animated.View>
 
@@ -141,16 +141,14 @@ export default function CodenamesLanding() {
 
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify().damping(12)}
-            className="text-white text-center font-bold"
-            style={{ fontSize: 52, lineHeight: 54, letterSpacing: -1.5, marginTop: 2 }}
+            style={{ color: '#ffffff', fontSize: 52, lineHeight: 54, letterSpacing: -1.5, marginTop: 2, fontWeight: '700', textAlign: 'center' }}
           >
             CODENAMES
           </Animated.Text>
 
           <Animated.Text
             entering={FadeIn.delay(400).duration(600)}
-            className="text-muted text-center mt-5"
-            style={{ fontSize: 15, lineHeight: 22 }}
+            style={{ color: '#7a7d88', fontSize: 15, lineHeight: 22, textAlign: 'center', marginTop: 20 }}
           >
             Guess the players. Don't hit the assassin.{'\n'}
             Two teams, one spymaster each.
@@ -184,7 +182,7 @@ export default function CodenamesLanding() {
                   {creating ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
-                    <Text className="text-white font-bold" style={{ fontSize: 17, letterSpacing: 1.5 }}>
+                    <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 17, letterSpacing: 1.5 }}>
                       CREATE ROOM
                     </Text>
                   )}
