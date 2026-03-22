@@ -30,13 +30,15 @@ const GRID_COLORS = [
 ];
 
 function MiniBoard() {
-  const CARD_SIZE = (SCREEN_WIDTH - 64) / 5;
+  // Cap at mobile width so it doesn't blow up on web/tablet
+  const boardWidth = Math.min(SCREEN_WIDTH, 420) - 64;
+  const CARD_SIZE = boardWidth / 5;
   const GAP = 3;
 
   return (
     <Animated.View
       entering={FadeIn.delay(200).duration(800)}
-      style={{ opacity: 0.18 }}
+      style={{ opacity: 0.08 }}
     >
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', width: (CARD_SIZE + GAP) * 5, gap: GAP }}>
         {GRID_COLORS.map((color, i) => (
@@ -125,7 +127,7 @@ export default function CodenamesLanding() {
         </View>
 
         {/* Title block */}
-        <View className="items-center px-8 mb-10">
+        <View style={{ alignItems: 'center', paddingHorizontal: 32, marginBottom: 40, maxWidth: 400 }}>
           <Animated.View
             entering={FadeInDown.delay(100).duration(500).springify().damping(14)}
           >
@@ -156,7 +158,7 @@ export default function CodenamesLanding() {
         </View>
 
         {/* Actions */}
-        <View className="w-full px-8">
+        <View style={{ width: '100%', maxWidth: 400, paddingHorizontal: 32, alignSelf: 'center' }}>
           {mode === 'landing' ? (
             <View className="items-center" style={{ gap: 12 }}>
               <Animated.View
