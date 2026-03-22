@@ -5,25 +5,31 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/lib/store/authStore';
-import { useCodenamesMultiplayerStore } from '@/lib/store/codenamesMultiplayerStore';
+import { useCodenamesMultiplayerStore, getAnonId } from '@/lib/store/codenamesMultiplayerStore';
 import { createRoom, joinRoom } from '@/lib/codenamesApi';
 import JoinRoomInput from '@/components/codenames/JoinRoomInput';
 
 export default function CodenamesLanding() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const { setRoom, setMyPlayer } = useCodenamesMultiplayerStore();
+  const { setRoom, setMyPlayer, setMyUserId } = useCodenamesMultiplayerStore();
   const [mode, setMode] = useState<'landing' | 'join'>('landing');
   const [creating, setCreating] = useState(false);
 
+  const getIdentity = () => {
+    const userId = user?.id ?? getAnonId();
+    const displayName = user?.user_metadata?.display_name ?? user?.email?.split('@')[0] ?? 'Guest';
+    const avatarUrl = user?.user_metadata?.avatar_url ?? null;
+    return { userId, displayName, avatarUrl };
+  };
+
   const handleCreate = useCallback(async () => {
-    if (!user) return;
     setCreating(true);
     try {
-      const displayName = user.user_metadata?.display_name ?? user.email?.split('@')[0] ?? 'Player';
-      const avatarUrl = user.user_metadata?.avatar_url ?? null;
-      const room = await createRoom(user.id, displayName, avatarUrl);
+      const { userId, displayName, avatarUrl } = getIdentity();
+      const room = await createRoom(userId, displayName, avatarUrl);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setMyUserId(userId);
       setRoom(room.id, room.code, true);
       router.push('/codenames/lobby' as any);
     } catch (e: any) {
@@ -31,18 +37,17 @@ export default function CodenamesLanding() {
     } finally {
       setCreating(false);
     }
-  }, [user, setRoom, router]);
+  }, [user, setRoom, setMyUserId, router]);
 
   const handleJoin = useCallback(async (code: string) => {
-    if (!user) return;
-    const displayName = user.user_metadata?.display_name ?? user.email?.split('@')[0] ?? 'Player';
-    const avatarUrl = user.user_metadata?.avatar_url ?? null;
-    const { room, player } = await joinRoom(code, user.id, displayName, avatarUrl);
+    const { userId, displayName, avatarUrl } = getIdentity();
+    const { room, player } = await joinRoom(code, userId, displayName, avatarUrl);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setRoom(room.id, room.code, room.host_id === user.id);
+    setMyUserId(userId);
+    setRoom(room.id, room.code, room.host_id === userId);
     setMyPlayer(player.id, player.team, player.role);
     router.push('/codenames/lobby' as any);
-  }, [user, setRoom, setMyPlayer, router]);
+  }, [user, setRoom, setMyPlayer, setMyUserId, router]);
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>

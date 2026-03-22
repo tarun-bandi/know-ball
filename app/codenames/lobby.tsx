@@ -6,7 +6,6 @@ import { ChevronLeft } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useCodenamesMultiplayerStore } from '@/lib/store/codenamesMultiplayerStore';
 import { useCodenamesRoom } from '@/hooks/useCodenamesRoom';
-import { useAuthStore } from '@/lib/store/authStore';
 import { updatePlayerAssignment, startGame, leaveRoom } from '@/lib/codenamesApi';
 import RoomCodeDisplay from '@/components/codenames/RoomCodeDisplay';
 import LobbyTeamColumn from '@/components/codenames/LobbyTeamColumn';
@@ -14,8 +13,7 @@ import type { Team } from '@/lib/codenamesEngine';
 
 export default function CodenamesLobby() {
   const router = useRouter();
-  const user = useAuthStore((s) => s.user);
-  const { roomId, roomCode, isHost, myPlayerId, reset, updateMyAssignment: updateStoreAssignment } =
+  const { roomId, roomCode, isHost, myPlayerId, myUserId, reset, updateMyAssignment: updateStoreAssignment } =
     useCodenamesMultiplayerStore();
   const { room, players, isLoading } = useCodenamesRoom(roomId);
   const [starting, setStarting] = useState(false);
@@ -30,15 +28,15 @@ export default function CodenamesLobby() {
 
   // Keep store in sync with my player from the players list
   useEffect(() => {
-    if (!user || !players.length) return;
-    const me = players.find((p) => p.user_id === user.id);
+    if (!myUserId || !players.length) return;
+    const me = players.find((p) => p.user_id === myUserId);
     if (me && myPlayerId !== me.id) {
       useCodenamesMultiplayerStore.getState().setMyPlayer(me.id, me.team, me.role);
     }
     if (me) {
       updateStoreAssignment(me.team, me.role);
     }
-  }, [players, user]);
+  }, [players, myUserId]);
 
   const handleAssign = useCallback(async (team: 'red' | 'blue', role: 'spymaster' | 'guesser') => {
     if (!myPlayerId) return;
@@ -65,13 +63,13 @@ export default function CodenamesLobby() {
   }, [roomId, firstTeam]);
 
   const handleLeave = useCallback(async () => {
-    if (!roomId || !user) return;
+    if (!roomId || !myUserId) return;
     try {
-      await leaveRoom(roomId, user.id);
+      await leaveRoom(roomId, myUserId);
     } catch {}
     reset();
     router.back();
-  }, [roomId, user, reset, router]);
+  }, [roomId, myUserId, reset, router]);
 
   const redPlayers = players.filter((p) => p.team === 'red');
   const bluePlayers = players.filter((p) => p.team === 'blue');
@@ -125,13 +123,13 @@ export default function CodenamesLobby() {
         <LobbyTeamColumn
           team="red"
           players={redPlayers}
-          myUserId={user?.id ?? ''}
+          myUserId={myUserId ?? ''}
           onAssign={handleAssign}
         />
         <LobbyTeamColumn
           team="blue"
           players={bluePlayers}
-          myUserId={user?.id ?? ''}
+          myUserId={myUserId ?? ''}
           onAssign={handleAssign}
         />
       </View>
@@ -143,7 +141,7 @@ export default function CodenamesLobby() {
           {unassigned.map((p) => (
             <Text key={p.id} className="text-white text-sm">
               {p.display_name ?? 'Player'}
-              {p.user_id === user?.id ? ' (you)' : ''}
+              {p.user_id === myUserId ? ' (you)' : ''}
             </Text>
           ))}
         </View>

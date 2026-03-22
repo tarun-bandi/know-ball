@@ -19,13 +19,11 @@ import ScoreBar from '@/components/codenames/ScoreBar';
 import ClueDisplay from '@/components/codenames/ClueDisplay';
 import WaitingOverlay from '@/components/codenames/WaitingOverlay';
 import GameOverModal from '@/components/codenames/GameOverModal';
-import { useAuthStore } from '@/lib/store/authStore';
 import type { Team } from '@/lib/codenamesEngine';
 
 export default function CodenamesPlay() {
   const router = useRouter();
-  const user = useAuthStore((s) => s.user);
-  const { roomId, myTeam, myRole, isHost, reset } = useCodenamesMultiplayerStore();
+  const { roomId, myUserId, myTeam, myRole, isHost, reset } = useCodenamesMultiplayerStore();
   const { gameState, isLoading } = useCodenamesGame(roomId);
 
   const cards = (gameState?.cards ?? []) as unknown as GameStateCards[];
@@ -84,12 +82,12 @@ export default function CodenamesPlay() {
   }, [roomId]);
 
   const handleExit = useCallback(async () => {
-    if (roomId && user) {
-      try { await leaveRoom(roomId, user.id); } catch {}
+    if (roomId && myUserId) {
+      try { await leaveRoom(roomId, myUserId); } catch {}
     }
     reset();
     router.replace('/codenames' as any);
-  }, [roomId, user, reset, router]);
+  }, [roomId, myUserId, reset, router]);
 
   if (isLoading || !gameState) {
     return (
