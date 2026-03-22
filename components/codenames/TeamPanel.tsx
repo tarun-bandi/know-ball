@@ -26,9 +26,9 @@ export default function TeamPanel({ team, players, myUserId, onlineUserIds, isCu
     <View
       style={{
         borderWidth: 1,
-        borderColor: isCurrentTeam ? color : '#2a2a2a',
+        borderColor: isCurrentTeam ? color : color + '40',
         borderRadius: 12,
-        backgroundColor: isCurrentTeam ? color + '10' : '#1a1a1a',
+        backgroundColor: isCurrentTeam ? color + '18' : color + '0a',
       }}
       className="p-3 flex-1"
     >
