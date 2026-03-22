@@ -5,6 +5,8 @@ import Constants from 'expo-constants';
 import { supabase } from './supabase';
 
 export async function registerForPushNotificationsAsync(): Promise<string | null> {
+  if (Platform.OS === 'web') return null;
+
   if (!Device.isDevice) {
     console.log('Push notifications require a physical device');
     return null;
