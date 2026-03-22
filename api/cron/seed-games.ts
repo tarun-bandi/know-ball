@@ -136,6 +136,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: teams, error: teamsErr } = await supabase
       .from('teams')
       .select('id, abbreviation')
+      .eq('sport', 'nba')
       .returns<{ id: string; abbreviation: string }[]>();
 
     if (teamsErr) {

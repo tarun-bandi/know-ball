@@ -296,6 +296,7 @@ async function loadTeamMap() {
   const { data, error } = await supabase
     .from('teams')
     .select('id, abbreviation')
+    .eq('sport', 'nba')
     .returns<{ id: string; abbreviation: string }[]>();
 
   if (error) {
