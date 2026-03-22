@@ -185,7 +185,7 @@ export default function PlayerDetailScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color="#c9a84c" size="large" />
+        <ActivityIndicator color="#d4a843" size="large" />
       </View>
     );
   }
@@ -204,7 +204,7 @@ export default function PlayerDetailScreen() {
         <RefreshControl
           refreshing={isRefetching}
           onRefresh={refetch}
-          tintColor="#c9a84c"
+          tintColor="#d4a843"
         />
       }
     >
@@ -248,8 +248,8 @@ export default function PlayerDetailScreen() {
           >
             <Heart
               size={24}
-              color="#c9a84c"
-              fill={isFavorite ? '#c9a84c' : 'transparent'}
+              color="#d4a843"
+              fill={isFavorite ? '#d4a843' : 'transparent'}
             />
           </TouchableOpacity>
         </View>

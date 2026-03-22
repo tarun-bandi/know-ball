@@ -34,7 +34,7 @@ export default function PlayerSlot({ player, isMe }: Props) {
         {isMe ? ' (you)' : ''}
       </Text>
       {RoleIcon && (
-        <RoleIcon size={14} color="#6b7280" />
+        <RoleIcon size={14} color="#7a7d88" />
       )}
     </View>
   );

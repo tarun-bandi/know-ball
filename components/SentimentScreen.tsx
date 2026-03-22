@@ -11,7 +11,7 @@ interface SentimentScreenProps {
 
 const OPTIONS: { sentiment: Sentiment; label: string; sub: string; icon: typeof ThumbsUp; color: string }[] = [
   { sentiment: 'loved', label: 'Had a great time', sub: 'Top tier game', icon: PartyPopper, color: '#4ade80' },
-  { sentiment: 'good', label: 'Was pretty good', sub: 'Solid game', icon: ThumbsUp, color: '#c9a84c' },
+  { sentiment: 'good', label: 'Was pretty good', sub: 'Solid game', icon: ThumbsUp, color: '#d4a843' },
   { sentiment: 'okay', label: 'Was okay', sub: 'Nothing special', icon: Meh, color: '#9ca3af' },
   { sentiment: 'bad', label: "Wasn't great", sub: 'Below average', icon: ThumbsDown, color: '#f87171' },
 ];

@@ -134,7 +134,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
 
   const reactionButtonAnimStyle = useAnimatedStyle(() => ({
     transform: [{ scale: reactionButtonScale.value }],
-    shadowColor: '#c9a84c',
+    shadowColor: '#d4a843',
     shadowOpacity: reactionGlow.value * 0.25,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 0 },
@@ -241,8 +241,8 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
       : log.fan_of === 'away'
         ? awayAccent
         : log.fan_of === 'both'
-          ? '#c9a84c'
-          : withAlpha('#6b7280', 0.7);
+          ? '#d4a843'
+          : withAlpha('#7a7d88', 0.7);
 
   const animateIconTap = (scale: typeof shareScale, glow: typeof shareGlow) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -624,7 +624,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.6}
             >
-              <Share2 size={17} color="#6b7280" />
+              <Share2 size={17} color="#7a7d88" />
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={commentButtonAnimStyle}>
@@ -637,7 +637,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.6}
             >
-              <MessageCircle size={18} color="#6b7280" />
+              <MessageCircle size={18} color="#7a7d88" />
               {commentCount > 0 && (
                 <Text className="text-xs font-medium text-muted">
                   {commentCount}
@@ -666,7 +666,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 {myReaction ? (
                   <Text style={{ fontSize: 18 }}>{REACTION_EMOJI[myReaction]}</Text>
                 ) : (
-                  <Heart size={18} color="#6b7280" fill="transparent" />
+                  <Heart size={18} color="#7a7d88" fill="transparent" />
                 )}
                 {topReactions.length > 0 ? (
                   <View className="flex-row items-center gap-1">

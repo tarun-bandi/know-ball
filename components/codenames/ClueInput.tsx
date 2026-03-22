@@ -38,7 +38,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
         <TextInput
           className="bg-surface border border-border rounded-xl px-4 py-3 text-white text-lg mb-3"
           placeholder="One word clue"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor="#7a7d88"
           value={word}
           onChangeText={setWord}
           autoCapitalize="characters"
@@ -53,9 +53,9 @@ export default function ClueInput({ team, onSubmit }: Props) {
               onPress={() => setNumber(n)}
               activeOpacity={0.7}
               style={{
-                backgroundColor: number === n ? color : '#1a1a1a',
+                backgroundColor: number === n ? color : '#141416',
                 borderWidth: 1,
-                borderColor: number === n ? color : '#2a2a2a',
+                borderColor: number === n ? color : '#2a2a30',
                 width: 36, height: 36, borderRadius: 18,
                 alignItems: 'center', justifyContent: 'center',
               }}
@@ -70,7 +70,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
           disabled={!canSubmit}
           activeOpacity={0.7}
           className="rounded-xl py-3.5 items-center"
-          style={{ backgroundColor: canSubmit ? color : '#2a2a2a' }}
+          style={{ backgroundColor: canSubmit ? color : '#2a2a30' }}
         >
           <Text className="text-white font-bold text-base">
             Submit Clue{number ? ` — ${word.trim().toUpperCase() || '...'} (${number})` : ''}

@@ -85,8 +85,8 @@ export default function CodenamesCard({ card, index, isSpymasterView, onPress, d
       <Animated.View
         style={[frontStyle, {
           position: 'absolute', width: '100%', height: '100%',
-          borderRadius: 12, backgroundColor: '#1a1a1a',
-          borderWidth: 1, borderColor: '#2a2a2a',
+          borderRadius: 12, backgroundColor: '#141416',
+          borderWidth: 1, borderColor: '#2a2a30',
           alignItems: 'center', justifyContent: 'center',
           overflow: 'hidden',
           shadowColor: '#000', shadowOffset: { width: 0, height: 2 },

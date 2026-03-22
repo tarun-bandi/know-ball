@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { UserPlus, Users, Gamepad2 } from 'lucide-react-native';
+import { UserPlus, Users, Gamepad2, TrendingUp, Flame, Trophy } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -55,7 +55,6 @@ async function fetchDiscover(userId: string): Promise<DiscoverData> {
     Date.now() - 7 * 24 * 60 * 60 * 1000,
   ).toISOString();
 
-  // Fetch recent logs, follows, and tag usage in parallel
   const [recentLogsRes, followsRes, tagMapRes] = await Promise.all([
     supabase
       .from('game_logs')
@@ -76,7 +75,6 @@ async function fetchDiscover(userId: string): Promise<DiscoverData> {
   const recentLogs = recentLogsRes.data ?? [];
   const followedIds = new Set((followsRes.data ?? []).map((f) => f.following_id));
 
-  // Aggregate: count logs per game
   const gameStats: Record<string, { count: number }> = {};
   const userLogCount: Record<string, number> = {};
 
@@ -88,26 +86,22 @@ async function fetchDiscover(userId: string): Promise<DiscoverData> {
     userLogCount[log.user_id] = (userLogCount[log.user_id] ?? 0) + 1;
   }
 
-  // Most logged games (top 5)
   const mostLoggedIds = Object.entries(gameStats)
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, 5)
     .map(([id]) => id);
 
-  // Popular users (top 5 by log count this week)
   const popularUserIds = Object.entries(userLogCount)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([id]) => id);
 
-  // Suggested users: most logs, not followed, not self
   const suggestedUserIds = Object.entries(userLogCount)
     .filter(([id]) => id !== userId && !followedIds.has(id))
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([id]) => id);
 
-  // Trending tags
   const tagCountMap: Record<string, number> = {};
   for (const row of (tagMapRes.data ?? []) as any[]) {
     tagCountMap[row.tag_id] = (tagCountMap[row.tag_id] ?? 0) + 1;
@@ -116,7 +110,6 @@ async function fetchDiscover(userId: string): Promise<DiscoverData> {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
 
-  // Fetch game details and profiles in parallel
   const allGameIds = [...new Set(mostLoggedIds)];
   const allUserIds = [...new Set([...popularUserIds, ...suggestedUserIds])];
   const tagIds = topTagIds.map(([id]) => id);
@@ -203,6 +196,17 @@ function formatDate(dateStr: string) {
   });
 }
 
+function SectionHeader({ icon: Icon, title, color = '#d4a843' }: { icon: any; title: string; color?: string }) {
+  return (
+    <View className="flex-row items-center gap-2 mb-3">
+      <View style={{ backgroundColor: color + '20', borderRadius: 8, padding: 6 }}>
+        <Icon size={16} color={color} strokeWidth={2.5} />
+      </View>
+      <Text className="text-white text-lg font-bold">{title}</Text>
+    </View>
+  );
+}
+
 export default function DiscoverScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -258,51 +262,108 @@ export default function DiscoverScreen() {
         <RefreshControl
           refreshing={isRefetching}
           onRefresh={refetch}
-          tintColor="#c9a84c"
+          tintColor="#d4a843"
         />
       }
     >
       <PageContainer>
-      {/* Find Friends */}
-      <View className="px-4 pt-5">
+      {/* Hero banners */}
+      <View className="px-4 pt-5 gap-3">
+        {/* Find Friends — gold tinted hero */}
         <TouchableOpacity
-          className="bg-accent/10 border border-accent/30 rounded-xl p-4 flex-row items-center gap-3"
           onPress={() => setShowFindFriends(true)}
           activeOpacity={0.7}
+          style={{
+            borderRadius: 16,
+            overflow: 'hidden',
+            position: 'relative',
+          }}
         >
-          <Users size={20} color="#c9a84c" />
-          <View className="flex-1">
-            <Text className="text-white font-semibold">Find Friends</Text>
-            <Text className="text-muted text-xs mt-0.5">See who from your contacts is on Know Ball</Text>
+          <View style={{
+            backgroundColor: '#141416',
+            borderWidth: 1,
+            borderColor: 'rgba(212, 168, 67, 0.15)',
+            borderRadius: 16,
+            padding: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 14,
+          }}>
+            {/* Gold glow orb */}
+            <View style={{
+              position: 'absolute', top: -20, right: -20,
+              width: 100, height: 100, borderRadius: 50,
+              backgroundColor: 'rgba(212, 168, 67, 0.06)',
+            }} />
+            <View style={{
+              backgroundColor: 'rgba(212, 168, 67, 0.15)',
+              width: 44, height: 44, borderRadius: 12,
+              alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Users size={22} color="#d4a843" strokeWidth={2.2} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text className="text-white font-bold text-base">Find Friends</Text>
+              <Text className="text-muted text-xs mt-0.5">See who from your contacts is here</Text>
+            </View>
           </View>
         </TouchableOpacity>
-      </View>
 
-      {/* NBA Codenames */}
-      <View className="px-4 pt-3">
+        {/* NBA Codenames — richer banner */}
         <TouchableOpacity
-          className="bg-surface border border-border rounded-xl p-4 flex-row items-center gap-3"
           onPress={() => router.push('/codenames' as any)}
           activeOpacity={0.7}
+          style={{
+            borderRadius: 16,
+            overflow: 'hidden',
+          }}
         >
-          <Gamepad2 size={20} color="#c9a84c" />
-          <View className="flex-1">
-            <Text className="text-white font-semibold">NBA Codenames</Text>
-            <Text className="text-muted text-xs mt-0.5">Pass-and-play word game with NBA teams</Text>
+          <View style={{
+            backgroundColor: '#141416',
+            borderWidth: 1,
+            borderColor: 'rgba(212, 168, 67, 0.1)',
+            borderRadius: 16,
+            padding: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 14,
+          }}>
+            {/* Accent glow */}
+            <View style={{
+              position: 'absolute', bottom: -15, left: -15,
+              width: 80, height: 80, borderRadius: 40,
+              backgroundColor: 'rgba(230, 57, 70, 0.04)',
+            }} />
+            <View style={{
+              backgroundColor: 'rgba(212, 168, 67, 0.12)',
+              width: 44, height: 44, borderRadius: 12,
+              alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Gamepad2 size={22} color="#d4a843" strokeWidth={2.2} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text className="text-white font-bold text-base">NBA Codenames</Text>
+              <Text className="text-muted text-xs mt-0.5">Real-time multiplayer word game</Text>
+            </View>
+            <View style={{
+              backgroundColor: 'rgba(212, 168, 67, 0.15)',
+              borderRadius: 20,
+              paddingHorizontal: 10, paddingVertical: 4,
+            }}>
+              <Text style={{ color: '#d4a843', fontSize: 11, fontWeight: '700' }}>PLAY</Text>
+            </View>
           </View>
         </TouchableOpacity>
       </View>
 
       {/* People to Follow */}
       {showSuggestions && (
-        <View className="px-4 pt-5">
-          <Text className="text-white text-lg font-bold mb-3">
-            People to Follow
-          </Text>
+        <View className="px-4 pt-6">
+          <SectionHeader icon={UserPlus} title="People to Follow" />
           {suggestedUsers.map((item) => (
             <View
               key={item.profile.user_id}
-              className="bg-surface border border-border rounded-xl p-4 mb-2 flex-row items-center gap-3"
+              className="bg-surface border border-border rounded-2xl p-4 mb-2 flex-row items-center gap-3"
             >
               <TouchableOpacity
                 className="flex-row items-center gap-3 flex-1"
@@ -324,13 +385,13 @@ export default function DiscoverScreen() {
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
-                className="bg-accent rounded-full px-3 py-1.5 flex-row items-center gap-1"
+                className="bg-accent rounded-full px-4 py-2 flex-row items-center gap-1.5"
                 onPress={() => followMutation.mutate(item.profile.user_id)}
                 disabled={followMutation.isPending}
                 activeOpacity={0.7}
               >
-                <UserPlus size={14} color="#0a0a0a" />
-                <Text className="text-background text-xs font-semibold">Follow</Text>
+                <UserPlus size={14} color="#08080a" strokeWidth={2.5} />
+                <Text style={{ color: '#08080a', fontSize: 12, fontWeight: '700' }}>Follow</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -339,20 +400,26 @@ export default function DiscoverScreen() {
 
       {/* Trending Tags */}
       {trendingTags.length > 0 && (
-        <View className="px-4 pt-4">
-          <Text className="text-white text-lg font-bold mb-3">
-            Trending Tags
-          </Text>
+        <View className="px-4 pt-6">
+          <SectionHeader icon={TrendingUp} title="Trending Tags" />
           <View className="flex-row flex-wrap gap-2 mb-2">
             {trendingTags.map((item) => (
               <TouchableOpacity
                 key={item.tag.id}
-                className="bg-accent/10 border border-accent/30 rounded-full px-3 py-1.5"
                 onPress={() => router.push(`/tag/${item.tag.slug}`)}
                 activeOpacity={0.7}
+                style={{
+                  backgroundColor: 'rgba(212, 168, 67, 0.1)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(212, 168, 67, 0.25)',
+                  borderRadius: 20,
+                  paddingHorizontal: 14,
+                  paddingVertical: 7,
+                }}
               >
-                <Text className="text-accent text-sm font-medium">
-                  {item.tag.name} ({item.count})
+                <Text style={{ color: '#d4a843', fontSize: 13, fontWeight: '600' }}>
+                  {item.tag.name}
+                  <Text style={{ color: '#7a7d88' }}> {item.count}</Text>
                 </Text>
               </TouchableOpacity>
             ))}
@@ -362,41 +429,55 @@ export default function DiscoverScreen() {
 
       {/* Most Logged This Week */}
       <View className="px-4 pt-6">
-        <Text className="text-white text-lg font-bold mb-3">
-          Most Logged This Week
-        </Text>
+        <SectionHeader icon={Flame} title="Most Logged This Week" color="#e63946" />
         {mostLogged.length === 0 ? (
-          <View className="items-center py-4 mb-4">
-            <Text style={{ fontSize: 32 }} className="mb-1">📊</Text>
+          <View className="items-center py-6 mb-4">
             <Text className="text-muted text-sm">No activity this week yet</Text>
           </View>
         ) : (
           mostLogged.map((item, idx) => (
             <TouchableOpacity
               key={item.game.id}
-              className="bg-surface border border-border rounded-xl p-4 mb-2"
+              className="bg-surface border border-border rounded-2xl p-4 mb-2"
               onPress={() => router.push(`/game/${item.game.id}`)}
               activeOpacity={0.7}
             >
               <View className="flex-row justify-between items-center">
                 <View className="flex-row items-center gap-2">
-                  <Text className="text-muted text-sm font-bold w-5">{idx + 1}</Text>
+                  <View style={{
+                    width: 24, height: 24, borderRadius: 12,
+                    backgroundColor: idx === 0 ? 'rgba(212, 168, 67, 0.2)' : 'rgba(122, 125, 136, 0.1)',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Text style={{
+                      color: idx === 0 ? '#d4a843' : '#7a7d88',
+                      fontSize: 11, fontWeight: '800',
+                    }}>
+                      {idx + 1}
+                    </Text>
+                  </View>
                   <TeamLogo abbreviation={item.game.away_team.abbreviation} sport={item.game.sport ?? 'nba'} size={22} />
                   <Text className="text-white font-semibold">
                     {item.game.away_team.abbreviation}
                   </Text>
-                  <Text className="text-muted">@</Text>
+                  <Text className="text-muted text-xs">@</Text>
                   <TeamLogo abbreviation={item.game.home_team.abbreviation} sport={item.game.sport ?? 'nba'} size={22} />
                   <Text className="text-white font-semibold">
                     {item.game.home_team.abbreviation}
                   </Text>
                   {item.game.playoff_round && <PlayoffBadge round={item.game.playoff_round} sport={item.game.sport ?? 'nba'} />}
                 </View>
-                <Text className="text-accent text-sm font-medium">
-                  {item.logCount} {item.logCount === 1 ? 'log' : 'logs'}
-                </Text>
+                <View style={{
+                  backgroundColor: 'rgba(212, 168, 67, 0.1)',
+                  borderRadius: 12,
+                  paddingHorizontal: 8, paddingVertical: 3,
+                }}>
+                  <Text style={{ color: '#d4a843', fontSize: 12, fontWeight: '700' }}>
+                    {item.logCount}
+                  </Text>
+                </View>
               </View>
-              <Text className="text-muted text-xs mt-1 ml-7">
+              <Text className="text-muted text-xs mt-1.5" style={{ marginLeft: 34 }}>
                 {formatDate(item.game.game_date_utc)}
               </Text>
             </TouchableOpacity>
@@ -404,21 +485,18 @@ export default function DiscoverScreen() {
         )}
       </View>
 
-      {/* Popular Reviewers */}
-      <View className="px-4 pt-5 pb-8">
-        <Text className="text-white text-lg font-bold mb-3">
-          Active Reviewers
-        </Text>
+      {/* Active Reviewers */}
+      <View className="px-4 pt-6 pb-8">
+        <SectionHeader icon={Trophy} title="Active Reviewers" />
         {popularUsers.length === 0 ? (
-          <View className="items-center py-4">
-            <Text style={{ fontSize: 32 }} className="mb-1">📊</Text>
+          <View className="items-center py-6">
             <Text className="text-muted text-sm">No active reviewers this week</Text>
           </View>
         ) : (
           popularUsers.map((item) => (
             <TouchableOpacity
               key={item.profile.user_id}
-              className="bg-surface border border-border rounded-xl p-4 mb-2 flex-row items-center gap-3"
+              className="bg-surface border border-border rounded-2xl p-4 mb-2 flex-row items-center gap-3"
               onPress={() => router.push(`/user/${item.profile.handle}`)}
               activeOpacity={0.7}
             >
@@ -433,9 +511,15 @@ export default function DiscoverScreen() {
                 </Text>
                 <Text className="text-muted text-sm">@{item.profile.handle}</Text>
               </View>
-              <Text className="text-accent text-sm font-medium">
-                {item.logCount} {item.logCount === 1 ? 'log' : 'logs'}
-              </Text>
+              <View style={{
+                backgroundColor: 'rgba(212, 168, 67, 0.1)',
+                borderRadius: 12,
+                paddingHorizontal: 8, paddingVertical: 3,
+              }}>
+                <Text style={{ color: '#d4a843', fontSize: 12, fontWeight: '700' }}>
+                  {item.logCount}
+                </Text>
+              </View>
             </TouchableOpacity>
           ))
         )}

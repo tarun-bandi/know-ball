@@ -157,7 +157,7 @@ export default function WatchlistScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor="#c9a84c"
+            tintColor="#d4a843"
           />
         }
         showsVerticalScrollIndicator={false}

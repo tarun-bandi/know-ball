@@ -183,7 +183,7 @@ export default function LoginScreen() {
           <Animated.View style={[{ marginBottom: 6 }, fadeSlide(titleAnim)]}>
             <Text
               style={{
-                color: '#c9a84c',
+                color: '#d4a843',
                 fontSize: 52,
                 fontWeight: '700',
                 letterSpacing: -2,
@@ -209,7 +209,7 @@ export default function LoginScreen() {
           <Animated.View style={[{ marginBottom: 40 }, fadeSlide(subtitleAnim)]}>
             <Text
               style={{
-                color: '#6b7280',
+                color: '#7a7d88',
                 fontSize: 15,
                 fontWeight: '400',
                 letterSpacing: 0.5,
@@ -225,7 +225,7 @@ export default function LoginScreen() {
               testID="auth_email_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Email"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#7a7d88"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -236,7 +236,7 @@ export default function LoginScreen() {
               testID="auth_password_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Password"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#7a7d88"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -251,7 +251,7 @@ export default function LoginScreen() {
               activeOpacity={0.85}
             >
               {loading ? (
-                <ActivityIndicator color="#0a0a0a" />
+                <ActivityIndicator color="#08080a" />
               ) : (
                 <Text className="text-background font-bold text-base tracking-wide">
                   Sign In

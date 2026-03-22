@@ -111,13 +111,13 @@ export default function AddToListModal({ gameId, onClose }: AddToListModalProps)
               Add to List
             </Text>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <X size={22} color="#6b7280" />
+              <X size={22} color="#7a7d88" />
             </TouchableOpacity>
           </View>
 
           {loading ? (
             <View className="py-12 items-center">
-              <ActivityIndicator color="#c9a84c" />
+              <ActivityIndicator color="#d4a843" />
             </View>
           ) : (
             <FlatList
@@ -130,7 +130,7 @@ export default function AddToListModal({ gameId, onClose }: AddToListModalProps)
                   onPress={() => setShowCreateList(true)}
                 >
                   <View className="w-10 h-10 bg-accent/20 rounded-lg items-center justify-center">
-                    <Plus size={20} color="#c9a84c" />
+                    <Plus size={20} color="#d4a843" />
                   </View>
                   <Text className="text-accent font-medium text-base">
                     Create New List
@@ -155,14 +155,14 @@ export default function AddToListModal({ gameId, onClose }: AddToListModalProps)
                           isInList ? 'bg-accent' : 'bg-background border border-border'
                         }`}
                       >
-                        {isInList && <Check size={18} color="#0a0a0a" />}
+                        {isInList && <Check size={18} color="#08080a" />}
                       </View>
                       <View className="flex-1">
                         <View className="flex-row items-center gap-1.5">
                           <Text className="text-white font-medium" numberOfLines={1}>
                             {item.title}
                           </Text>
-                          {item.is_private && <Lock size={12} color="#6b7280" />}
+                          {item.is_private && <Lock size={12} color="#7a7d88" />}
                         </View>
                         {item.description && (
                           <Text className="text-muted text-xs mt-0.5" numberOfLines={1}>

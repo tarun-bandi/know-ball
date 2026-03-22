@@ -87,7 +87,7 @@ export default function SignupScreen() {
               testID="signup_name_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Display Name"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#7a7d88"
               value={displayName}
               onChangeText={setDisplayName}
               autoCapitalize="words"
@@ -97,7 +97,7 @@ export default function SignupScreen() {
               testID="signup_email_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Email"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#7a7d88"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -108,7 +108,7 @@ export default function SignupScreen() {
               testID="signup_password_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Password (min 6 characters)"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#7a7d88"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -122,7 +122,7 @@ export default function SignupScreen() {
               disabled={loading || googleLoading}
             >
               {loading ? (
-                <ActivityIndicator color="#0a0a0a" />
+                <ActivityIndicator color="#08080a" />
               ) : (
                 <Text className="text-background font-semibold text-base">
                   Create Account

@@ -89,13 +89,13 @@ export default function FollowListModal({
                 onPress={onClose}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <X size={22} color="#6b7280" />
+                <X size={22} color="#7a7d88" />
               </TouchableOpacity>
             </View>
 
             {loading ? (
               <View className="items-center py-8">
-                <ActivityIndicator color="#c9a84c" />
+                <ActivityIndicator color="#d4a843" />
               </View>
             ) : (
               <FlatList

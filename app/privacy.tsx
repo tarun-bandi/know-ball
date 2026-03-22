@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PrivacyPolicy() {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0a0a0a' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#08080a' }}>
       <ScrollView style={{ flex: 1, padding: 24 }}>
         <Text style={{ color: '#ffffff', fontSize: 28, fontWeight: 'bold', marginBottom: 8 }}>
           Privacy Policy

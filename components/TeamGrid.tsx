@@ -98,11 +98,11 @@ export default function TeamGrid({ query, onSelectTeam, excludeTeamId }: TeamGri
             key={tab.key}
             onPress={() => setActiveSport(tab.key)}
             className="px-3 py-1 rounded-full border border-border bg-background"
-            style={activeSport === tab.key ? { backgroundColor: '#c9a84c', borderColor: '#c9a84c' } : undefined}
+            style={activeSport === tab.key ? { backgroundColor: '#d4a843', borderColor: '#d4a843' } : undefined}
           >
             <Text
               className="text-xs font-medium text-muted"
-              style={activeSport === tab.key ? { color: '#0a0a0a' } : undefined}
+              style={activeSport === tab.key ? { color: '#08080a' } : undefined}
             >
               {tab.label}
             </Text>
@@ -112,7 +112,7 @@ export default function TeamGrid({ query, onSelectTeam, excludeTeamId }: TeamGri
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#c9a84c" />
+          <ActivityIndicator color="#d4a843" />
         </View>
       ) : showGrouped ? (
         <ScrollView

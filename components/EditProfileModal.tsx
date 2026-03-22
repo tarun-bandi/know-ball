@@ -120,7 +120,7 @@ export default function EditProfileModal({
                 Edit Profile
               </Text>
               <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <X size={22} color="#6b7280" />
+                <X size={22} color="#7a7d88" />
               </TouchableOpacity>
             </View>
 
@@ -144,12 +144,12 @@ export default function EditProfileModal({
                     />
                     <View
                       className="absolute bottom-0 right-0 bg-accent rounded-full p-1.5"
-                      style={{ borderWidth: 2, borderColor: '#1a1a1a' }}
+                      style={{ borderWidth: 2, borderColor: '#141416' }}
                     >
                       {uploading ? (
-                        <ActivityIndicator color="#0a0a0a" size="small" />
+                        <ActivityIndicator color="#08080a" size="small" />
                       ) : (
-                        <Camera size={14} color="#0a0a0a" />
+                        <Camera size={14} color="#08080a" />
                       )}
                     </View>
                   </View>
@@ -165,7 +165,7 @@ export default function EditProfileModal({
                   value={displayName}
                   onChangeText={setDisplayName}
                   placeholder="Your name"
-                  placeholderTextColor="#6b7280"
+                  placeholderTextColor="#7a7d88"
                   autoCapitalize="words"
                   maxLength={50}
                 />
@@ -181,7 +181,7 @@ export default function EditProfileModal({
                     value={handle}
                     onChangeText={(t) => setHandle(t.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                     placeholder="handle"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor="#7a7d88"
                     autoCapitalize="none"
                     autoCorrect={false}
                     maxLength={30}
@@ -197,7 +197,7 @@ export default function EditProfileModal({
                   value={bio}
                   onChangeText={setBio}
                   placeholder="Tell us about yourself"
-                  placeholderTextColor="#6b7280"
+                  placeholderTextColor="#7a7d88"
                   multiline
                   numberOfLines={3}
                   textAlignVertical="top"
@@ -225,7 +225,7 @@ export default function EditProfileModal({
                     value={avatarUrl}
                     onChangeText={setAvatarUrl}
                     placeholder="https://example.com/avatar.jpg"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor="#7a7d88"
                     autoCapitalize="none"
                     autoCorrect={false}
                     keyboardType="url"
@@ -240,7 +240,7 @@ export default function EditProfileModal({
                 disabled={saving}
               >
                 {saving ? (
-                  <ActivityIndicator color="#0a0a0a" />
+                  <ActivityIndicator color="#08080a" />
                 ) : (
                   <Text className="text-background font-semibold text-base">
                     Save Profile

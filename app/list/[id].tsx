@@ -116,7 +116,7 @@ export default function ListDetailScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color="#c9a84c" size="large" />
+        <ActivityIndicator color="#d4a843" size="large" />
       </View>
     );
   }
@@ -141,7 +141,7 @@ export default function ListDetailScreen() {
           <Text className="text-white text-xl font-bold flex-1" numberOfLines={2}>
             {list.title}
           </Text>
-          {list.is_private && <Lock size={16} color="#6b7280" />}
+          {list.is_private && <Lock size={16} color="#7a7d88" />}
           <View className="flex-row items-center gap-1">
             <TouchableOpacity
               className="p-2"
@@ -152,7 +152,7 @@ export default function ListDetailScreen() {
               }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Share2 size={18} color="#6b7280" />
+              <Share2 size={18} color="#7a7d88" />
             </TouchableOpacity>
             {isOwner && (
               <>
@@ -161,7 +161,7 @@ export default function ListDetailScreen() {
                   onPress={() => setShowEditModal(true)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Pencil size={18} color="#c9a84c" />
+                  <Pencil size={18} color="#d4a843" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="p-2"

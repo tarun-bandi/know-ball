@@ -10,6 +10,27 @@
     font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #08080a;
+    color: #f0f0f0;
+  }
+}
+
+/* Subtle ambient glow on body — gives depth to the black void */
+@media screen {
+  #root {
+    position: relative;
+  }
+  #root::before {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 50%;
+    background: radial-gradient(ellipse at center, rgba(212, 168, 67, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
   }
 }
 
@@ -20,6 +41,15 @@
 
 .banner-shimmer {
   animation: banner-shimmer 6s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 /* Smooth scrolling on mobile web */

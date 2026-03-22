@@ -200,7 +200,7 @@ export default function StatsScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color="#c9a84c" size="large" />
+        <ActivityIndicator color="#d4a843" size="large" />
       </View>
     );
   }
@@ -217,7 +217,7 @@ export default function StatsScreen() {
         <RefreshControl
           refreshing={isRefetching}
           onRefresh={refetch}
-          tintColor="#c9a84c"
+          tintColor="#d4a843"
         />
       }
     >

@@ -141,12 +141,12 @@ export default function OnboardingProfileSetup() {
                 />
                 <View
                   className="absolute bottom-0 right-0 bg-accent rounded-full p-1.5"
-                  style={{ borderWidth: 2, borderColor: '#0a0a0a' }}
+                  style={{ borderWidth: 2, borderColor: '#08080a' }}
                 >
                   {uploading ? (
-                    <ActivityIndicator color="#0a0a0a" size="small" />
+                    <ActivityIndicator color="#08080a" size="small" />
                   ) : (
-                    <Camera size={14} color="#0a0a0a" />
+                    <Camera size={14} color="#08080a" />
                   )}
                 </View>
               </View>
@@ -163,7 +163,7 @@ export default function OnboardingProfileSetup() {
                 value={displayName}
                 onChangeText={setDisplayName}
                 placeholder="Your name"
-                placeholderTextColor="#6b7280"
+                placeholderTextColor="#7a7d88"
                 autoCapitalize="words"
                 maxLength={50}
               />
@@ -177,7 +177,7 @@ export default function OnboardingProfileSetup() {
                 value={bio}
                 onChangeText={setBio}
                 placeholder="Tell us about yourself"
-                placeholderTextColor="#6b7280"
+                placeholderTextColor="#7a7d88"
                 multiline
                 numberOfLines={3}
                 textAlignVertical="top"
@@ -201,7 +201,7 @@ export default function OnboardingProfileSetup() {
             activeOpacity={0.8}
           >
             {saving ? (
-              <ActivityIndicator color="#0a0a0a" />
+              <ActivityIndicator color="#08080a" />
             ) : (
               <Text className="text-background font-semibold text-base">
                 Done

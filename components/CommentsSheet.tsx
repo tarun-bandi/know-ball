@@ -152,13 +152,13 @@ export default function CommentsSheet({
                 onPress={onClose}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <X size={22} color="#6b7280" />
+                <X size={22} color="#7a7d88" />
               </TouchableOpacity>
             </View>
 
             {loading ? (
               <View className="items-center py-8">
-                <ActivityIndicator color="#c9a84c" />
+                <ActivityIndicator color="#d4a843" />
               </View>
             ) : (
               <FlatList
@@ -211,7 +211,7 @@ export default function CommentsSheet({
               <TextInput
                 className="flex-1 bg-background border border-border rounded-xl px-4 py-3 text-white text-sm"
                 placeholder="Add a comment..."
-                placeholderTextColor="#6b7280"
+                placeholderTextColor="#7a7d88"
                 value={body}
                 onChangeText={setBody}
                 maxLength={500}
@@ -223,11 +223,11 @@ export default function CommentsSheet({
                 className="p-2"
               >
                 {posting ? (
-                  <ActivityIndicator color="#c9a84c" size="small" />
+                  <ActivityIndicator color="#d4a843" size="small" />
                 ) : (
                   <Send
                     size={22}
-                    color={body.trim() ? '#c9a84c' : '#6b7280'}
+                    color={body.trim() ? '#d4a843' : '#7a7d88'}
                   />
                 )}
               </TouchableOpacity>

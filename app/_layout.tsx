@@ -140,14 +140,14 @@ export default function RootLayout() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#0a0a0a', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: '#08080a', alignItems: 'center', justifyContent: 'center' }}>
         <StatusBar barStyle="light-content" />
         <Image
           source={require('@/assets/splash-icon.png')}
           style={{ width: 120, height: 120, opacity: 0.7 }}
           resizeMode="contain"
         />
-        <ActivityIndicator color="#c9a84c" size="small" style={{ marginTop: 24 }} />
+        <ActivityIndicator color="#d4a843" size="small" style={{ marginTop: 24 }} />
       </View>
     );
   }
@@ -167,7 +167,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Game',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
                 headerLeft: () => (
                   <TouchableOpacity
@@ -187,7 +187,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Profile',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -196,7 +196,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'List',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -205,7 +205,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Notifications',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -214,7 +214,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Tag',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -223,7 +223,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Watchlist',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -232,7 +232,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Stats & Insights',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -241,7 +241,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Diary',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -250,7 +250,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Settings',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -259,7 +259,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'My Rankings',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -268,7 +268,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Privacy Policy',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -277,7 +277,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Support',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />
@@ -286,7 +286,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: 'Player',
-                headerStyle: { backgroundColor: '#1a1a1a' },
+                headerStyle: { backgroundColor: '#141416' },
                 headerTintColor: '#ffffff',
               }}
             />

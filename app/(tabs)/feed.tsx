@@ -166,20 +166,37 @@ export default function FeedScreen() {
             : { paddingTop: 4, paddingBottom: 24, paddingHorizontal: 16 }
         }
         ListEmptyComponent={
-          <View className="px-6 items-center">
-            <Text style={{ fontSize: 48 }} className="mb-3">{'\u{1F3C0}'}</Text>
-            <Text className="text-white text-lg font-semibold mb-2">
+          <View className="px-6 items-center" style={{ paddingTop: 40 }}>
+            <View style={{
+              width: 80, height: 80, borderRadius: 40,
+              backgroundColor: 'rgba(212, 168, 67, 0.1)',
+              alignItems: 'center', justifyContent: 'center',
+              marginBottom: 20,
+            }}>
+              <Text style={{ fontSize: 36 }}>{'\u{1F3C0}'}</Text>
+            </View>
+            <Text className="text-white font-bold mb-2" style={{ fontSize: 22 }}>
               Nothing here yet
             </Text>
-            <Text className="text-muted text-center mb-4">
-              Follow other fans or search for a game to log your first entry.
+            <Text className="text-muted text-center mb-6" style={{ fontSize: 15, lineHeight: 22 }}>
+              Follow other fans or search for a game{'\n'}to log your first entry.
             </Text>
             <TouchableOpacity
-              className="bg-accent rounded-xl px-6 py-3"
+              style={{
+                backgroundColor: '#d4a843',
+                borderRadius: 14,
+                paddingHorizontal: 32,
+                paddingVertical: 14,
+                shadowColor: '#d4a843',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 12,
+                elevation: 8,
+              }}
               onPress={() => router.push('/(tabs)/search')}
               activeOpacity={0.8}
             >
-              <Text className="text-background font-semibold text-base">
+              <Text className="font-bold text-base" style={{ color: '#08080a' }}>
                 Search Games
               </Text>
             </TouchableOpacity>
@@ -188,7 +205,7 @@ export default function FeedScreen() {
         ListFooterComponent={
           isFetchingNextPage ? (
             <View className="py-4">
-              <ActivityIndicator color="#c9a84c" />
+              <ActivityIndicator color="#d4a843" />
             </View>
           ) : null
         }
@@ -200,7 +217,7 @@ export default function FeedScreen() {
           <RefreshControl
             refreshing={isRefetching && !isFetchingNextPage}
             onRefresh={refetch}
-            tintColor="#c9a84c"
+            tintColor="#d4a843"
           />
         }
         showsVerticalScrollIndicator={false}

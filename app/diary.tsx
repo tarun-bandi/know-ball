@@ -102,7 +102,7 @@ export default function DiaryScreen() {
               queryClient.invalidateQueries({ queryKey: ['diary-month', user.id] }),
             ]);
           }}
-          tintColor="#c9a84c"
+          tintColor="#d4a843"
         />
       }
     >
@@ -129,7 +129,7 @@ export default function DiaryScreen() {
 
           {isLoading ? (
             <View className="bg-surface border border-border rounded-xl p-6 items-center">
-              <ActivityIndicator size="small" color="#c9a84c" />
+              <ActivityIndicator size="small" color="#d4a843" />
               <Text className="text-muted text-sm mt-3">Loading logs...</Text>
             </View>
           ) : error ? (

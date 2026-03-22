@@ -132,7 +132,7 @@ export default function FavoriteTeamsModal({
                 Favorite Teams
               </Text>
               <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <X size={22} color="#6b7280" />
+                <X size={22} color="#7a7d88" />
               </TouchableOpacity>
             </View>
 
@@ -148,13 +148,13 @@ export default function FavoriteTeamsModal({
                     disabled={isDisabled}
                     className="px-4 py-1.5 rounded-full border border-border bg-background"
                     style={[
-                      isActive ? { backgroundColor: '#c9a84c', borderColor: '#c9a84c' } : undefined,
+                      isActive ? { backgroundColor: '#d4a843', borderColor: '#d4a843' } : undefined,
                       isDisabled ? { opacity: 0.35 } : undefined,
                     ]}
                   >
                     <Text
                       className="text-sm font-medium text-muted"
-                      style={isActive ? { color: '#0a0a0a' } : undefined}
+                      style={isActive ? { color: '#08080a' } : undefined}
                     >
                       {tab.label}
                     </Text>
@@ -165,7 +165,7 @@ export default function FavoriteTeamsModal({
 
             {loading ? (
               <View className="items-center py-8">
-                <ActivityIndicator color="#c9a84c" />
+                <ActivityIndicator color="#d4a843" />
               </View>
             ) : (
               <ScrollView
@@ -195,7 +195,7 @@ export default function FavoriteTeamsModal({
                         >
                           {team.abbreviation}
                         </Text>
-                        {isSelected && <Check size={14} color="#c9a84c" />}
+                        {isSelected && <Check size={14} color="#d4a843" />}
                       </TouchableOpacity>
                     );
                   })}
@@ -210,7 +210,7 @@ export default function FavoriteTeamsModal({
                 disabled={saving}
               >
                 {saving ? (
-                  <ActivityIndicator color="#0a0a0a" />
+                  <ActivityIndicator color="#08080a" />
                 ) : (
                   <Text className="text-background font-semibold text-base">
                     Save ({selected.size} selected)

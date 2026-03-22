@@ -149,7 +149,7 @@ function timeAgo(dateStr: string): string {
 
 const ICON_MAP = {
   like: { icon: Heart, color: '#e63946' },
-  comment: { icon: MessageCircle, color: '#c9a84c' },
+  comment: { icon: MessageCircle, color: '#d4a843' },
   follow: { icon: UserPlus, color: '#457b9d' },
 };
 
@@ -181,7 +181,7 @@ export default function NotificationsScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color="#c9a84c" size="large" />
+        <ActivityIndicator color="#d4a843" size="large" />
       </View>
     );
   }
@@ -242,7 +242,7 @@ export default function NotificationsScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor="#c9a84c"
+            tintColor="#d4a843"
           />
         }
         showsVerticalScrollIndicator={false}

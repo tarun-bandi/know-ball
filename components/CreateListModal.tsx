@@ -104,7 +104,7 @@ export default function CreateListModal({
                 {existingList ? 'Edit List' : 'New List'}
               </Text>
               <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <X size={22} color="#6b7280" />
+                <X size={22} color="#7a7d88" />
               </TouchableOpacity>
             </View>
 
@@ -120,7 +120,7 @@ export default function CreateListModal({
                   value={title}
                   onChangeText={setTitle}
                   placeholder="e.g. Best Games of 2024"
-                  placeholderTextColor="#6b7280"
+                  placeholderTextColor="#7a7d88"
                   maxLength={100}
                 />
               </View>
@@ -132,7 +132,7 @@ export default function CreateListModal({
                   value={description}
                   onChangeText={setDescription}
                   placeholder="What's this list about?"
-                  placeholderTextColor="#6b7280"
+                  placeholderTextColor="#7a7d88"
                   multiline
                   numberOfLines={3}
                   textAlignVertical="top"
@@ -151,7 +151,7 @@ export default function CreateListModal({
                 <Switch
                   value={isPrivate}
                   onValueChange={setIsPrivate}
-                  trackColor={{ false: '#2a2a2a', true: '#c9a84c' }}
+                  trackColor={{ false: '#2a2a30', true: '#d4a843' }}
                   thumbColor="#ffffff"
                 />
               </View>
@@ -162,7 +162,7 @@ export default function CreateListModal({
                 disabled={saving}
               >
                 {saving ? (
-                  <ActivityIndicator color="#0a0a0a" />
+                  <ActivityIndicator color="#08080a" />
                 ) : (
                   <Text className="text-background font-semibold text-base">
                     {existingList ? 'Save Changes' : 'Create List'}

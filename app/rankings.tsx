@@ -99,7 +99,7 @@ export default function RankingsScreen() {
           onLongPress={drag}
           disabled={isActive}
           activeOpacity={0.7}
-          style={isActive ? { opacity: 0.9, shadowColor: '#c9a84c', shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 } : undefined}
+          style={isActive ? { opacity: 0.9, shadowColor: '#d4a843', shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 } : undefined}
         >
           {/* Drag handle */}
           <View className="mr-1 opacity-40">
@@ -148,7 +148,7 @@ export default function RankingsScreen() {
                   {formatScore(score)}
                 </Text>
                 {item.fan_of && item.fan_of !== 'neutral' && (
-                  <Heart size={12} color="#c9a84c" fill="#c9a84c" />
+                  <Heart size={12} color="#d4a843" fill="#d4a843" />
                 )}
               </View>
             </View>
@@ -159,9 +159,9 @@ export default function RankingsScreen() {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#0a0a0a' }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#08080a' }}>
       <DraggableFlatList
-        containerStyle={{ backgroundColor: '#0a0a0a' }}
+        containerStyle={{ backgroundColor: '#08080a' }}
         data={data ?? []}
         keyExtractor={(item) => item.game_id}
         renderItem={renderItem}
@@ -171,7 +171,7 @@ export default function RankingsScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor="#c9a84c"
+            tintColor="#d4a843"
           />
         }
         ListHeaderComponent={
@@ -179,7 +179,7 @@ export default function RankingsScreen() {
             <View className="mb-4">
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center gap-2">
-                  <Trophy size={18} color="#c9a84c" />
+                  <Trophy size={18} color="#d4a843" />
                   <Text className="text-white font-semibold text-base">
                     {totalCount} Ranked Games
                   </Text>
@@ -190,7 +190,7 @@ export default function RankingsScreen() {
                   className="flex-row items-center gap-1.5 bg-surface border border-border rounded-full px-3 py-1.5"
                   activeOpacity={0.7}
                 >
-                  <Share2 size={14} color="#c9a84c" />
+                  <Share2 size={14} color="#d4a843" />
                   <Text className="text-accent text-xs font-medium">
                     {isSharing ? 'Saving...' : 'Share Top 10'}
                   </Text>
@@ -207,7 +207,7 @@ export default function RankingsScreen() {
         ListEmptyComponent={
           isLoading ? null : (
             <View className="items-center py-20">
-              <Trophy size={48} color="#6b7280" />
+              <Trophy size={48} color="#7a7d88" />
               <Text className="text-muted text-base mt-4 mb-2">No rankings yet</Text>
               <Text className="text-muted text-sm text-center px-8">
                 After logging a game, you'll be prompted to rank it against your other games.

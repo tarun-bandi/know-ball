@@ -19,21 +19,21 @@ const RankingsShareCard = forwardRef<View, RankingsShareCardProps>(
         ref={ref}
         style={{
           width: 400,
-          backgroundColor: '#0a0a0a',
+          backgroundColor: '#08080a',
           padding: 24,
           borderRadius: 16,
           borderWidth: 1,
-          borderColor: '#c9a84c33',
+          borderColor: '#d4a84333',
         }}
         collapsable={false}
       >
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-          <Text style={{ color: '#c9a84c', fontSize: 20, fontWeight: '700', flex: 1 }}>
+          <Text style={{ color: '#d4a843', fontSize: 20, fontWeight: '700', flex: 1 }}>
             My Top 10 Games
           </Text>
           {handle && (
-            <Text style={{ color: '#6b7280', fontSize: 13 }}>@{handle}</Text>
+            <Text style={{ color: '#7a7d88', fontSize: 13 }}>@{handle}</Text>
           )}
         </View>
 
@@ -50,13 +50,13 @@ const RankingsShareCard = forwardRef<View, RankingsShareCardProps>(
                 alignItems: 'center',
                 paddingVertical: 8,
                 borderBottomWidth: idx < top10.length - 1 ? 1 : 0,
-                borderBottomColor: '#1a1a1a',
+                borderBottomColor: '#141416',
               }}
             >
               {/* Position */}
               <Text
                 style={{
-                  color: idx < 3 ? '#c9a84c' : '#fff',
+                  color: idx < 3 ? '#d4a843' : '#fff',
                   fontWeight: '700',
                   fontSize: 16,
                   width: 32,
@@ -71,7 +71,7 @@ const RankingsShareCard = forwardRef<View, RankingsShareCardProps>(
                 <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>
                   {game.away_team.abbreviation} {game.away_team_score ?? ''} - {game.home_team_score ?? ''} {game.home_team.abbreviation}
                 </Text>
-                <Text style={{ color: '#6b7280', fontSize: 11, marginTop: 2 }}>
+                <Text style={{ color: '#7a7d88', fontSize: 11, marginTop: 2 }}>
                   {new Date(game.game_date_utc).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -85,7 +85,7 @@ const RankingsShareCard = forwardRef<View, RankingsShareCardProps>(
 
               {/* Score */}
               {score !== null && (
-                <Text style={{ color: '#c9a84c', fontWeight: '700', fontSize: 15 }}>
+                <Text style={{ color: '#d4a843', fontWeight: '700', fontSize: 15 }}>
                   {formatScore(score)}
                 </Text>
               )}

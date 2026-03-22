@@ -163,7 +163,7 @@ export default function SettingsScreen() {
             <Switch
               value={spoilerFreeMode}
               onValueChange={setSpoilerFreeMode}
-              trackColor={{ false: '#2a2a2a', true: '#c9a84c' }}
+              trackColor={{ false: '#2a2a30', true: '#d4a843' }}
               thumbColor="#ffffff"
             />
           </View>
@@ -204,7 +204,7 @@ export default function SettingsScreen() {
                     queryClient.invalidateQueries({ queryKey: ['nba-scoreboard'] });
                     queryClient.invalidateQueries({ queryKey: ['feed'] });
                   }}
-                  trackColor={{ false: '#2a2a2a', true: '#c9a84c' }}
+                  trackColor={{ false: '#2a2a30', true: '#d4a843' }}
                   thumbColor="#ffffff"
                 />
               </View>
@@ -229,7 +229,7 @@ export default function SettingsScreen() {
             <Switch
               value={notifyReactions}
               onValueChange={setNotifyReactions}
-              trackColor={{ false: '#2a2a2a', true: '#c9a84c' }}
+              trackColor={{ false: '#2a2a30', true: '#d4a843' }}
               thumbColor="#ffffff"
             />
           </View>
@@ -243,7 +243,7 @@ export default function SettingsScreen() {
             <Switch
               value={notifyComments}
               onValueChange={setNotifyComments}
-              trackColor={{ false: '#2a2a2a', true: '#c9a84c' }}
+              trackColor={{ false: '#2a2a30', true: '#d4a843' }}
               thumbColor="#ffffff"
             />
           </View>
@@ -257,7 +257,7 @@ export default function SettingsScreen() {
             <Switch
               value={notifyFollows}
               onValueChange={setNotifyFollows}
-              trackColor={{ false: '#2a2a2a', true: '#c9a84c' }}
+              trackColor={{ false: '#2a2a30', true: '#d4a843' }}
               thumbColor="#ffffff"
             />
           </View>
@@ -281,10 +281,10 @@ export default function SettingsScreen() {
             activeOpacity={0.7}
           >
             <View className="flex-row items-center gap-3">
-              <Share2 size={18} color="#c9a84c" />
+              <Share2 size={18} color="#d4a843" />
               <Text className="text-white font-medium">Invite Friends</Text>
             </View>
-            <ChevronRight size={16} color="#6b7280" />
+            <ChevronRight size={16} color="#7a7d88" />
           </TouchableOpacity>
           <TouchableOpacity
             className="p-4 flex-row items-center justify-between"
@@ -292,10 +292,10 @@ export default function SettingsScreen() {
             activeOpacity={0.7}
           >
             <View className="flex-row items-center gap-3">
-              <Users size={18} color="#c9a84c" />
+              <Users size={18} color="#d4a843" />
               <Text className="text-white font-medium">Find Friends from Contacts</Text>
             </View>
-            <ChevronRight size={16} color="#6b7280" />
+            <ChevronRight size={16} color="#7a7d88" />
           </TouchableOpacity>
         </View>
       </View>

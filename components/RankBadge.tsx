@@ -29,7 +29,7 @@ export default function RankBadge({ position, total, fanOf, size = 'sm' }: RankB
         </Text>
       )}
       {isFanGame && (
-        <Heart size={size === 'md' ? 12 : 10} color="#c9a84c" fill="#c9a84c" />
+        <Heart size={size === 'md' ? 12 : 10} color="#d4a843" fill="#d4a843" />
       )}
       <Text
         className={`${showScore ? 'text-muted' : 'text-accent font-bold'} ${size === 'md' ? 'text-xs' : 'text-[10px]'}`}

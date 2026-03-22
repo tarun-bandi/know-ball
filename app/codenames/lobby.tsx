@@ -157,9 +157,9 @@ export default function CodenamesLobby() {
               onPress={() => setFirstTeam('red')}
               className="rounded-lg px-3 py-1"
               style={{
-                backgroundColor: firstTeam === 'red' ? '#E03A3E' : '#1a1a1a',
+                backgroundColor: firstTeam === 'red' ? '#E03A3E' : '#141416',
                 borderWidth: 1,
-                borderColor: firstTeam === 'red' ? '#E03A3E' : '#2a2a2a',
+                borderColor: firstTeam === 'red' ? '#E03A3E' : '#2a2a30',
               }}
               activeOpacity={0.7}
             >
@@ -169,9 +169,9 @@ export default function CodenamesLobby() {
               onPress={() => setFirstTeam('blue')}
               className="rounded-lg px-3 py-1"
               style={{
-                backgroundColor: firstTeam === 'blue' ? '#1D428A' : '#1a1a1a',
+                backgroundColor: firstTeam === 'blue' ? '#1D428A' : '#141416',
                 borderWidth: 1,
-                borderColor: firstTeam === 'blue' ? '#1D428A' : '#2a2a2a',
+                borderColor: firstTeam === 'blue' ? '#1D428A' : '#2a2a30',
               }}
               activeOpacity={0.7}
             >
@@ -182,7 +182,7 @@ export default function CodenamesLobby() {
             onPress={handleStart}
             disabled={!canStart || starting}
             className="rounded-xl py-4 items-center"
-            style={{ backgroundColor: canStart ? '#D4A843' : '#2a2a2a' }}
+            style={{ backgroundColor: canStart ? '#D4A843' : '#2a2a30' }}
             activeOpacity={0.7}
           >
             {starting ? (

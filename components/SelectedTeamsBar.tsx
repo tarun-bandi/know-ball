@@ -17,7 +17,7 @@ function TeamChip({ team, onClear }: { team: Team; onClear: () => void }) {
       <TeamLogo abbreviation={team.abbreviation} sport={team.sport ?? 'nba'} size={20} />
       <Text className="text-white text-sm font-medium">{team.abbreviation}</Text>
       <TouchableOpacity onPress={onClear} hitSlop={8}>
-        <X size={14} color="#6b7280" />
+        <X size={14} color="#7a7d88" />
       </TouchableOpacity>
     </View>
   );
@@ -44,7 +44,7 @@ export default function SelectedTeamsBar({
           onPress={onPickOpponent}
           activeOpacity={0.7}
         >
-          <Plus size={14} color="#c9a84c" />
+          <Plus size={14} color="#d4a843" />
           <Text className="text-accent text-sm font-medium">vs</Text>
         </TouchableOpacity>
       )}

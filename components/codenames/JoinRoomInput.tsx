@@ -62,7 +62,7 @@ export default function JoinRoomInput({ onJoin, onCancel }: Props) {
           onPress={handleJoin}
           disabled={code.length !== 6 || loading}
           className="flex-1 rounded-xl py-3 items-center"
-          style={{ backgroundColor: code.length === 6 ? '#D4A843' : '#2a2a2a' }}
+          style={{ backgroundColor: code.length === 6 ? '#D4A843' : '#2a2a30' }}
           activeOpacity={0.7}
         >
           {loading ? (

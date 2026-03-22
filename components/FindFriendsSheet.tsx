@@ -109,13 +109,13 @@ export default function FindFriendsSheet({ onClose }: FindFriendsSheetProps) {
         <View className="flex-row items-center justify-between px-4 py-4 border-b border-border">
           <Text className="text-white text-lg font-bold">Find Friends</Text>
           <TouchableOpacity onPress={onClose} className="p-2">
-            <X size={22} color="#6b7280" />
+            <X size={22} color="#7a7d88" />
           </TouchableOpacity>
         </View>
 
         {state === 'loading' && (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color="#c9a84c" size="large" />
+            <ActivityIndicator color="#d4a843" size="large" />
             <Text className="text-muted text-sm mt-3">
               Checking your contacts...
             </Text>
@@ -176,7 +176,7 @@ export default function FindFriendsSheet({ onClose }: FindFriendsSheetProps) {
                   </View>
                   {isFollowed ? (
                     <View className="flex-row items-center gap-1 px-3 py-1.5 rounded-full border border-border bg-surface">
-                      <Check size={14} color="#6b7280" />
+                      <Check size={14} color="#7a7d88" />
                       <Text className="text-muted text-xs font-semibold">
                         Following
                       </Text>
@@ -188,7 +188,7 @@ export default function FindFriendsSheet({ onClose }: FindFriendsSheetProps) {
                       disabled={followMutation.isPending}
                       activeOpacity={0.7}
                     >
-                      <UserPlus size={14} color="#0a0a0a" />
+                      <UserPlus size={14} color="#08080a" />
                       <Text className="text-background text-xs font-semibold">
                         Follow
                       </Text>

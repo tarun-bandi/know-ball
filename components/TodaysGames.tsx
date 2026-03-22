@@ -208,7 +208,7 @@ export default function TodaysGames() {
           borderRadius: 18,
           overflow: 'hidden',
           borderWidth: 1,
-          borderColor: withAlpha('#c9a84c', 0.12),
+          borderColor: withAlpha('#d4a843', 0.12),
           backgroundColor: '#05070d',
         }}
       >
@@ -244,7 +244,7 @@ export default function TodaysGames() {
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: `linear-gradient(105deg, transparent 30%, ${withAlpha('#c9a84c', 0.03)} 50%, transparent 70%)`,
+                background: `linear-gradient(105deg, transparent 30%, ${withAlpha('#d4a843', 0.03)} 50%, transparent 70%)`,
               } as any}
             />
           )}
@@ -282,7 +282,7 @@ export default function TodaysGames() {
             width: 100,
             height: 100,
             borderRadius: 999,
-            backgroundColor: withAlpha('#c9a84c', 0.03),
+            backgroundColor: withAlpha('#d4a843', 0.03),
           }}
         />
         {/* Top edge highlight */}
@@ -294,7 +294,7 @@ export default function TodaysGames() {
             left: 24,
             right: 24,
             height: 1,
-            backgroundColor: withAlpha('#c9a84c', 0.08),
+            backgroundColor: withAlpha('#d4a843', 0.08),
           }}
         />
 
@@ -313,17 +313,17 @@ export default function TodaysGames() {
               </Text>
               <View
                 style={{
-                  backgroundColor: withAlpha('#c9a84c', 0.1),
+                  backgroundColor: withAlpha('#d4a843', 0.1),
                   borderRadius: 10,
                   paddingHorizontal: 7,
                   paddingVertical: 2,
                   borderWidth: 1,
-                  borderColor: withAlpha('#c9a84c', 0.15),
+                  borderColor: withAlpha('#d4a843', 0.15),
                 }}
               >
                 <Text
                   style={{
-                    color: '#c9a84c',
+                    color: '#d4a843',
                     fontSize: 11,
                     fontWeight: '600',
                   }}
@@ -422,7 +422,7 @@ export default function TodaysGames() {
                       isFav
                         ? {
                           borderLeftWidth: 2.5,
-                          borderLeftColor: '#c9a84c',
+                          borderLeftColor: '#d4a843',
                         }
                         : null,
                     ];
