@@ -17,11 +17,18 @@ const ROLE_COLORS: Record<string, string> = {
   assassin: 'rgba(0, 0, 0, 0.95)',
 };
 
-const SPYMASTER_STRIP: Record<string, string> = {
-  red: '#E03A3E',
-  blue: '#1D428A',
-  neutral: '#6B7280',
-  assassin: '#000000',
+const SPYMASTER_BG: Record<string, string> = {
+  red: 'rgba(224, 58, 62, 0.18)',
+  blue: 'rgba(29, 66, 138, 0.22)',
+  neutral: 'rgba(107, 114, 128, 0.12)',
+  assassin: 'rgba(0, 0, 0, 0.6)',
+};
+
+const SPYMASTER_BORDER: Record<string, string> = {
+  red: 'rgba(224, 58, 62, 0.4)',
+  blue: 'rgba(29, 66, 138, 0.45)',
+  neutral: '#2a2a30',
+  assassin: 'rgba(255, 255, 255, 0.15)',
 };
 
 interface Props {
@@ -85,8 +92,10 @@ export default function CodenamesCard({ card, index, isSpymasterView, onPress, d
       <Animated.View
         style={[frontStyle, {
           position: 'absolute', width: '100%', height: '100%',
-          borderRadius: 12, backgroundColor: '#141416',
-          borderWidth: 1, borderColor: '#2a2a30',
+          borderRadius: 12,
+          backgroundColor: isSpymasterView ? SPYMASTER_BG[card.role] : '#141416',
+          borderWidth: 1,
+          borderColor: isSpymasterView ? SPYMASTER_BORDER[card.role] : '#2a2a30',
           alignItems: 'center', justifyContent: 'center',
           overflow: 'hidden',
           shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
@@ -101,13 +110,6 @@ export default function CodenamesCard({ card, index, isSpymasterView, onPress, d
         >
           {card.team}
         </Text>
-        {/* Spymaster: colored bottom strip */}
-        {isSpymasterView && (
-          <View style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0,
-            height: 4, backgroundColor: SPYMASTER_STRIP[card.role],
-          }} />
-        )}
       </Animated.View>
 
       {/* Back face (revealed) */}
