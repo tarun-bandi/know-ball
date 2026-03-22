@@ -1,8 +1,8 @@
-# NBA Letterbox
+# Know Ball
 
-Letterboxd, but for NBA games. Log, rate, and review the basketball games you watch, and see what other fans think.
+Log, rate, and review the basketball games you watch — and see what other fans think.
 
-https://nba-letterbox.vercel.app/login
+https://know-ball.vercel.app
 
 ## What It Does
 
@@ -13,10 +13,11 @@ https://nba-letterbox.vercel.app/login
 - **Create lists** of your favorite games and share them
 - **Discover** trending games, popular users, and what the community is watching
 - **Search** for any game, player, or user
+- **Play NBA Codenames** — real-time multiplayer party game, no account required
 
 ## Tech Stack
 
 - Expo SDK 54, Expo Router v6, React Native
-- Supabase (auth, database, storage)
+- Supabase (auth, database, storage, realtime)
 - TanStack Query v5, Zustand v5
 - NativeWind v4 + Tailwind CSS v3
