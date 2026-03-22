@@ -1,20 +1,48 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
-import { useState } from 'react';
-import { useCodenamesStore } from '@/lib/store/codenamesStore';
-import type { Team } from '@/lib/codenamesEngine';
+import * as Haptics from 'expo-haptics';
+import { useAuthStore } from '@/lib/store/authStore';
+import { useCodenamesMultiplayerStore } from '@/lib/store/codenamesMultiplayerStore';
+import { createRoom, joinRoom } from '@/lib/codenamesApi';
+import JoinRoomInput from '@/components/codenames/JoinRoomInput';
 
-export default function CodenamesSetup() {
+export default function CodenamesLanding() {
   const router = useRouter();
-  const [firstTeam, setFirstTeam] = useState<Team>('red');
-  const startNewGame = useCodenamesStore((s) => s.startNewGame);
+  const user = useAuthStore((s) => s.user);
+  const { setRoom, setMyPlayer } = useCodenamesMultiplayerStore();
+  const [mode, setMode] = useState<'landing' | 'join'>('landing');
+  const [creating, setCreating] = useState(false);
 
-  const handleStart = () => {
-    startNewGame(firstTeam);
-    router.push('/codenames/play' as any);
-  };
+  const handleCreate = useCallback(async () => {
+    if (!user) return;
+    setCreating(true);
+    try {
+      const displayName = user.user_metadata?.display_name ?? user.email?.split('@')[0] ?? 'Player';
+      const avatarUrl = user.user_metadata?.avatar_url ?? null;
+      const room = await createRoom(user.id, displayName, avatarUrl);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setRoom(room.id, room.code, true);
+      router.push('/codenames/lobby' as any);
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    } finally {
+      setCreating(false);
+    }
+  }, [user, setRoom, router]);
+
+  const handleJoin = useCallback(async (code: string) => {
+    if (!user) return;
+    const displayName = user.user_metadata?.display_name ?? user.email?.split('@')[0] ?? 'Player';
+    const avatarUrl = user.user_metadata?.avatar_url ?? null;
+    const { room, player } = await joinRoom(code, user.id, displayName, avatarUrl);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setRoom(room.id, room.code, room.host_id === user.id);
+    setMyPlayer(player.id, player.team, player.role);
+    router.push('/codenames/lobby' as any);
+  }, [user, setRoom, setMyPlayer, router]);
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
@@ -35,53 +63,40 @@ export default function CodenamesSetup() {
           NBA Codenames
         </Text>
         <Text className="text-muted text-center text-base mb-10">
-          A pass-and-play word game for 4+ players.{'\n'}
+          Real-time multiplayer word game.{'\n'}
           Two teams, one spymaster each.
         </Text>
 
-        <Text className="text-white text-lg font-semibold mb-4">
-          Who goes first?
-        </Text>
-        <View className="flex-row gap-3 mb-10">
-          <TouchableOpacity
-            className="rounded-xl px-6 py-3"
-            style={{
-              backgroundColor: firstTeam === 'red' ? '#E03A3E' : '#1a1a1a',
-              borderWidth: 1,
-              borderColor: firstTeam === 'red' ? '#E03A3E' : '#2a2a2a',
-            }}
-            onPress={() => setFirstTeam('red')}
-            activeOpacity={0.7}
-          >
-            <Text className="text-white font-bold text-base">Red Team</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="rounded-xl px-6 py-3"
-            style={{
-              backgroundColor: firstTeam === 'blue' ? '#1D428A' : '#1a1a1a',
-              borderWidth: 1,
-              borderColor: firstTeam === 'blue' ? '#1D428A' : '#2a2a2a',
-            }}
-            onPress={() => setFirstTeam('blue')}
-            activeOpacity={0.7}
-          >
-            <Text className="text-white font-bold text-base">Blue Team</Text>
-          </TouchableOpacity>
-        </View>
+        {mode === 'landing' ? (
+          <View className="w-full items-center gap-3">
+            <TouchableOpacity
+              onPress={handleCreate}
+              disabled={creating}
+              className="rounded-xl px-12 py-4 w-full items-center"
+              style={{ backgroundColor: '#D4A843' }}
+              activeOpacity={0.7}
+            >
+              {creating ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-white text-lg font-bold">CREATE ROOM</Text>
+              )}
+            </TouchableOpacity>
 
-        <Text className="text-muted text-center text-sm mb-6">
-          {firstTeam === 'red' ? 'Red' : 'Blue'} gets 9 cards,{' '}
-          {firstTeam === 'red' ? 'Blue' : 'Red'} gets 8.
-        </Text>
-
-        <TouchableOpacity
-          className="rounded-xl px-12 py-4"
-          style={{ backgroundColor: firstTeam === 'red' ? '#E03A3E' : '#1D428A' }}
-          onPress={handleStart}
-          activeOpacity={0.7}
-        >
-          <Text className="text-white text-lg font-bold">Start Game</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setMode('join')}
+              className="rounded-xl px-12 py-4 w-full items-center bg-surface border border-border"
+              activeOpacity={0.7}
+            >
+              <Text className="text-white text-lg font-bold">JOIN ROOM</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <JoinRoomInput
+            onJoin={handleJoin}
+            onCancel={() => setMode('landing')}
+          />
+        )}
       </View>
     </SafeAreaView>
   );

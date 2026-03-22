@@ -1,63 +1,56 @@
-import { View, Text, TouchableOpacity } from 'react-native';
-import type { Team } from '@/lib/codenamesEngine';
-import type { ClueEntry } from '@/lib/store/codenamesStore';
+import { useEffect } from 'react';
+import { View, Text } from 'react-native';
+import Animated, {
+  useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing,
+} from 'react-native-reanimated';
 
 const TEAM_LABEL = { red: 'Red', blue: 'Blue' } as const;
 const TEAM_COLOR = { red: '#E03A3E', blue: '#1D428A' } as const;
 
 interface Props {
-  team: Team;
-  clue: ClueEntry | null;
-  guessesRemaining: number;
-  redRemaining: number;
-  blueRemaining: number;
-  onEndTurn: () => void;
+  team: 'red' | 'blue';
+  phase: string;
+  isMyTurn: boolean;
 }
 
-export default function TurnBanner({
-  team,
-  clue,
-  guessesRemaining,
-  redRemaining,
-  blueRemaining,
-  onEndTurn,
-}: Props) {
+export default function TurnBanner({ team, phase, isMyTurn }: Props) {
+  const pulseOpacity = useSharedValue(1);
+  const color = TEAM_COLOR[team];
+
+  useEffect(() => {
+    pulseOpacity.value = withRepeat(
+      withTiming(0.3, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true,
+    );
+  }, []);
+
+  const dotStyle = useAnimatedStyle(() => ({
+    opacity: pulseOpacity.value,
+  }));
+
+  const phaseLabel = phase === 'spymaster_clue'
+    ? 'Spymaster giving clue'
+    : phase === 'guessing'
+      ? 'Guessers picking cards'
+      : '';
+
   return (
-    <View className="px-4 py-2">
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center gap-2">
-          <View
-            style={{ backgroundColor: TEAM_COLOR[team], width: 12, height: 12, borderRadius: 6 }}
-          />
-          <Text className="text-white font-bold text-base">
-            {TEAM_LABEL[team]} Team's Turn
-          </Text>
-        </View>
-        <View className="flex-row gap-3">
-          <Text style={{ color: '#E03A3E' }} className="font-bold">{redRemaining}</Text>
-          <Text className="text-muted">-</Text>
-          <Text style={{ color: '#1D428A' }} className="font-bold">{blueRemaining}</Text>
-        </View>
+    <View className="px-4 py-4" style={{ backgroundColor: color + '10' }}>
+      <View className="flex-row items-center gap-2">
+        <Animated.View
+          style={[dotStyle, {
+            width: 10, height: 10, borderRadius: 5, backgroundColor: color,
+          }]}
+        />
+        <Text className="text-white font-bold text-xl">
+          {TEAM_LABEL[team]} Team
+          {isMyTurn ? ' — Your Turn' : "'s Turn"}
+        </Text>
       </View>
-      {clue && (
-        <View className="flex-row items-center justify-between mt-1">
-          <Text className="text-accent font-bold text-lg">
-            {clue.word} — {clue.number}
-          </Text>
-          <View className="flex-row items-center gap-3">
-            <Text className="text-muted text-sm">
-              {guessesRemaining} guess{guessesRemaining !== 1 ? 'es' : ''} left
-            </Text>
-            <TouchableOpacity
-              onPress={onEndTurn}
-              className="bg-surface border border-border rounded-lg px-3 py-1"
-              activeOpacity={0.7}
-            >
-              <Text className="text-white text-sm font-medium">End Turn</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+      {phaseLabel ? (
+        <Text className="text-muted text-sm mt-0.5 ml-5">{phaseLabel}</Text>
+      ) : null}
     </View>
   );
 }

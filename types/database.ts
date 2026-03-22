@@ -626,9 +626,100 @@ export interface Database {
           updated_at?: string;
         };
       };
+      codenames_rooms: {
+        Row: {
+          id: string;
+          code: string;
+          host_id: string;
+          status: 'lobby' | 'playing' | 'finished';
+          first_team: 'red' | 'blue' | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          host_id: string;
+          status?: 'lobby' | 'playing' | 'finished';
+          first_team?: 'red' | 'blue' | null;
+        };
+        Update: {
+          status?: 'lobby' | 'playing' | 'finished';
+          first_team?: 'red' | 'blue' | null;
+          updated_at?: string;
+        };
+      };
+      codenames_players: {
+        Row: {
+          id: string;
+          room_id: string;
+          user_id: string;
+          display_name: string | null;
+          avatar_url: string | null;
+          team: 'red' | 'blue' | null;
+          role: 'spymaster' | 'guesser' | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          user_id: string;
+          display_name?: string | null;
+          avatar_url?: string | null;
+          team?: 'red' | 'blue' | null;
+          role?: 'spymaster' | 'guesser' | null;
+        };
+        Update: {
+          team?: 'red' | 'blue' | null;
+          role?: 'spymaster' | 'guesser' | null;
+          display_name?: string | null;
+          avatar_url?: string | null;
+        };
+      };
+      codenames_game_state: {
+        Row: {
+          room_id: string;
+          cards: Json;
+          current_team: 'red' | 'blue';
+          phase: 'spymaster_clue' | 'guessing' | 'game_over';
+          current_clue: Json | null;
+          guesses_remaining: number;
+          winner: 'red' | 'blue' | null;
+          win_reason: 'cards' | 'assassin' | null;
+          clue_history: Json;
+          updated_at: string;
+        };
+        Insert: {
+          room_id: string;
+          cards: Json;
+          current_team: 'red' | 'blue';
+          phase?: 'spymaster_clue' | 'guessing' | 'game_over';
+          current_clue?: Json | null;
+          guesses_remaining?: number;
+          winner?: 'red' | 'blue' | null;
+          win_reason?: 'cards' | 'assassin' | null;
+          clue_history?: Json;
+        };
+        Update: {
+          cards?: Json;
+          current_team?: 'red' | 'blue';
+          phase?: 'spymaster_clue' | 'guessing' | 'game_over';
+          current_clue?: Json | null;
+          guesses_remaining?: number;
+          winner?: 'red' | 'blue' | null;
+          win_reason?: 'cards' | 'assassin' | null;
+          clue_history?: Json;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      generate_room_code: {
+        Args: Record<string, never>;
+        Returns: string;
+      };
+    };
     Enums: {
       season_type: SeasonType;
       game_status: GameStatus;
@@ -663,6 +754,10 @@ export type GameWithTeams = Game & {
 
 export type GamePrediction = Database['public']['Tables']['game_predictions']['Row'];
 export type PushToken = Database['public']['Tables']['push_tokens']['Row'];
+
+export type CodenamesRoom = Database['public']['Tables']['codenames_rooms']['Row'];
+export type CodenamesPlayer = Database['public']['Tables']['codenames_players']['Row'];
+export type CodenamesGameState = Database['public']['Tables']['codenames_game_state']['Row'];
 
 export type GameLogWithGame = GameLog & {
   game: GameWithTeams;
