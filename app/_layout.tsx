@@ -290,6 +290,7 @@ export default function RootLayout() {
                 headerTintColor: '#ffffff',
               }}
             />
+            <Stack.Screen name="codenames" options={{ headerShown: false }} />
           </Stack>
           <Toast />
         </QueryClientProvider>

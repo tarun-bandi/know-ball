@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { UserPlus, Users } from 'lucide-react-native';
+import { UserPlus, Users, Gamepad2 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -274,6 +274,21 @@ export default function DiscoverScreen() {
           <View className="flex-1">
             <Text className="text-white font-semibold">Find Friends</Text>
             <Text className="text-muted text-xs mt-0.5">See who from your contacts is on Know Ball</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* NBA Codenames */}
+      <View className="px-4 pt-3">
+        <TouchableOpacity
+          className="bg-surface border border-border rounded-xl p-4 flex-row items-center gap-3"
+          onPress={() => router.push('/codenames' as any)}
+          activeOpacity={0.7}
+        >
+          <Gamepad2 size={20} color="#c9a84c" />
+          <View className="flex-1">
+            <Text className="text-white font-semibold">NBA Codenames</Text>
+            <Text className="text-muted text-xs mt-0.5">Pass-and-play word game with NBA teams</Text>
           </View>
         </TouchableOpacity>
       </View>
