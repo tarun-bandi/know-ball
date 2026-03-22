@@ -34,7 +34,7 @@ function useProtectedRoute() {
 
     const inAuthGroup = segments[0] === '(auth)';
     const inOnboarding = segments[0] === 'onboarding';
-    const inPublicPage = segments[0] === 'privacy' || segments[0] === 'support';
+    const inPublicPage = segments[0] === 'privacy' || segments[0] === 'support' || segments[0] === 'codenames';
 
     if (!session && !inAuthGroup && !inPublicPage) {
       router.replace('/(auth)/login');
