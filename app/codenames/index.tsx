@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Dimensions, LayoutAnimation, UIManager, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
@@ -13,6 +13,10 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { useCodenamesMultiplayerStore, getAnonId } from '@/lib/store/codenamesMultiplayerStore';
 import { createRoom, joinRoom } from '@/lib/codenamesApi';
 import JoinRoomInput from '@/components/codenames/JoinRoomInput';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -57,6 +61,7 @@ export default function CodenamesLanding() {
   const { setRoom, setMyPlayer, setMyUserId } = useCodenamesMultiplayerStore();
   const [mode, setMode] = useState<'landing' | 'join'>('landing');
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   const getIdentity = () => {
     const userId = user?.id ?? getAnonId();
@@ -67,6 +72,7 @@ export default function CodenamesLanding() {
 
   const handleCreate = useCallback(async () => {
     setCreating(true);
+    setCreateError('');
     try {
       const { userId, displayName, avatarUrl } = getIdentity();
       const room = await createRoom(userId, displayName, avatarUrl);
@@ -75,7 +81,7 @@ export default function CodenamesLanding() {
       setRoom(room.id, room.code, true);
       router.push(`/codenames/lobby?code=${room.code}` as any);
     } catch (e: any) {
-      Alert.alert('Error', e.message);
+      setCreateError(e.message ?? 'Failed to create room');
     } finally {
       setCreating(false);
     }
@@ -91,6 +97,12 @@ export default function CodenamesLanding() {
     router.push(`/codenames/lobby?code=${room.code}` as any);
   }, [user, setRoom, setMyPlayer, setMyUserId, router]);
 
+  const switchMode = (next: 'landing' | 'join') => {
+    LayoutAnimation.configureNext(LayoutAnimation.create(250, 'easeInEaseOut', 'opacity'));
+    setMode(next);
+    setCreateError('');
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* Header */}
@@ -99,7 +111,7 @@ export default function CodenamesLanding() {
           onPress={() => router.back()}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="flex-row items-center"
-          activeOpacity={0.6}
+          activeOpacity={0.7}
         >
           <ChevronLeft size={24} color="#ffffff" />
           <Text className="text-white text-base">Back</Text>
@@ -115,23 +127,23 @@ export default function CodenamesLanding() {
         {/* Title block */}
         <View className="items-center px-8 mb-10">
           <Animated.View
-            entering={FadeInDown.delay(150).duration(600).springify().damping(12)}
-            className="flex-row items-center"
-            style={{ gap: 10 }}
+            entering={FadeInDown.delay(100).duration(500).springify().damping(14)}
           >
-            {/* Red accent line */}
-            <View style={{ width: 24, height: 3, backgroundColor: '#E03A3E', borderRadius: 2 }} />
-
             <Text
-              className="text-white text-center font-bold"
-              style={{ fontSize: 44, lineHeight: 46, letterSpacing: -1 }}
+              className="text-center"
+              style={{ color: '#D4A843', fontSize: 13, letterSpacing: 4, fontWeight: '600' }}
             >
-              NBA{'\n'}CODENAMES
+              NBA
             </Text>
-
-            {/* Blue accent line */}
-            <View style={{ width: 24, height: 3, backgroundColor: '#1D428A', borderRadius: 2 }} />
           </Animated.View>
+
+          <Animated.Text
+            entering={FadeInDown.delay(200).duration(600).springify().damping(12)}
+            className="text-white text-center font-bold"
+            style={{ fontSize: 52, lineHeight: 54, letterSpacing: -1.5, marginTop: 2 }}
+          >
+            CODENAMES
+          </Animated.Text>
 
           <Animated.Text
             entering={FadeIn.delay(400).duration(600)}
@@ -154,7 +166,7 @@ export default function CodenamesLanding() {
                 <TouchableOpacity
                   onPress={handleCreate}
                   disabled={creating}
-                  activeOpacity={0.8}
+                  activeOpacity={0.7}
                   style={{
                     backgroundColor: '#D4A843',
                     borderRadius: 14,
@@ -177,13 +189,17 @@ export default function CodenamesLanding() {
                 </TouchableOpacity>
               </Animated.View>
 
+              {createError ? (
+                <Text style={{ color: '#e63946', fontSize: 13, textAlign: 'center' }}>{createError}</Text>
+              ) : null}
+
               <Animated.View
                 entering={FadeInUp.delay(550).duration(500).springify().damping(14)}
                 className="w-full"
               >
                 <TouchableOpacity
-                  onPress={() => setMode('join')}
-                  activeOpacity={0.8}
+                  onPress={() => switchMode('join')}
+                  activeOpacity={0.7}
                   style={{
                     borderRadius: 14,
                     paddingVertical: 18,
@@ -202,19 +218,17 @@ export default function CodenamesLanding() {
               {/* Practical info */}
               <Animated.Text
                 entering={FadeIn.delay(700).duration(600)}
-                className="text-center mt-3"
-                style={{ color: '#444', fontSize: 12 }}
+                className="text-center mt-1"
+                style={{ color: '#555', fontSize: 12 }}
               >
                 4–8 players · ~15 min
               </Animated.Text>
             </View>
           ) : (
-            <Animated.View entering={FadeIn.duration(300)}>
-              <JoinRoomInput
-                onJoin={handleJoin}
-                onCancel={() => setMode('landing')}
-              />
-            </Animated.View>
+            <JoinRoomInput
+              onJoin={handleJoin}
+              onCancel={() => switchMode('landing')}
+            />
           )}
         </View>
       </View>

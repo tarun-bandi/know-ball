@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 interface Props {
   onJoin: (code: string) => Promise<void>;
@@ -32,46 +33,69 @@ export default function JoinRoomInput({ onJoin, onCancel }: Props) {
     }
   };
 
+  const ready = code.length === 6;
+
   return (
     <View className="items-center w-full">
-      <Text className="text-white text-lg font-bold mb-4">Enter Room Code</Text>
-      <TextInput
-        ref={inputRef}
-        className="bg-surface border border-border rounded-2xl px-6 py-4 text-white text-2xl font-bold text-center tracking-[8px] w-full"
-        placeholder="------"
-        placeholderTextColor="#333"
-        value={code}
-        onChangeText={handleChange}
-        autoCapitalize="characters"
-        autoCorrect={false}
-        autoFocus
-        maxLength={6}
-      />
+      <Animated.View entering={FadeInUp.delay(50).duration(400).springify().damping(16)} className="w-full">
+        <Text className="text-white text-lg font-bold mb-4 text-center">Enter Room Code</Text>
+        <TextInput
+          ref={inputRef}
+          className="bg-surface border border-border rounded-2xl px-6 py-4 text-white text-2xl font-bold text-center tracking-[8px] w-full"
+          placeholder="------"
+          placeholderTextColor="#333"
+          value={code}
+          onChangeText={handleChange}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          autoFocus
+          maxLength={6}
+        />
+      </Animated.View>
+
       {error ? (
-        <Text className="text-red-500 text-sm mt-2">{error}</Text>
+        <Text style={{ color: '#e63946', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{error}</Text>
       ) : null}
-      <View className="flex-row gap-3 mt-4 w-full">
+
+      <Animated.View
+        entering={FadeInUp.delay(150).duration(400).springify().damping(16)}
+        className="flex-row w-full mt-4"
+        style={{ gap: 12 }}
+      >
         <TouchableOpacity
           onPress={onCancel}
-          className="flex-1 bg-surface border border-border rounded-xl py-3 items-center"
           activeOpacity={0.7}
+          style={{
+            flex: 1,
+            paddingVertical: 18,
+            alignItems: 'center',
+            borderRadius: 14,
+          }}
         >
-          <Text className="text-white font-semibold">Cancel</Text>
+          <Text style={{ color: '#7a7d88', fontSize: 16, fontWeight: '600' }}>Cancel</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           onPress={handleJoin}
-          disabled={code.length !== 6 || loading}
-          className="flex-1 rounded-xl py-3 items-center"
-          style={{ backgroundColor: code.length === 6 ? '#D4A843' : '#2a2a30' }}
+          disabled={!ready || loading}
           activeOpacity={0.7}
+          style={{
+            flex: 1,
+            borderRadius: 14,
+            paddingVertical: 18,
+            alignItems: 'center',
+            backgroundColor: ready ? '#D4A843' : '#2a2a30',
+          }}
         >
           {loading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text className="text-white font-bold">Join</Text>
+            <Text className="text-white font-bold" style={{ fontSize: 17, letterSpacing: 1.5 }}>
+              JOIN
+            </Text>
           )}
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 }
