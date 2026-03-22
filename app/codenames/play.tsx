@@ -1,15 +1,19 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { useCodenamesMultiplayerStore } from '@/lib/store/codenamesMultiplayerStore';
+import { useCodenamesMultiplayerStore, getAnonId } from '@/lib/store/codenamesMultiplayerStore';
+import { useAuthStore } from '@/lib/store/authStore';
 import { useCodenamesGame } from '@/hooks/useCodenamesGame';
+import { useCodenamesRoom } from '@/hooks/useCodenamesRoom';
 import {
   submitClue as apiSubmitClue,
   revealCard as apiRevealCard,
   endTurn as apiEndTurn,
   leaveRoom,
+  fetchRoomByCode,
+  fetchPlayers,
 } from '@/lib/codenamesApi';
 import type { GameStateCards, CluePayload } from '@/lib/codenamesApi';
 import CodenamesBoard from '@/components/codenames/CodenamesBoard';
@@ -23,8 +27,56 @@ import type { Team } from '@/lib/codenamesEngine';
 
 export default function CodenamesPlay() {
   const router = useRouter();
-  const { roomId, myUserId, myTeam, myRole, isHost, reset } = useCodenamesMultiplayerStore();
+  const { code } = useLocalSearchParams<{ code?: string }>();
+  const user = useAuthStore((s) => s.user);
+  const { roomId, myUserId, myTeam, myRole, isHost, reset, setRoom, setMyPlayer, setMyUserId } = useCodenamesMultiplayerStore();
+  const [rejoining, setRejoining] = useState(false);
+
+  // Rejoin on mount if store is empty but code param exists
+  useEffect(() => {
+    if (roomId || !code || rejoining) return;
+    setRejoining(true);
+
+    const userId = user?.id ?? getAnonId();
+
+    (async () => {
+      try {
+        const room = await fetchRoomByCode(code);
+        if (!room) throw new Error('Room not found');
+        const players = await fetchPlayers(room.id);
+        const me = players.find((p) => p.user_id === userId);
+        if (!me) throw new Error('Not in this room');
+        setMyUserId(userId);
+        setRoom(room.id, room.code, room.host_id === userId);
+        setMyPlayer(me.id, me.team, me.role);
+      } catch {
+        router.replace('/codenames' as any);
+      } finally {
+        setRejoining(false);
+      }
+    })();
+  }, [code, roomId]);
+
+  // Redirect if no room and no code
+  useEffect(() => {
+    if (!roomId && !code && !rejoining) {
+      router.replace('/codenames' as any);
+    }
+  }, [roomId, code, rejoining]);
+
   const { gameState, isLoading } = useCodenamesGame(roomId);
+
+  // Subscribe to room channel for presence tracking (host rotation, stale cleanup)
+  const { room: roomData } = useCodenamesRoom(roomId);
+
+  // Keep isHost in sync when host_id changes (host rotation)
+  useEffect(() => {
+    if (!roomData || !myUserId) return;
+    const shouldBeHost = roomData.host_id === myUserId;
+    if (shouldBeHost !== isHost) {
+      useCodenamesMultiplayerStore.getState().setRoom(roomData.id, roomData.code, shouldBeHost);
+    }
+  }, [roomData?.host_id, myUserId]);
 
   const cards = (gameState?.cards ?? []) as unknown as GameStateCards[];
   const currentTeam = (gameState?.current_team ?? 'red') as Team;
@@ -89,7 +141,7 @@ export default function CodenamesPlay() {
     router.replace('/codenames' as any);
   }, [roomId, myUserId, reset, router]);
 
-  if (isLoading || !gameState) {
+  if (isLoading || rejoining || !gameState) {
     return (
       <SafeAreaView className="flex-1 bg-background items-center justify-center">
         <ActivityIndicator color="#fff" size="large" />

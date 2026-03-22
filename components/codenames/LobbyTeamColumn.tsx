@@ -11,9 +11,10 @@ interface Props {
   players: CodenamesPlayer[];
   myUserId: string;
   onAssign: (team: 'red' | 'blue', role: 'spymaster' | 'guesser') => void;
+  onlineUserIds?: Set<string>;
 }
 
-export default function LobbyTeamColumn({ team, players, myUserId, onAssign }: Props) {
+export default function LobbyTeamColumn({ team, players, myUserId, onAssign, onlineUserIds }: Props) {
   const spymaster = players.find((p) => p.role === 'spymaster');
   const guessers = players.filter((p) => p.role === 'guesser');
   const color = TEAM_COLOR[team];
@@ -39,7 +40,7 @@ export default function LobbyTeamColumn({ team, players, myUserId, onAssign }: P
           </Text>
         </View>
         {spymaster ? (
-          <PlayerSlot player={spymaster} isMe={spymaster.user_id === myUserId} />
+          <PlayerSlot player={spymaster} isMe={spymaster.user_id === myUserId} isOnline={onlineUserIds ? onlineUserIds.has(spymaster.user_id) : undefined} />
         ) : (
           <Text className="text-muted text-xs italic py-1.5">Tap to join</Text>
         )}
@@ -60,7 +61,7 @@ export default function LobbyTeamColumn({ team, players, myUserId, onAssign }: P
         </View>
         {guessers.length > 0 ? (
           guessers.map((p) => (
-            <PlayerSlot key={p.id} player={p} isMe={p.user_id === myUserId} />
+            <PlayerSlot key={p.id} player={p} isMe={p.user_id === myUserId} isOnline={onlineUserIds ? onlineUserIds.has(p.user_id) : undefined} />
           ))
         ) : (
           <Text className="text-muted text-xs italic py-1.5">Tap to join</Text>

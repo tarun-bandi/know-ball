@@ -230,6 +230,25 @@ export async function endTurn(roomId: string) {
   if (error) throw new Error(error.message);
 }
 
+/** Reassign host to a different user. */
+export async function reassignHost(roomId: string, newHostUserId: string) {
+  const { error } = await supabase
+    .from('codenames_rooms')
+    .update({ host_id: newHostUserId })
+    .eq('id', roomId);
+  if (error) throw new Error(error.message);
+}
+
+/** Remove a player from a room by their user_id (used for stale cleanup). */
+export async function removePlayer(roomId: string, userId: string) {
+  const { error } = await supabase
+    .from('codenames_players')
+    .delete()
+    .eq('room_id', roomId)
+    .eq('user_id', userId);
+  if (error) throw new Error(error.message);
+}
+
 /** Player leaves the room. */
 export async function leaveRoom(roomId: string, userId: string) {
   const { error } = await supabase

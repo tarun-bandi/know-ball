@@ -31,7 +31,7 @@ export default function CodenamesLanding() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setMyUserId(userId);
       setRoom(room.id, room.code, true);
-      router.push('/codenames/lobby' as any);
+      router.push(`/codenames/lobby?code=${room.code}` as any);
     } catch (e: any) {
       Alert.alert('Error', e.message);
     } finally {
@@ -46,7 +46,7 @@ export default function CodenamesLanding() {
     setMyUserId(userId);
     setRoom(room.id, room.code, room.host_id === userId);
     setMyPlayer(player.id, player.team, player.role);
-    router.push('/codenames/lobby' as any);
+    router.push(`/codenames/lobby?code=${room.code}` as any);
   }, [user, setRoom, setMyPlayer, setMyUserId, router]);
 
   return (

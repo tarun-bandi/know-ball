@@ -1,28 +1,78 @@
 import { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { useCodenamesMultiplayerStore } from '@/lib/store/codenamesMultiplayerStore';
+import { useCodenamesMultiplayerStore, getAnonId } from '@/lib/store/codenamesMultiplayerStore';
+import { useAuthStore } from '@/lib/store/authStore';
 import { useCodenamesRoom } from '@/hooks/useCodenamesRoom';
-import { updatePlayerAssignment, startGame, leaveRoom } from '@/lib/codenamesApi';
+import { updatePlayerAssignment, startGame, leaveRoom, joinRoom } from '@/lib/codenamesApi';
 import RoomCodeDisplay from '@/components/codenames/RoomCodeDisplay';
 import LobbyTeamColumn from '@/components/codenames/LobbyTeamColumn';
 import type { Team } from '@/lib/codenamesEngine';
 
 export default function CodenamesLobby() {
   const router = useRouter();
-  const { roomId, roomCode, isHost, myPlayerId, myUserId, reset, updateMyAssignment: updateStoreAssignment } =
+  const { code } = useLocalSearchParams<{ code?: string }>();
+  const user = useAuthStore((s) => s.user);
+  const { roomId, roomCode, isHost, myPlayerId, myUserId, reset, updateMyAssignment: updateStoreAssignment, setRoom, setMyPlayer, setMyUserId } =
     useCodenamesMultiplayerStore();
-  const { room, players, isLoading } = useCodenamesRoom(roomId);
+  const [rejoining, setRejoining] = useState(false);
+
+  // Rejoin on mount if store is empty but code param exists
+  useEffect(() => {
+    if (roomId || !code || rejoining) return;
+    setRejoining(true);
+
+    const userId = user?.id ?? getAnonId();
+    const displayName = user?.user_metadata?.display_name ?? user?.email?.split('@')[0] ?? 'Guest';
+    const avatarUrl = user?.user_metadata?.avatar_url ?? null;
+
+    joinRoom(code, userId, displayName, avatarUrl)
+      .then(({ room, player }) => {
+        setMyUserId(userId);
+        setRoom(room.id, room.code, room.host_id === userId);
+        setMyPlayer(player.id, player.team, player.role);
+      })
+      .catch(async () => {
+        // Room might be in 'playing' status — try to rejoin play screen
+        try {
+          const { fetchRoomByCode, fetchPlayers: fetchPlayersApi } = await import('@/lib/codenamesApi');
+          const existingRoom = await fetchRoomByCode(code);
+          if (existingRoom?.status === 'playing') {
+            const players = await fetchPlayersApi(existingRoom.id);
+            const me = players.find((p) => p.user_id === userId);
+            if (me) {
+              setMyUserId(userId);
+              setRoom(existingRoom.id, existingRoom.code, existingRoom.host_id === userId);
+              setMyPlayer(me.id, me.team, me.role);
+              router.replace(`/codenames/play?code=${code}` as any);
+              return;
+            }
+          }
+        } catch {}
+        router.replace('/codenames' as any);
+      })
+      .finally(() => setRejoining(false));
+  }, [code, roomId]);
+
+  // Redirect if no room and no code
+  useEffect(() => {
+    if (!roomId && !code && !rejoining) {
+      router.replace('/codenames' as any);
+    }
+  }, [roomId, code, rejoining]);
+
+  const { room, players, isLoading, onlineUserIds } = useCodenamesRoom(roomId);
   const [starting, setStarting] = useState(false);
   const [firstTeam, setFirstTeam] = useState<Team>('red');
 
   // Navigate to game when room status changes to 'playing'
   useEffect(() => {
     if (room?.status === 'playing') {
-      router.replace('/codenames/play' as any);
+      const rc = roomCode ?? code;
+      router.replace(`/codenames/play?code=${rc}` as any);
     }
   }, [room?.status]);
 
@@ -37,6 +87,15 @@ export default function CodenamesLobby() {
       updateStoreAssignment(me.team, me.role);
     }
   }, [players, myUserId]);
+
+  // Keep isHost in sync when host_id changes (host rotation)
+  useEffect(() => {
+    if (!room || !myUserId) return;
+    const shouldBeHost = room.host_id === myUserId;
+    if (shouldBeHost !== isHost) {
+      useCodenamesMultiplayerStore.getState().setRoom(room.id, room.code, shouldBeHost);
+    }
+  }, [room?.host_id, myUserId]);
 
   const handleAssign = useCallback(async (team: 'red' | 'blue', role: 'spymaster' | 'guesser') => {
     if (!myPlayerId) return;
@@ -86,7 +145,7 @@ export default function CodenamesLobby() {
     return true;
   })();
 
-  if (isLoading) {
+  if (isLoading || rejoining) {
     return (
       <SafeAreaView className="flex-1 bg-background items-center justify-center">
         <ActivityIndicator color="#fff" />
@@ -125,12 +184,14 @@ export default function CodenamesLobby() {
           players={redPlayers}
           myUserId={myUserId ?? ''}
           onAssign={handleAssign}
+          onlineUserIds={onlineUserIds}
         />
         <LobbyTeamColumn
           team="blue"
           players={bluePlayers}
           myUserId={myUserId ?? ''}
           onAssign={handleAssign}
+          onlineUserIds={onlineUserIds}
         />
       </View>
 
