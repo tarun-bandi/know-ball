@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { generateBoard, processGuess, checkWinCondition } from '@/lib/codenamesEngine';
-import type { CodenamesCard, Team } from '@/lib/codenamesEngine';
+import type { CodenamesCard, Team, League } from '@/lib/codenamesEngine';
 import type { CodenamesRoom, CodenamesPlayer, CodenamesGameState } from '@/types/database';
 
 export interface GameStateCards {
@@ -74,7 +74,7 @@ export async function updatePlayerAssignment(
 }
 
 /** Host starts the game. Validates teams, generates board, creates game state. */
-export async function startGame(roomId: string, firstTeam: Team) {
+export async function startGame(roomId: string, firstTeam: Team, league: League = 'nba') {
   // Validate: each team needs 1 spymaster + ≥1 guesser
   const { data: players, error: pError } = await supabase
     .from('codenames_players')
@@ -90,7 +90,7 @@ export async function startGame(roomId: string, firstTeam: Team) {
     if (guessers.length < 1) throw new Error(`${t} team needs at least 1 guesser`);
   }
 
-  const cards = generateBoard(firstTeam);
+  const cards = generateBoard(firstTeam, league);
   const cardsJson = cards.map((c) => ({ team: c.team, role: c.role, revealed: c.revealed }));
 
   const { error: gsError } = await supabase
@@ -107,7 +107,7 @@ export async function startGame(roomId: string, firstTeam: Team) {
 
   const { error: roomError } = await supabase
     .from('codenames_rooms')
-    .update({ status: 'playing', first_team: firstTeam })
+    .update({ status: 'playing', first_team: firstTeam, league })
     .eq('id', roomId);
   if (roomError) throw new Error(roomError.message);
 }

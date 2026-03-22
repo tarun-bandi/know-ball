@@ -26,6 +26,7 @@ import GameOverModal from '@/components/codenames/GameOverModal';
 import TeamPanel from '@/components/codenames/TeamPanel';
 import ClueHistory from '@/components/codenames/ClueHistory';
 import type { Team } from '@/lib/codenamesEngine';
+import type { Sport } from '@/types/database';
 
 const DESKTOP_BREAKPOINT = 900;
 const DESKTOP_BOARD_MAX_WIDTH = 520;
@@ -93,6 +94,7 @@ export default function CodenamesPlay() {
   const winner = gameState?.winner as Team | null;
   const winReason = gameState?.win_reason as 'cards' | 'assassin' | null;
   const clueHistory = (Array.isArray(gameState?.clue_history) ? gameState.clue_history : []) as unknown as CluePayload[];
+  const sport = ((roomData as any)?.league ?? 'nba') as Sport;
 
   const isSpymaster = myRole === 'spymaster';
   const isMyTeamTurn = myTeam === currentTeam;
@@ -250,6 +252,7 @@ export default function CodenamesPlay() {
                 onCardPress={handleCardPress}
                 disabled={!canTapCards}
                 maxWidth={DESKTOP_BOARD_MAX_WIDTH}
+                sport={sport}
               />
             </View>
 
@@ -292,6 +295,7 @@ export default function CodenamesPlay() {
           isSpymasterView={showSpymasterKeyMap}
           onCardPress={handleCardPress}
           disabled={!canTapCards}
+          sport={sport}
         />
       </View>
 

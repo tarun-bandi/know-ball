@@ -7,6 +7,7 @@ import Animated, {
 import { Skull } from 'lucide-react-native';
 import TeamLogo from '@/components/TeamLogo';
 import type { GameStateCards } from '@/lib/codenamesApi';
+import type { Sport } from '@/types/database';
 
 const GAP = 2;
 
@@ -38,9 +39,10 @@ interface Props {
   onPress: (index: number) => void;
   disabled: boolean;
   cardSize: number;
+  sport?: Sport;
 }
 
-export default function CodenamesCard({ card, index, isSpymasterView, onPress, disabled, cardSize }: Props) {
+export default function CodenamesCard({ card, index, isSpymasterView, onPress, disabled, cardSize, sport = 'nba' }: Props) {
   const CARD_SIZE = cardSize;
   const flipProgress = useSharedValue(card.revealed ? 1 : 0);
   const scale = useSharedValue(1);
@@ -102,7 +104,7 @@ export default function CodenamesCard({ card, index, isSpymasterView, onPress, d
           shadowOpacity: 0.3, shadowRadius: 4, elevation: 4,
         }]}
       >
-        <TeamLogo abbreviation={card.team} size={logoSize} />
+        <TeamLogo abbreviation={card.team} size={logoSize} sport={sport} />
         <Text
           style={{ fontSize: CARD_SIZE * 0.14, marginTop: 1 }}
           className="text-muted font-semibold"
@@ -126,7 +128,7 @@ export default function CodenamesCard({ card, index, isSpymasterView, onPress, d
         {card.role === 'assassin' ? (
           <Skull size={logoSize * 0.7} color="#ffffff" />
         ) : (
-          <TeamLogo abbreviation={card.team} size={logoSize} />
+          <TeamLogo abbreviation={card.team} size={logoSize} sport={sport} />
         )}
         <Text
           style={{ fontSize: CARD_SIZE * 0.14, marginTop: 1 }}

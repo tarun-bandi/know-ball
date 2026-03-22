@@ -10,7 +10,7 @@ import { useCodenamesRoom } from '@/hooks/useCodenamesRoom';
 import { updatePlayerAssignment, startGame, leaveRoom, joinRoom } from '@/lib/codenamesApi';
 import RoomCodeDisplay from '@/components/codenames/RoomCodeDisplay';
 import LobbyTeamColumn from '@/components/codenames/LobbyTeamColumn';
-import type { Team } from '@/lib/codenamesEngine';
+import type { Team, League } from '@/lib/codenamesEngine';
 
 export default function CodenamesLobby() {
   const router = useRouter();
@@ -67,6 +67,7 @@ export default function CodenamesLobby() {
   const { room, players, isLoading, onlineUserIds } = useCodenamesRoom(roomId);
   const [starting, setStarting] = useState(false);
   const [firstTeam, setFirstTeam] = useState<Team>('red');
+  const [league, setLeague] = useState<League>('nba');
 
   // Navigate to game when room status changes to 'playing'
   useEffect(() => {
@@ -112,7 +113,7 @@ export default function CodenamesLobby() {
     if (!roomId) return;
     setStarting(true);
     try {
-      await startGame(roomId, firstTeam);
+      await startGame(roomId, firstTeam, league);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (e: any) {
       Alert.alert('Cannot Start', e.message);
@@ -211,6 +212,26 @@ export default function CodenamesLobby() {
       {/* Host controls */}
       {isHost && (
         <View className="px-4 pb-4">
+          {/* League picker */}
+          <View className="flex-row items-center justify-center gap-2 mb-3">
+            <Text className="text-muted text-sm">League:</Text>
+            {(['nba', 'nfl'] as const).map((l) => (
+              <TouchableOpacity
+                key={l}
+                onPress={() => setLeague(l)}
+                className="rounded-lg px-3 py-1"
+                style={{
+                  backgroundColor: league === l ? '#c9a84c' : '#141416',
+                  borderWidth: 1,
+                  borderColor: league === l ? '#c9a84c' : '#2a2a30',
+                }}
+                activeOpacity={0.7}
+              >
+                <Text className="text-white text-sm font-bold">{l.toUpperCase()}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
           {/* First team picker */}
           <View className="flex-row items-center justify-center gap-2 mb-3">
             <Text className="text-muted text-sm">First turn:</Text>

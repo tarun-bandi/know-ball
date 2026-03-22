@@ -1,6 +1,7 @@
 import { View, useWindowDimensions } from 'react-native';
 import CodenamesCard from './CodenamesCard';
 import type { GameStateCards } from '@/lib/codenamesApi';
+import type { Sport } from '@/types/database';
 
 interface Props {
   cards: GameStateCards[];
@@ -8,9 +9,10 @@ interface Props {
   onCardPress: (index: number) => void;
   disabled: boolean;
   maxWidth?: number;
+  sport?: Sport;
 }
 
-export default function CodenamesBoard({ cards, isSpymasterView, onCardPress, disabled, maxWidth }: Props) {
+export default function CodenamesBoard({ cards, isSpymasterView, onCardPress, disabled, maxWidth, sport }: Props) {
   const { width: screenWidth } = useWindowDimensions();
   const boardWidth = maxWidth ? Math.min(screenWidth, maxWidth) : screenWidth;
   const cardSize = (boardWidth - 16) / 5;
@@ -29,6 +31,7 @@ export default function CodenamesBoard({ cards, isSpymasterView, onCardPress, di
               onPress={onCardPress}
               disabled={disabled}
               cardSize={cardSize}
+              sport={sport}
             />
           ))}
         </View>

@@ -1,4 +1,4 @@
-/** Pure game logic for NBA Codenames — no React, no side-effects. */
+/** Pure game logic for NBA/NFL Codenames — no React, no side-effects. */
 
 const NBA_TEAMS = [
   'ATL', 'BOS', 'BKN', 'CHA', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW',
@@ -6,16 +6,28 @@ const NBA_TEAMS = [
   'OKC', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS',
 ] as const;
 
-export type TeamAbbr = (typeof NBA_TEAMS)[number];
+const NFL_TEAMS = [
+  'ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE', 'DAL', 'DEN',
+  'DET', 'GB', 'HOU', 'IND', 'JAX', 'KC', 'LV', 'LAC', 'LAR', 'MIA',
+  'MIN', 'NE', 'NO', 'NYG', 'NYJ', 'PHI', 'PIT', 'SEA', 'SF', 'TB',
+  'TEN', 'WAS',
+] as const;
+
+export type League = 'nba' | 'nfl';
 export type CardRole = 'red' | 'blue' | 'neutral' | 'assassin';
 export type Team = 'red' | 'blue';
 export type GuessOutcome = 'correct' | 'wrong_team' | 'neutral' | 'assassin';
 
 export interface CodenamesCard {
-  team: TeamAbbr;
+  team: string;
   role: CardRole;
   revealed: boolean;
 }
+
+const TEAM_POOLS: Record<League, readonly string[]> = {
+  nba: NBA_TEAMS,
+  nfl: NFL_TEAMS,
+};
 
 /** Fisher-Yates shuffle (in-place). */
 function shuffle<T>(arr: T[]): T[] {
@@ -30,8 +42,9 @@ function shuffle<T>(arr: T[]): T[] {
  * Generate a fresh 25-card board.
  * The team that goes first gets 9 cards, the other gets 8.
  */
-export function generateBoard(firstTeam: Team): CodenamesCard[] {
-  const teams = shuffle([...NBA_TEAMS]).slice(0, 25);
+export function generateBoard(firstTeam: Team, league: League = 'nba'): CodenamesCard[] {
+  const pool = TEAM_POOLS[league];
+  const teams = shuffle([...pool]).slice(0, 25);
 
   const roles: CardRole[] = [
     ...Array(9).fill(firstTeam),
