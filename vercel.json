@@ -8,10 +8,6 @@
       "schedule": "0 12 * * *"
     },
     {
-      "path": "/api/cron/seed-nba",
-      "schedule": "0 12 * * *"
-    },
-    {
       "path": "/api/cron/seed-nfl",
       "schedule": "0 12 * * *"
     }

@@ -74,6 +74,21 @@ interface EspnScoreboard {
   events: EspnEvent[];
 }
 
+/** Normalize ESPN abbreviations to match our DB (e.g. GS → GSW) */
+const ESPN_ABBR_MAP: Record<string, string> = {
+  GS: 'GSW',
+  NO: 'NOP',
+  SA: 'SAS',
+  UTAH: 'UTA',
+  NY: 'NYK',
+  WSH: 'WAS',
+};
+
+function normalizeAbbr(abbr: string): string {
+  const upper = abbr.toUpperCase();
+  return ESPN_ABBR_MAP[upper] ?? upper;
+}
+
 // ─── CLI Args ───────────────────────────────────────────────────────────────
 
 function parseArgs() {
@@ -148,7 +163,7 @@ async function ensureSeason(year: number): Promise<string> {
 
   const { data, error } = await supabase
     .from('seasons')
-    .upsert({ year, type: 'regular' }, { onConflict: 'year' })
+    .upsert({ year, type: 'regular', sport: 'nba' }, { onConflict: 'sport,year' })
     .select('id')
     .returns<{ id: string }[]>()
     .single();
@@ -209,8 +224,12 @@ async function seedGames(season: number, days: number | null = null) {
         const away = comp.competitors.find((c) => c.homeAway === 'away');
         if (!home || !away) return [];
 
-        const homeTeamId = teamAbbrMap.get(home.team.abbreviation.toUpperCase());
-        const awayTeamId = teamAbbrMap.get(away.team.abbreviation.toUpperCase());
+        const homeAbbr = home.team?.abbreviation;
+        const awayAbbr = away.team?.abbreviation;
+        if (!homeAbbr || !awayAbbr) return [];
+
+        const homeTeamId = teamAbbrMap.get(normalizeAbbr(homeAbbr));
+        const awayTeamId = teamAbbrMap.get(normalizeAbbr(awayAbbr));
 
         if (!homeTeamId || !awayTeamId) {
           console.warn(`  Skipping game ${event.id}: unknown team ${home.team.abbreviation} or ${away.team.abbreviation}`);
