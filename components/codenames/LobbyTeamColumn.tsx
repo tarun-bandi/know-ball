@@ -20,7 +20,7 @@ export default function LobbyTeamColumn({ team, players, myUserId, onAssign, onl
   const color = TEAM_COLOR[team];
 
   return (
-    <View className="flex-1 bg-surface border border-border rounded-2xl p-3 mx-1">
+    <View className="flex-1 bg-surface border border-border rounded-2xl p-3">
       <View className="items-center mb-3">
         <View style={{ backgroundColor: color, width: 10, height: 10, borderRadius: 5 }} />
         <Text className="text-white font-bold text-base mt-1">{TEAM_LABEL[team]}</Text>

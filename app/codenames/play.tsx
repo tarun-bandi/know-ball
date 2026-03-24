@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LogOut } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useCodenamesMultiplayerStore, getAnonId } from '@/lib/store/codenamesMultiplayerStore';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -158,6 +159,17 @@ export default function CodenamesPlay() {
     router.replace('/codenames' as any);
   }, [roomId, myUserId, reset, router]);
 
+  const handlePlayAgain = useCallback(async () => {
+    if (!roomId || !isHost) return;
+    const { startGame } = await import('@/lib/codenamesApi');
+    const league = ((roomData as any)?.league ?? 'nba') as any;
+    const firstTeam: Team = Math.random() < 0.5 ? 'red' : 'blue';
+    try {
+      await startGame(roomId, firstTeam, league);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {}
+  }, [roomId, isHost, roomData]);
+
   if (isLoading || rejoining || !gameState) {
     return (
       <SafeAreaView className="flex-1 bg-background items-center justify-center">
@@ -173,6 +185,7 @@ export default function CodenamesPlay() {
         winner={winner}
         reason={winReason}
         isHost={isHost}
+        onPlayAgain={isHost ? handlePlayAgain : undefined}
         onBackToLobby={handleExit}
       />
     );
@@ -202,10 +215,15 @@ export default function CodenamesPlay() {
           {canTapCards && (
             <TouchableOpacity
               onPress={handleEndTurn}
-              className="bg-surface border border-border rounded-xl py-3 items-center"
               activeOpacity={0.7}
+              style={{
+                backgroundColor: '#D4A843',
+                borderRadius: 12,
+                paddingVertical: 14,
+                alignItems: 'center',
+              }}
             >
-              <Text className="text-white font-semibold">End Turn</Text>
+              <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 15 }}>End Turn</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -240,12 +258,20 @@ export default function CodenamesPlay() {
             <View
               className="flex-row items-center px-4 py-2.5 rounded-xl w-full"
               style={{
-                backgroundColor: (currentTeam === 'red' ? '#E03A3E' : '#1D428A') + '08',
+                backgroundColor: (currentTeam === 'red' ? '#E03A3E' : '#1D428A') + '10',
                 maxWidth: DESKTOP_BOARD_MAX_WIDTH,
               }}
             >
               <TurnBanner team={currentTeam} phase={phase} isMyTurn={isMyTurn} />
               <ScoreBar redRemaining={redRemaining} blueRemaining={blueRemaining} />
+              <TouchableOpacity
+                onPress={handleExit}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                activeOpacity={0.6}
+                style={{ marginLeft: 8 }}
+              >
+                <LogOut size={18} color="#7a7d88" />
+              </TouchableOpacity>
             </View>
 
             {/* Board */}
@@ -286,10 +312,18 @@ export default function CodenamesPlay() {
   // Mobile: original vertical layout
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
-      {/* Game status header: turn + score in one row */}
-      <View className="flex-row items-center px-4 py-2.5" style={{ backgroundColor: (currentTeam === 'red' ? '#E03A3E' : '#1D428A') + '08' }}>
+      {/* Game status header: turn + score + exit */}
+      <View className="flex-row items-center px-4 py-2.5" style={{ backgroundColor: (currentTeam === 'red' ? '#E03A3E' : '#1D428A') + '10' }}>
         <TurnBanner team={currentTeam} phase={phase} isMyTurn={isMyTurn} />
         <ScoreBar redRemaining={redRemaining} blueRemaining={blueRemaining} />
+        <TouchableOpacity
+          onPress={handleExit}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          activeOpacity={0.6}
+          style={{ marginLeft: 8 }}
+        >
+          <LogOut size={18} color="#7a7d88" />
+        </TouchableOpacity>
       </View>
 
       {/* Board — the hero */}

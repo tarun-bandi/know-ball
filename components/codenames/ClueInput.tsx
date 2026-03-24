@@ -102,7 +102,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
         </TouchableOpacity>
 
         <Text className="text-muted text-xs text-center">
-          One word only. Cannot match any team name, city, or alias on the board.
+          One word, no team names or cities
         </Text>
       </View>
     </KeyboardAvoidingView>

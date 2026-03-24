@@ -120,7 +120,7 @@ export default function CodenamesLobby() {
     } finally {
       setStarting(false);
     }
-  }, [roomId, firstTeam]);
+  }, [roomId, firstTeam, league]);
 
   const handleLeave = useCallback(async () => {
     if (!roomId || !myUserId) return;
@@ -179,7 +179,7 @@ export default function CodenamesLobby() {
       </View>
 
       {/* Team columns */}
-      <View className="flex-row px-3 flex-1">
+      <View className="flex-row px-4 flex-1" style={{ gap: 8 }}>
         <LobbyTeamColumn
           team="red"
           players={redPlayers}
@@ -198,79 +198,120 @@ export default function CodenamesLobby() {
 
       {/* Unassigned players */}
       {unassigned.length > 0 && (
-        <View className="px-4 py-2">
-          <Text className="text-muted text-xs uppercase tracking-wider mb-1">Unassigned</Text>
-          {unassigned.map((p) => (
-            <Text key={p.id} className="text-white text-sm">
-              {p.display_name ?? 'Player'}
-              {p.user_id === myUserId ? ' (you)' : ''}
-            </Text>
-          ))}
+        <View className="px-4 py-3">
+          <View className="bg-surface border border-border rounded-2xl p-3">
+            <Text className="text-muted text-xs font-medium uppercase tracking-wider mb-2">Unassigned</Text>
+            {unassigned.map((p) => (
+              <Text key={p.id} className="text-white text-sm py-0.5">
+                {p.display_name ?? 'Player'}
+                {p.user_id === myUserId ? ' (you)' : ''}
+              </Text>
+            ))}
+            <Text className="text-muted text-xs mt-2">Tap a team slot above to join</Text>
+          </View>
         </View>
       )}
 
       {/* Host controls */}
       {isHost && (
-        <View className="px-4 pb-4">
+        <View className="px-4 pb-4" style={{ gap: 12 }}>
           {/* League picker */}
-          <View className="flex-row items-center justify-center gap-2 mb-3">
-            <Text className="text-muted text-sm">League:</Text>
-            {(['nba', 'nfl', 'mixed'] as const).map((l) => (
-              <TouchableOpacity
-                key={l}
-                onPress={() => setLeague(l)}
-                className="rounded-lg px-3 py-1"
-                style={{
-                  backgroundColor: league === l ? '#c9a84c' : '#141416',
-                  borderWidth: 1,
-                  borderColor: league === l ? '#c9a84c' : '#2a2a30',
-                }}
-                activeOpacity={0.7}
-              >
-                <Text className="text-white text-sm font-bold">{l.toUpperCase()}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={{ gap: 6 }}>
+            <Text className="text-muted text-xs font-medium uppercase tracking-wider">League</Text>
+            <View className="flex-row" style={{ gap: 8 }}>
+              {(['nba', 'nfl', 'mixed'] as const).map((l) => (
+                <TouchableOpacity
+                  key={l}
+                  onPress={() => setLeague(l)}
+                  activeOpacity={0.7}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 10,
+                    alignItems: 'center',
+                    borderRadius: 10,
+                    backgroundColor: league === l ? '#D4A843' : '#141416',
+                    borderWidth: 1.5,
+                    borderColor: league === l ? '#D4A843' : '#2a2a30',
+                  }}
+                >
+                  <Text style={{
+                    color: league === l ? '#ffffff' : '#7a7d88',
+                    fontSize: 14,
+                    fontWeight: '700',
+                  }}>{l.toUpperCase()}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
           {/* First team picker */}
-          <View className="flex-row items-center justify-center gap-2 mb-3">
-            <Text className="text-muted text-sm">First turn:</Text>
-            <TouchableOpacity
-              onPress={() => setFirstTeam('red')}
-              className="rounded-lg px-3 py-1"
-              style={{
-                backgroundColor: firstTeam === 'red' ? '#E03A3E' : '#141416',
-                borderWidth: 1,
-                borderColor: firstTeam === 'red' ? '#E03A3E' : '#2a2a30',
-              }}
-              activeOpacity={0.7}
-            >
-              <Text className="text-white text-sm font-bold">Red</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setFirstTeam('blue')}
-              className="rounded-lg px-3 py-1"
-              style={{
-                backgroundColor: firstTeam === 'blue' ? '#1D428A' : '#141416',
-                borderWidth: 1,
-                borderColor: firstTeam === 'blue' ? '#1D428A' : '#2a2a30',
-              }}
-              activeOpacity={0.7}
-            >
-              <Text className="text-white text-sm font-bold">Blue</Text>
-            </TouchableOpacity>
+          <View style={{ gap: 6 }}>
+            <Text className="text-muted text-xs font-medium uppercase tracking-wider">First Turn</Text>
+            <View className="flex-row" style={{ gap: 8 }}>
+              <TouchableOpacity
+                onPress={() => setFirstTeam('red')}
+                activeOpacity={0.7}
+                style={{
+                  flex: 1,
+                  paddingVertical: 10,
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  backgroundColor: firstTeam === 'red' ? '#E03A3E' : '#141416',
+                  borderWidth: 1.5,
+                  borderColor: firstTeam === 'red' ? '#E03A3E' : '#2a2a30',
+                }}
+              >
+                <Text style={{
+                  color: '#ffffff',
+                  fontSize: 14,
+                  fontWeight: '700',
+                  opacity: firstTeam === 'red' ? 1 : 0.5,
+                }}>Red</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setFirstTeam('blue')}
+                activeOpacity={0.7}
+                style={{
+                  flex: 1,
+                  paddingVertical: 10,
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  backgroundColor: firstTeam === 'blue' ? '#1D428A' : '#141416',
+                  borderWidth: 1.5,
+                  borderColor: firstTeam === 'blue' ? '#1D428A' : '#2a2a30',
+                }}
+              >
+                <Text style={{
+                  color: '#ffffff',
+                  fontSize: 14,
+                  fontWeight: '700',
+                  opacity: firstTeam === 'blue' ? 1 : 0.5,
+                }}>Blue</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+
+          {/* Start button */}
           <TouchableOpacity
             onPress={handleStart}
             disabled={!canStart || starting}
-            className="rounded-xl py-4 items-center"
-            style={{ backgroundColor: canStart ? '#D4A843' : '#2a2a30' }}
             activeOpacity={0.7}
+            style={{
+              borderRadius: 14,
+              paddingVertical: 16,
+              alignItems: 'center',
+              backgroundColor: canStart ? '#D4A843' : '#2a2a30',
+            }}
           >
             {starting ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text className="text-white text-lg font-bold">
+              <Text style={{
+                color: '#ffffff',
+                fontSize: 17,
+                fontWeight: '700',
+                letterSpacing: 1,
+              }}>
                 {canStart ? 'START GAME' : 'Waiting for teams...'}
               </Text>
             )}

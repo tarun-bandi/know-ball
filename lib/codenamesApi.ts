@@ -96,14 +96,17 @@ export async function startGame(roomId: string, firstTeam: Team, league: League 
 
   const { error: gsError } = await supabase
     .from('codenames_game_state')
-    .insert({
+    .upsert({
       room_id: roomId,
       cards: cardsJson as any,
       current_team: firstTeam,
       phase: 'spymaster_clue',
       guesses_remaining: 0,
+      current_clue: null,
+      winner: null,
+      win_reason: null,
       clue_history: [] as any,
-    });
+    }, { onConflict: 'room_id' });
   if (gsError) throw new Error(gsError.message);
 
   const { error: roomError } = await supabase
