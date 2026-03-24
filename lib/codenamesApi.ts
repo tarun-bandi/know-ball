@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
-import { generateBoard, processGuess, checkWinCondition } from '@/lib/codenamesEngine';
+import { generateBoard, processGuess, checkWinCondition, validateClue } from '@/lib/codenamesEngine';
 import type { CodenamesCard, Team, League } from '@/lib/codenamesEngine';
+import type { BoardCard } from '@/features/codenames/types';
 import type { CodenamesRoom, CodenamesPlayer, CodenamesGameState } from '@/types/database';
 
 export interface GameStateCards {
@@ -112,7 +113,7 @@ export async function startGame(roomId: string, firstTeam: Team, league: League 
   if (roomError) throw new Error(roomError.message);
 }
 
-/** Spymaster submits a clue. */
+/** Spymaster submits a clue. Validates against board team names/cities/aliases. */
 export async function submitClue(roomId: string, word: string, number: number, team: Team) {
   const { data: gs, error: fetchError } = await supabase
     .from('codenames_game_state')
@@ -120,6 +121,19 @@ export async function submitClue(roomId: string, word: string, number: number, t
     .eq('room_id', roomId)
     .single();
   if (fetchError || !gs) throw new Error('Game state not found');
+
+  // Fetch room to know the league for accurate team lookups
+  const { data: room } = await supabase
+    .from('codenames_rooms')
+    .select('league')
+    .eq('id', roomId)
+    .single();
+  const league = (room?.league as 'nba' | 'nfl') ?? undefined;
+
+  // Validate clue against board
+  const cards = gs.cards as unknown as BoardCard[];
+  const validation = validateClue(word, cards, league);
+  if (!validation.valid) throw new Error(validation.reason!);
 
   const clue: CluePayload = { team, word: word.toUpperCase(), number };
   const history = Array.isArray(gs.clue_history) ? gs.clue_history : [];

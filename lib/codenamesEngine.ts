@@ -1,19 +1,10 @@
 /** Pure game logic for NBA/NFL Codenames — no React, no side-effects. */
 
-const NBA_TEAMS = [
-  'ATL', 'BOS', 'BKN', 'CHA', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW',
-  'HOU', 'IND', 'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NOP', 'NYK',
-  'OKC', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS',
-] as const;
+import { getAbbreviationPool } from '@/features/codenames/data/teams';
+export { lookupTeam } from '@/features/codenames/data/teams';
+export { validateClue } from '@/features/codenames/utils/clue-validation';
 
-const NFL_TEAMS = [
-  'ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE', 'DAL', 'DEN',
-  'DET', 'GB', 'HOU', 'IND', 'JAX', 'KC', 'LV', 'LAC', 'LAR', 'MIA',
-  'MIN', 'NE', 'NO', 'NYG', 'NYJ', 'PHI', 'PIT', 'SEA', 'SF', 'TB',
-  'TEN', 'WAS',
-] as const;
-
-export type League = 'nba' | 'nfl';
+export type League = 'nba' | 'nfl' | 'mixed';
 export type CardRole = 'red' | 'blue' | 'neutral' | 'assassin';
 export type Team = 'red' | 'blue';
 export type GuessOutcome = 'correct' | 'wrong_team' | 'neutral' | 'assassin';
@@ -23,11 +14,6 @@ export interface CodenamesCard {
   role: CardRole;
   revealed: boolean;
 }
-
-const TEAM_POOLS: Record<League, readonly string[]> = {
-  nba: NBA_TEAMS,
-  nfl: NFL_TEAMS,
-};
 
 /** Fisher-Yates shuffle (in-place). */
 function shuffle<T>(arr: T[]): T[] {
@@ -43,7 +29,7 @@ function shuffle<T>(arr: T[]): T[] {
  * The team that goes first gets 9 cards, the other gets 8.
  */
 export function generateBoard(firstTeam: Team, league: League = 'nba'): CodenamesCard[] {
-  const pool = TEAM_POOLS[league];
+  const pool = getAbbreviationPool(league);
   const teams = shuffle([...pool]).slice(0, 25);
 
   const roles: CardRole[] = [

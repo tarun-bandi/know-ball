@@ -130,12 +130,16 @@ export default function CodenamesPlay() {
     } catch {}
   }, [roomId, isMyTurn, phase]);
 
-  const handleSubmitClue = useCallback(async (word: string, number: number) => {
-    if (!roomId || !myTeam) return;
+  const handleSubmitClue = useCallback(async (word: string, number: number): Promise<string | null> => {
+    if (!roomId || !myTeam) return 'No active room.';
     try {
       await apiSubmitClue(roomId, word, number, myTeam);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {}
+      return null;
+    } catch (e: any) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return e.message ?? 'Failed to submit clue.';
+    }
   }, [roomId, myTeam]);
 
   const handleEndTurn = useCallback(async () => {

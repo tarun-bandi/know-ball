@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform,
+  ActivityIndicator,
 } from 'react-native';
 import type { Team } from '@/lib/codenamesEngine';
 
@@ -11,21 +12,36 @@ const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 interface Props {
   team: Team;
-  onSubmit: (word: string, number: number) => void;
+  /** Return null on success, or an error string on failure. */
+  onSubmit: (word: string, number: number) => Promise<string | null> | void;
 }
 
 export default function ClueInput({ team, onSubmit }: Props) {
   const [word, setWord] = useState('');
   const [number, setNumber] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = word.trim().length > 0 && !word.trim().includes(' ') && number !== null;
+  const canSubmit = word.trim().length > 0 && !word.trim().includes(' ') && number !== null && !submitting;
   const color = TEAM_COLOR[team];
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit || !number) return;
-    onSubmit(word.trim().toUpperCase(), number);
-    setWord('');
-    setNumber(null);
+    setError(null);
+    setSubmitting(true);
+    try {
+      const result = await onSubmit(word.trim().toUpperCase(), number);
+      if (result) {
+        setError(result);
+      } else {
+        setWord('');
+        setNumber(null);
+      }
+    } catch (e: any) {
+      setError(e.message ?? 'Failed to submit clue.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -40,7 +56,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
           placeholder="One word clue"
           placeholderTextColor="#7a7d88"
           value={word}
-          onChangeText={setWord}
+          onChangeText={(t) => { setWord(t); setError(null); }}
           autoCapitalize="characters"
           autoCorrect={false}
         />
@@ -65,6 +81,10 @@ export default function ClueInput({ team, onSubmit }: Props) {
           ))}
         </View>
 
+        {error && (
+          <Text style={{ color: '#e63946', fontSize: 13 }}>{error}</Text>
+        )}
+
         <TouchableOpacity
           onPress={handleSubmit}
           disabled={!canSubmit}
@@ -72,13 +92,17 @@ export default function ClueInput({ team, onSubmit }: Props) {
           className="rounded-xl py-3 items-center"
           style={{ backgroundColor: canSubmit ? color : '#2a2a30' }}
         >
-          <Text className="text-white font-bold text-base">
-            Submit Clue{number ? ` — ${word.trim().toUpperCase() || '...'} (${number})` : ''}
-          </Text>
+          {submitting ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text className="text-white font-bold text-base">
+              Submit Clue{number ? ` — ${word.trim().toUpperCase() || '...'} (${number})` : ''}
+            </Text>
+          )}
         </TouchableOpacity>
 
         <Text className="text-muted text-xs text-center">
-          One word only. Number = how many cards match.
+          One word only. Cannot match any team name, city, or alias on the board.
         </Text>
       </View>
     </KeyboardAvoidingView>

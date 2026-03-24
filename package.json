@@ -16,7 +16,9 @@
     "scrape:players": "python scripts/scrape_players.py",
     "e2e": "maestro test -e APP_ID=com.tarunbandi.nbaletterbox .maestro/",
     "e2e:smoke": "maestro test -e APP_ID=com.tarunbandi.nbaletterbox .maestro/smoke-test.yaml",
-    "e2e:auth": "maestro test -e APP_ID=com.tarunbandi.nbaletterbox .maestro/auth-login.yaml"
+    "e2e:auth": "maestro test -e APP_ID=com.tarunbandi.nbaletterbox .maestro/auth-login.yaml",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
@@ -61,10 +63,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "~19.1.0",
     "@vercel/node": "^5.6.6",
     "dotenv": "^16.0.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.0",
     "typescript": "~5.9.2"
   },

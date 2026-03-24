@@ -215,7 +215,7 @@ export default function CodenamesLobby() {
           {/* League picker */}
           <View className="flex-row items-center justify-center gap-2 mb-3">
             <Text className="text-muted text-sm">League:</Text>
-            {(['nba', 'nfl'] as const).map((l) => (
+            {(['nba', 'nfl', 'mixed'] as const).map((l) => (
               <TouchableOpacity
                 key={l}
                 onPress={() => setLeague(l)}
