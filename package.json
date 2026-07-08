@@ -46,7 +46,7 @@
     "lucide-react-native": "^0.475.0",
     "nativewind": "^4.2.1",
     "react": "19.1.0",
-    "react-dom": "^19.1.0",
+    "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-draggable-flatlist": "^4.0.3",
     "react-native-gesture-handler": "~2.28.0",
@@ -63,12 +63,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/jest": "^30.0.0",
+    "@types/jest": "29.5.14",
     "@types/node": "^22.0.0",
     "@types/react": "~19.1.0",
     "@vercel/node": "^5.6.6",
     "dotenv": "^16.0.0",
-    "jest": "^30.3.0",
+    "jest": "~29.7.0",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.0",
     "typescript": "~5.9.2"
