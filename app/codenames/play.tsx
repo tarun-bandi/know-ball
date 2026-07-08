@@ -217,7 +217,7 @@ export default function CodenamesPlay() {
               onPress={handleEndTurn}
               activeOpacity={0.7}
               style={{
-                backgroundColor: '#D4A843',
+                backgroundColor: '#4ea1ff',
                 borderRadius: 12,
                 paddingVertical: 14,
                 alignItems: 'center',
@@ -270,7 +270,7 @@ export default function CodenamesPlay() {
                 activeOpacity={0.6}
                 style={{ marginLeft: 8 }}
               >
-                <LogOut size={18} color="#7a7d88" />
+                <LogOut size={18} color="#8fa1b3" />
               </TouchableOpacity>
             </View>
 
@@ -322,7 +322,7 @@ export default function CodenamesPlay() {
           activeOpacity={0.6}
           style={{ marginLeft: 8 }}
         >
-          <LogOut size={18} color="#7a7d88" />
+          <LogOut size={18} color="#8fa1b3" />
         </TouchableOpacity>
       </View>
 

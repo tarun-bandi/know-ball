@@ -34,7 +34,7 @@ export default function RoomCodeDisplay({ code }: Props) {
         {copied ? (
           <Check size={20} color="#22c55e" />
         ) : (
-          <Copy size={20} color="#7a7d88" />
+          <Copy size={20} color="#8fa1b3" />
         )}
       </View>
       <Text className="text-muted text-xs mt-1">

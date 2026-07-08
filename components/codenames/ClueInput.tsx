@@ -54,7 +54,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
         <TextInput
           className="bg-surface border border-border rounded-xl px-4 py-3 text-white text-lg"
           placeholder="One word clue"
-          placeholderTextColor="#7a7d88"
+          placeholderTextColor="#8fa1b3"
           value={word}
           onChangeText={(t) => { setWord(t); setError(null); }}
           autoCapitalize="characters"
@@ -69,9 +69,9 @@ export default function ClueInput({ team, onSubmit }: Props) {
               onPress={() => setNumber(n)}
               activeOpacity={0.7}
               style={{
-                backgroundColor: number === n ? color : '#141416',
+                backgroundColor: number === n ? color : '#111923',
                 borderWidth: 1,
-                borderColor: number === n ? color : '#2a2a30',
+                borderColor: number === n ? color : '#2f4052',
                 width: 34, height: 34, borderRadius: 17,
                 alignItems: 'center', justifyContent: 'center',
               }}
@@ -82,7 +82,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
         </View>
 
         {error && (
-          <Text style={{ color: '#e63946', fontSize: 13 }}>{error}</Text>
+          <Text style={{ color: '#ff6b76', fontSize: 13 }}>{error}</Text>
         )}
 
         <TouchableOpacity
@@ -90,7 +90,7 @@ export default function ClueInput({ team, onSubmit }: Props) {
           disabled={!canSubmit}
           activeOpacity={0.7}
           className="rounded-xl py-3 items-center"
-          style={{ backgroundColor: canSubmit ? color : '#2a2a30' }}
+          style={{ backgroundColor: canSubmit ? color : '#2f4052' }}
         >
           {submitting ? (
             <ActivityIndicator color="#fff" size="small" />

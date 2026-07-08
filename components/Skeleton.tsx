@@ -56,7 +56,7 @@ function BrandedLoader() {
         style={{ width: 80, height: 80, opacity: 0.5 }}
         resizeMode="contain"
       />
-      <ActivityIndicator color="#d4a843" size="small" style={{ marginTop: 20 }} />
+      <ActivityIndicator color="#4ea1ff" size="small" style={{ marginTop: 20 }} />
     </View>
   );
 }

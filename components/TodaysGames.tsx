@@ -14,6 +14,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useNbaScoreboard } from '@/hooks/useNbaScoreboard';
 import { getTeamAccentColor, withAlpha } from '@/lib/teamColors';
+import { stadiumSlate } from '@/lib/theme';
 import TeamLogo from './TeamLogo';
 
 interface MappedNbaGame {
@@ -84,7 +85,7 @@ function LivePulseDot() {
         width: 8,
         height: 8,
         borderRadius: 999,
-        backgroundColor: '#e63946',
+        backgroundColor: stadiumSlate.danger,
         transform: [{ scale }],
         opacity,
       }}
@@ -208,8 +209,8 @@ export default function TodaysGames() {
           borderRadius: 18,
           overflow: 'hidden',
           borderWidth: 1,
-          borderColor: withAlpha('#d4a843', 0.12),
-          backgroundColor: '#05070d',
+          borderColor: withAlpha(stadiumSlate.borderStrong, 0.55),
+          backgroundColor: stadiumSlate.background,
         }}
       >
         <View
@@ -217,7 +218,7 @@ export default function TodaysGames() {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: '#040507',
+            backgroundColor: '#09111c',
           }}
         />
         {/* Top gradient sweep */}
@@ -234,7 +235,7 @@ export default function TodaysGames() {
           <View
             style={{
               flex: 1,
-              backgroundColor: withAlpha('#132548', 0.25),
+              backgroundColor: withAlpha(stadiumSlate.surfaceRaised, 0.72),
             }}
           />
           {/* Animated shimmer overlay (web only) */}
@@ -244,7 +245,7 @@ export default function TodaysGames() {
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: `linear-gradient(105deg, transparent 30%, ${withAlpha('#d4a843', 0.03)} 50%, transparent 70%)`,
+                background: `linear-gradient(105deg, transparent 30%, ${withAlpha(stadiumSlate.accent, 0.08)} 50%, transparent 70%)`,
               } as any}
             />
           )}
@@ -257,7 +258,7 @@ export default function TodaysGames() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: withAlpha('#080b12', 0.9),
+            backgroundColor: withAlpha(stadiumSlate.background, 0.92),
           }}
         />
         {/* Decorative orbs */}
@@ -270,7 +271,7 @@ export default function TodaysGames() {
             width: 160,
             height: 160,
             borderRadius: 999,
-            backgroundColor: withAlpha('#1D428A', 0.08),
+            backgroundColor: withAlpha(stadiumSlate.accentDim, 0.12),
           }}
         />
         <View
@@ -282,7 +283,7 @@ export default function TodaysGames() {
             width: 100,
             height: 100,
             borderRadius: 999,
-            backgroundColor: withAlpha('#d4a843', 0.03),
+            backgroundColor: withAlpha(stadiumSlate.accent, 0.06),
           }}
         />
         {/* Top edge highlight */}
@@ -294,7 +295,7 @@ export default function TodaysGames() {
             left: 24,
             right: 24,
             height: 1,
-            backgroundColor: withAlpha('#d4a843', 0.08),
+            backgroundColor: withAlpha(stadiumSlate.accent, 0.14),
           }}
         />
 
@@ -314,19 +315,19 @@ export default function TodaysGames() {
               </Text>
               <View
                 style={{
-                  backgroundColor: withAlpha('#d4a843', 0.15),
+                  backgroundColor: withAlpha(stadiumSlate.accent, 0.14),
                   borderRadius: 10,
                   minWidth: 24,
                   alignItems: 'center',
                   paddingHorizontal: 7,
                   paddingVertical: 2.5,
                   borderWidth: 1,
-                  borderColor: withAlpha('#d4a843', 0.25),
+                  borderColor: withAlpha(stadiumSlate.accent, 0.32),
                 }}
               >
                 <Text
                   style={{
-                    color: '#d4a843',
+                    color: stadiumSlate.accent,
                     fontSize: 12,
                     fontWeight: '700',
                   }}
@@ -368,8 +369,6 @@ export default function TodaysGames() {
 
               const awayAccent = getTeamAccentColor(game.awayTeam.abbreviation, 'nba');
               const homeAccent = getTeamAccentColor(game.homeTeam.abbreviation, 'nba');
-              const cardAccent = homeWon ? homeAccent : awayWon ? awayAccent : homeAccent;
-
               const isFav =
                 !!mappedGame &&
                 (favoriteTeamIds.has(mappedGame.home_team_id) ||
@@ -383,12 +382,12 @@ export default function TodaysGames() {
                   }}
                   disabled={!isMapped}
                   style={({ pressed, hovered }: any) => {
-                    const scale = pressed ? 0.975 : hovered ? 1.015 : 1;
+                    const scale = pressed ? 0.985 : hovered ? 1.006 : 1;
                     const borderTint = pressed
-                      ? withAlpha(cardAccent, 0.35)
+                      ? withAlpha(stadiumSlate.accent, 0.55)
                       : hovered
-                        ? withAlpha(cardAccent, 0.22)
-                        : withAlpha('#ffffff', 0.1);
+                        ? withAlpha(stadiumSlate.accent, 0.38)
+                        : withAlpha(stadiumSlate.borderStrong, 0.58);
 
                     return [
                       {
@@ -398,7 +397,7 @@ export default function TodaysGames() {
                         overflow: 'hidden',
                         borderWidth: 1,
                         borderColor: borderTint,
-                        backgroundColor: withAlpha('#1a2233', Platform.OS === 'web' ? 0.48 : 0.76),
+                        backgroundColor: withAlpha(stadiumSlate.surfaceRaised, Platform.OS === 'web' ? 0.68 : 0.9),
                         transform: [{ scale }],
                       },
                       Platform.OS === 'web'
@@ -406,10 +405,10 @@ export default function TodaysGames() {
                           backdropFilter: 'blur(10px)',
                           WebkitBackdropFilter: 'blur(10px)',
                           boxShadow: pressed
-                            ? `0 6px 14px ${withAlpha('#000000', 0.3)}, 0 0 0 1px ${withAlpha(cardAccent, 0.1)}`
+                            ? `0 6px 14px ${withAlpha('#020617', 0.3)}, 0 0 0 1px ${withAlpha(stadiumSlate.accent, 0.12)}`
                             : hovered
-                              ? `0 10px 22px ${withAlpha('#000000', 0.35)}, 0 0 0 1px ${withAlpha(cardAccent, 0.16)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.08)}`
-                              : `0 6px 16px ${withAlpha('#000000', 0.28)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.06)}`,
+                              ? `0 10px 22px ${withAlpha('#020617', 0.35)}, 0 0 0 1px ${withAlpha(stadiumSlate.accent, 0.16)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.08)}`
+                              : `0 6px 16px ${withAlpha('#020617', 0.28)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.06)}`,
                         } as any)
                         : Platform.OS === 'ios'
                           ? {
@@ -425,7 +424,7 @@ export default function TodaysGames() {
                       isFav
                         ? {
                           borderLeftWidth: 2.5,
-                          borderLeftColor: '#d4a843',
+                          borderLeftColor: stadiumSlate.accent,
                         }
                         : null,
                     ];

@@ -270,11 +270,11 @@ export default function SearchScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <PageContainer className="flex-1">
+      <PageContainer className="flex-1" showDesktopNav>
       {/* Search bar */}
       <View className="px-4 pt-4 pb-2">
         <View className="flex-row items-center bg-surface border border-border rounded-xl px-3 gap-2">
-          <SearchIcon size={18} color="#7a7d88" />
+          <SearchIcon size={18} color="#8fa1b3" />
           <TextInput
             testID="search_input"
             className="flex-1 py-3.5 text-white text-base"
@@ -289,7 +289,7 @@ export default function SearchScreen() {
                 ? 'Search users by name or handle'
                 : 'Search players by name'
             }
-            placeholderTextColor="#7a7d88"
+            placeholderTextColor="#8fa1b3"
             value={query}
             onChangeText={setQuery}
             autoCapitalize="none"
@@ -314,11 +314,11 @@ export default function SearchScreen() {
               }
             }}
             className="px-4 py-1.5 rounded-full border border-border bg-background"
-            style={searchMode === mode ? { backgroundColor: '#d4a843', borderColor: '#d4a843' } : undefined}
+            style={searchMode === mode ? { backgroundColor: '#4ea1ff', borderColor: '#4ea1ff' } : undefined}
           >
             <Text
               className="text-sm font-medium capitalize text-muted"
-              style={searchMode === mode ? { color: '#08080a' } : undefined}
+              style={searchMode === mode ? { color: '#0b1118' } : undefined}
             >
               {mode}
             </Text>
@@ -358,11 +358,11 @@ export default function SearchScreen() {
               <TouchableOpacity
                 onPress={() => setSelectedSeasonYear(null)}
                 className="px-3 py-1.5 rounded-full border border-border bg-background"
-                style={selectedSeasonYear === null ? { backgroundColor: '#d4a843', borderColor: '#d4a843' } : undefined}
+                style={selectedSeasonYear === null ? { backgroundColor: '#4ea1ff', borderColor: '#4ea1ff' } : undefined}
               >
                 <Text
                   className="text-sm font-medium text-muted"
-                  style={selectedSeasonYear === null ? { color: '#08080a' } : undefined}
+                  style={selectedSeasonYear === null ? { color: '#0b1118' } : undefined}
                 >
                   All
                 </Text>
@@ -372,11 +372,11 @@ export default function SearchScreen() {
                   key={year}
                   onPress={() => setSelectedSeasonYear(year)}
                   className="px-3 py-1.5 rounded-full border border-border bg-background"
-                  style={selectedSeasonYear === year ? { backgroundColor: '#d4a843', borderColor: '#d4a843' } : undefined}
+                  style={selectedSeasonYear === year ? { backgroundColor: '#4ea1ff', borderColor: '#4ea1ff' } : undefined}
                 >
                   <Text
                     className="text-sm font-medium text-muted"
-                    style={selectedSeasonYear === year ? { color: '#08080a' } : undefined}
+                    style={selectedSeasonYear === year ? { color: '#0b1118' } : undefined}
                   >
                     {formatSeasonLabel(year)}
                   </Text>
@@ -387,7 +387,7 @@ export default function SearchScreen() {
 
           {gamesQuery.isLoading ? (
             <View className="flex-1 items-center justify-center">
-              <ActivityIndicator color="#d4a843" />
+              <ActivityIndicator color="#4ea1ff" />
             </View>
           ) : (
             <FlatList
@@ -408,7 +408,7 @@ export default function SearchScreen() {
               ListFooterComponent={
                 gamesQuery.isFetchingNextPage ? (
                   <View className="py-4">
-                    <ActivityIndicator color="#d4a843" />
+                    <ActivityIndicator color="#4ea1ff" />
                   </View>
                 ) : null
               }
@@ -429,7 +429,7 @@ export default function SearchScreen() {
                 <RefreshControl
                   refreshing={gamesQuery.isRefetching && !gamesQuery.isFetchingNextPage}
                   onRefresh={() => gamesQuery.refetch()}
-                  tintColor="#d4a843"
+                  tintColor="#4ea1ff"
                 />
               }
             />
@@ -490,7 +490,7 @@ export default function SearchScreen() {
           ListFooterComponent={
             playersQuery.isFetchingNextPage ? (
               <View className="py-4">
-                <ActivityIndicator color="#d4a843" />
+                <ActivityIndicator color="#4ea1ff" />
               </View>
             ) : null
           }
@@ -512,7 +512,7 @@ export default function SearchScreen() {
               <RefreshControl
                 refreshing={playersQuery.isRefetching && !playersQuery.isFetchingNextPage}
                 onRefresh={() => playersQuery.refetch()}
-                tintColor="#d4a843"
+                tintColor="#4ea1ff"
               />
             ) : undefined
           }
@@ -560,7 +560,7 @@ export default function SearchScreen() {
           ListFooterComponent={
             usersQuery.isFetchingNextPage ? (
               <View className="py-4">
-                <ActivityIndicator color="#d4a843" />
+                <ActivityIndicator color="#4ea1ff" />
               </View>
             ) : null
           }
@@ -582,7 +582,7 @@ export default function SearchScreen() {
               <RefreshControl
                 refreshing={usersQuery.isRefetching && !usersQuery.isFetchingNextPage}
                 onRefresh={() => usersQuery.refetch()}
-                tintColor="#d4a843"
+                tintColor="#4ea1ff"
               />
             ) : undefined
           }

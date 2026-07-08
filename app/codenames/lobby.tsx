@@ -229,13 +229,13 @@ export default function CodenamesLobby() {
                     paddingVertical: 10,
                     alignItems: 'center',
                     borderRadius: 10,
-                    backgroundColor: league === l ? '#D4A843' : '#141416',
+                    backgroundColor: league === l ? '#4ea1ff' : '#111923',
                     borderWidth: 1.5,
-                    borderColor: league === l ? '#D4A843' : '#2a2a30',
+                    borderColor: league === l ? '#4ea1ff' : '#2f4052',
                   }}
                 >
                   <Text style={{
-                    color: league === l ? '#ffffff' : '#7a7d88',
+                    color: league === l ? '#ffffff' : '#8fa1b3',
                     fontSize: 14,
                     fontWeight: '700',
                   }}>{l.toUpperCase()}</Text>
@@ -256,9 +256,9 @@ export default function CodenamesLobby() {
                   paddingVertical: 10,
                   alignItems: 'center',
                   borderRadius: 10,
-                  backgroundColor: firstTeam === 'red' ? '#E03A3E' : '#141416',
+                  backgroundColor: firstTeam === 'red' ? '#E03A3E' : '#111923',
                   borderWidth: 1.5,
-                  borderColor: firstTeam === 'red' ? '#E03A3E' : '#2a2a30',
+                  borderColor: firstTeam === 'red' ? '#E03A3E' : '#2f4052',
                 }}
               >
                 <Text style={{
@@ -276,9 +276,9 @@ export default function CodenamesLobby() {
                   paddingVertical: 10,
                   alignItems: 'center',
                   borderRadius: 10,
-                  backgroundColor: firstTeam === 'blue' ? '#1D428A' : '#141416',
+                  backgroundColor: firstTeam === 'blue' ? '#1D428A' : '#111923',
                   borderWidth: 1.5,
-                  borderColor: firstTeam === 'blue' ? '#1D428A' : '#2a2a30',
+                  borderColor: firstTeam === 'blue' ? '#1D428A' : '#2f4052',
                 }}
               >
                 <Text style={{
@@ -300,7 +300,7 @@ export default function CodenamesLobby() {
               borderRadius: 14,
               paddingVertical: 16,
               alignItems: 'center',
-              backgroundColor: canStart ? '#D4A843' : '#2a2a30',
+              backgroundColor: canStart ? '#4ea1ff' : '#2f4052',
             }}
           >
             {starting ? (

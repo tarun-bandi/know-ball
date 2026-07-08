@@ -100,9 +100,9 @@ export default function CodenamesCard({ card, index, isSpymasterView, onPress, d
         style={[frontStyle, {
           position: 'absolute', width: '100%', height: '100%',
           borderRadius: 12,
-          backgroundColor: isSpymasterView ? SPYMASTER_BG[card.role] : '#141416',
+          backgroundColor: isSpymasterView ? SPYMASTER_BG[card.role] : '#111923',
           borderWidth: 1,
-          borderColor: isSpymasterView ? SPYMASTER_BORDER[card.role] : '#2a2a30',
+          borderColor: isSpymasterView ? SPYMASTER_BORDER[card.role] : '#2f4052',
           alignItems: 'center', justifyContent: 'center',
           overflow: 'hidden',
           shadowColor: '#000', shadowOffset: { width: 0, height: 2 },

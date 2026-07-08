@@ -135,7 +135,7 @@ export default function FavoritePlayersModal({
       case 'F-G': return '#a78bfa';
       case 'F-C':
       case 'C-F': return '#fb923c';
-      default: return '#7a7d88';
+      default: return '#8fa1b3';
     }
   }
 
@@ -161,7 +161,7 @@ export default function FavoritePlayersModal({
                 Favorite Players
               </Text>
               <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <X size={22} color="#7a7d88" />
+                <X size={22} color="#8fa1b3" />
               </TouchableOpacity>
             </View>
 
@@ -178,7 +178,7 @@ export default function FavoritePlayersModal({
                       <Text className="text-accent text-xs font-medium">
                         {player.first_name} {player.last_name}
                       </Text>
-                      <X size={12} color="#d4a843" />
+                      <X size={12} color="#4ea1ff" />
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -188,11 +188,11 @@ export default function FavoritePlayersModal({
             {/* Search input */}
             <View className="px-5 pb-3">
               <View className="flex-row items-center bg-background border border-border rounded-xl px-3 gap-2">
-                <Search size={16} color="#7a7d88" />
+                <Search size={16} color="#8fa1b3" />
                 <TextInput
                   className="flex-1 py-3 text-white text-sm"
                   placeholder="Search players by name..."
-                  placeholderTextColor="#7a7d88"
+                  placeholderTextColor="#8fa1b3"
                   value={query}
                   onChangeText={setQuery}
                   autoCapitalize="none"
@@ -240,14 +240,14 @@ export default function FavoritePlayersModal({
                         </View>
                       </View>
                     </View>
-                    {isSelected && <Check size={16} color="#d4a843" />}
+                    {isSelected && <Check size={16} color="#4ea1ff" />}
                   </TouchableOpacity>
                 );
               }}
               ListEmptyComponent={
                 searching ? (
                   <View className="items-center py-8">
-                    <ActivityIndicator color="#d4a843" />
+                    <ActivityIndicator color="#4ea1ff" />
                   </View>
                 ) : debouncedQuery.length >= 2 ? (
                   <View className="items-center py-8">
@@ -273,7 +273,7 @@ export default function FavoritePlayersModal({
                 disabled={saving}
               >
                 {saving ? (
-                  <ActivityIndicator color="#08080a" />
+                  <ActivityIndicator color="#0b1118" />
                 ) : (
                   <Text className="text-background font-semibold text-base">
                     Save ({selected.size} selected)

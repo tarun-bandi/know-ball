@@ -25,7 +25,7 @@ import RankBadge from './RankBadge';
 import ReactionPicker, { REACTION_EMOJI, REACTION_CONFIG } from './ReactionPicker';
 import { gameUrl } from '@/lib/urls';
 import { getTeamAccentColor, withAlpha, ensureTextContrast } from '@/lib/teamColors';
-import { useTilt3D } from '@/hooks/useTilt3D';
+import { stadiumSlate } from '@/lib/theme';
 import type { GameLogWithGame, ReactionType } from '@/types/database';
 
 interface GameCardProps {
@@ -134,7 +134,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
 
   const reactionButtonAnimStyle = useAnimatedStyle(() => ({
     transform: [{ scale: reactionButtonScale.value }],
-    shadowColor: '#d4a843',
+    shadowColor: '#4ea1ff',
     shadowOpacity: reactionGlow.value * 0.25,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 0 },
@@ -229,8 +229,6 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
     },
   });
 
-  const { tiltStyle, shineStyle, tiltHandlers, shadowOffset } = useTilt3D();
-
   if (!game) return null;
 
   const awayAccent = getTeamAccentColor(game.away_team.abbreviation, game.sport);
@@ -241,8 +239,8 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
       : log.fan_of === 'away'
         ? awayAccent
         : log.fan_of === 'both'
-          ? '#d4a843'
-          : withAlpha('#7a7d88', 0.7);
+          ? stadiumSlate.accent
+          : withAlpha(stadiumSlate.textMuted, 0.7);
 
   const animateIconTap = (scale: typeof shareScale, glow: typeof shareGlow) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -376,8 +374,8 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               paddingHorizontal: 8,
               paddingVertical: 6,
               borderWidth: 1,
-              borderColor: withAlpha('#ffffff', 0.09),
-              backgroundColor: withAlpha('#111827', 0.46),
+              borderColor: withAlpha(stadiumSlate.borderStrong, 0.52),
+              backgroundColor: withAlpha(stadiumSlate.surfaceRaised, 0.78),
               overflow: 'hidden',
             }}
           >
@@ -390,7 +388,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 width: 76,
                 height: 76,
                 borderRadius: 999,
-                backgroundColor: withAlpha(awayAccent, 0.08),
+                backgroundColor: withAlpha(awayAccent, 0.05),
               }}
             />
             <View
@@ -402,7 +400,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 width: 76,
                 height: 76,
                 borderRadius: 999,
-                backgroundColor: withAlpha(homeAccent, 0.08),
+                backgroundColor: withAlpha(homeAccent, 0.05),
               }}
             />
             <View className="flex-row items-center justify-center gap-2">
@@ -495,8 +493,8 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
         {/* Team-tinted divider */}
         <View className="mb-3" style={{ position: 'relative' }}>
           <View className="flex-row h-[1.5px] overflow-hidden rounded-full">
-            <View style={{ flex: 1, backgroundColor: withAlpha(awayAccent, 0.5) }} />
-            <View style={{ flex: 1, backgroundColor: withAlpha(homeAccent, 0.5) }} />
+            <View style={{ flex: 1, backgroundColor: withAlpha(stadiumSlate.borderStrong, 0.95) }} />
+            <View style={{ flex: 1, backgroundColor: withAlpha(stadiumSlate.accent, 0.58) }} />
           </View>
         </View>
 
@@ -613,7 +611,10 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
         )}
 
         {/* Actions: share + comments + reactions */}
-        <View className="flex-row items-center justify-end gap-4 mt-4 pt-3 border-t border-border">
+        <View
+          className="flex-row items-center justify-end gap-4 mt-4 pt-3"
+          style={{ borderTopWidth: 1, borderTopColor: withAlpha(stadiumSlate.borderStrong, 0.65) }}
+        >
           <Animated.View style={shareButtonAnimStyle}>
             <TouchableOpacity
               className="flex-row items-center gap-1.5"
@@ -624,7 +625,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.6}
             >
-              <Share2 size={17} color="#7a7d88" />
+              <Share2 size={17} color="#8fa1b3" />
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={commentButtonAnimStyle}>
@@ -637,7 +638,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.6}
             >
-              <MessageCircle size={18} color="#7a7d88" />
+              <MessageCircle size={18} color="#8fa1b3" />
               {commentCount > 0 && (
                 <Text className="text-xs font-medium text-muted">
                   {commentCount}
@@ -666,7 +667,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 {myReaction ? (
                   <Text style={{ fontSize: 18 }}>{REACTION_EMOJI[myReaction]}</Text>
                 ) : (
-                  <Heart size={18} color="#7a7d88" fill="transparent" />
+                  <Heart size={18} color="#8fa1b3" fill="transparent" />
                 )}
                 {topReactions.length > 0 ? (
                   <View className="flex-row items-center gap-1">
@@ -699,51 +700,35 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
 
   if (Platform.OS === 'web') {
     return (
-      <div style={tiltStyle as any} {...tiltHandlers}>
-        <Pressable
-          className="rounded-2xl p-4 mb-5"
-          style={({ pressed, hovered }: any) => {
-            const scale = pressed ? 0.988 : 1;
-            const borderColor = pressed
-              ? withAlpha(homeAccent, 0.35)
+      <Pressable
+        className="rounded-2xl p-4 mb-5"
+        style={({ pressed, hovered }: any) => [
+          {
+            position: 'relative',
+            overflow: 'hidden',
+            borderWidth: 1,
+            borderColor: pressed
+              ? withAlpha(stadiumSlate.accent, 0.72)
               : hovered
-                ? withAlpha(homeAccent, 0.25)
-                : withAlpha('#ffffff', 0.1);
-
-            // Dynamic shadow: shift opposite to tilt direction
-            const ox = Math.round(shadowOffset.x);
-            const oy = Math.round(shadowOffset.y);
-            const shadow = pressed
-              ? `${ox}px ${8 + oy}px 18px ${withAlpha('#000000', 0.4)}, 0 0 0 1px ${withAlpha(homeAccent, 0.15)}`
-              : hovered
-                ? `${ox}px ${14 + oy}px 30px ${withAlpha('#000000', 0.45)}, 0 0 0 1px ${withAlpha(homeAccent, 0.22)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.06)}`
-                : `0 8px 24px ${withAlpha('#000000', 0.35)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.05)}`;
-
-            return [
-              {
-                position: 'relative',
-                overflow: 'hidden',
-                borderWidth: 1,
-                borderColor,
-                transform: [{ scale }],
-                backgroundColor: '#151518',
-              },
-              {
-                boxShadow: shadow,
-                transitionDuration: '180ms',
-                transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
-                transitionProperty: 'transform, box-shadow, border-color, background-color',
-                cursor: 'pointer',
-              } as any,
-            ];
-          }}
-          onPress={() => router.push(`/game/${game.id}`)}
-        >
-          {/* Shine overlay */}
-          <div style={shineStyle as any} />
-          {cardContent}
-        </Pressable>
-      </div>
+                ? withAlpha(stadiumSlate.accent, 0.5)
+                : withAlpha(stadiumSlate.borderStrong, 0.62),
+            transform: [{ translateY: pressed ? 0 : hovered ? -2 : 0 }],
+            backgroundColor: hovered ? stadiumSlate.surfaceElevated : stadiumSlate.surface,
+          },
+          {
+            boxShadow: hovered
+              ? `0 16px 34px ${withAlpha('#020617', 0.34)}, 0 0 0 1px ${withAlpha(stadiumSlate.accent, 0.16)}`
+              : `0 8px 18px ${withAlpha('#020617', 0.24)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.05)}`,
+            transitionDuration: '160ms',
+            transitionTimingFunction: 'ease-out',
+            transitionProperty: 'transform, box-shadow, border-color, background-color',
+            cursor: 'pointer',
+          } as any,
+        ]}
+        onPress={() => router.push(`/game/${game.id}`)}
+      >
+        {cardContent}
+      </Pressable>
     );
   }
 
@@ -754,9 +739,9 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
         style={{
           position: 'relative',
           overflow: 'hidden',
-          backgroundColor: '#151518',
+          backgroundColor: stadiumSlate.surface,
           borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.1)',
+          borderColor: withAlpha(stadiumSlate.borderStrong, 0.62),
         }}
       >
         {cardContent}

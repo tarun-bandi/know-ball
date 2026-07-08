@@ -272,7 +272,7 @@ export default function RankingFlowModal({
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <View style={{ flex: 1, backgroundColor: '#141416' }}>
+      <View style={{ flex: 1, backgroundColor: '#111923' }}>
         <View style={{ flex: 1 }}>
           {/* Header */}
           <View className="flex-row justify-between items-center px-5 pt-14 pb-4">
@@ -283,14 +283,14 @@ export default function RankingFlowModal({
               onPress={onClose}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <X size={22} color="#7a7d88" />
+              <X size={22} color="#8fa1b3" />
             </TouchableOpacity>
           </View>
 
           {/* Loading */}
           {step === 'loading' && (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-              <ActivityIndicator color="#d4a843" size="large" />
+              <ActivityIndicator color="#4ea1ff" size="large" />
               <Text className="text-muted text-sm mt-3">Loading your rankings...</Text>
             </View>
           )}
@@ -300,7 +300,7 @@ export default function RankingFlowModal({
             <View style={{ flex: 1, paddingHorizontal: 24, justifyContent: 'center' }}>
               <View className="items-center mb-6">
                 <View className="w-14 h-14 rounded-full bg-accent/20 items-center justify-center mb-3">
-                  <Heart size={28} color="#d4a843" />
+                  <Heart size={28} color="#4ea1ff" />
                 </View>
                 <Text className="text-white text-lg font-bold text-center mb-1">
                   {detectedFanTeamName} fan?
@@ -357,7 +357,7 @@ export default function RankingFlowModal({
           {step === 'placement' && insertPosition !== null && (
             <View style={{ flex: 1, paddingHorizontal: 24, justifyContent: 'center', alignItems: 'center' }}>
               <View className="w-16 h-16 rounded-full bg-accent/20 items-center justify-center mb-4">
-                <Trophy size={32} color="#d4a843" />
+                <Trophy size={32} color="#4ea1ff" />
               </View>
 
               <Text className="text-white text-2xl font-bold mb-1">
@@ -372,7 +372,7 @@ export default function RankingFlowModal({
                     {formatScore(score)}
                   </Text>
                   {isFanGame && (
-                    <Heart size={16} color="#d4a843" fill="#d4a843" />
+                    <Heart size={16} color="#4ea1ff" fill="#4ea1ff" />
                   )}
                 </View>
               ) : (
@@ -388,7 +388,7 @@ export default function RankingFlowModal({
                 activeOpacity={0.8}
               >
                 {saving ? (
-                  <ActivityIndicator color="#08080a" />
+                  <ActivityIndicator color="#0b1118" />
                 ) : (
                   <Text className="text-background font-semibold text-base">
                     Confirm Ranking

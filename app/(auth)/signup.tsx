@@ -13,6 +13,7 @@ import {
 import { Link } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { signInWithGoogle } from '@/lib/googleAuth';
+import { getAuthErrorMessage, withAuthTimeout } from '@/lib/authFeedback';
 import { PageContainer } from '@/components/PageContainer';
 
 export default function SignupScreen() {
@@ -21,40 +22,69 @@ export default function SignupScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   async function handleSignup() {
+    setErrorMessage('');
+    setSuccessMessage('');
+
     if (!displayName.trim() || !email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      const message = 'Please fill in all fields';
+      setErrorMessage(message);
+      if (Platform.OS !== 'web') Alert.alert('Error', message);
       return;
     }
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      const message = 'Password must be at least 6 characters';
+      setErrorMessage(message);
+      if (Platform.OS !== 'web') Alert.alert('Error', message);
       return;
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { display_name: displayName.trim() },
-      },
-    });
-    setLoading(false);
+    try {
+      const { data, error } = await withAuthTimeout(
+        supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { display_name: displayName.trim() },
+          },
+        })
+      );
 
-    if (error) {
-      Alert.alert('Sign Up Failed', error.message);
+      if (error) {
+        const message = getAuthErrorMessage(error);
+        setErrorMessage(message);
+        if (Platform.OS !== 'web') Alert.alert('Sign Up Failed', message);
+        return;
+      }
+
+      if (data.user && !data.session) {
+        setSuccessMessage('Account created. Check your email to confirm your address, then sign in.');
+      }
+    } catch (error) {
+      const message = getAuthErrorMessage(error);
+      setErrorMessage(message);
+      if (Platform.OS !== 'web') Alert.alert('Sign Up Failed', message);
+    } finally {
+      setLoading(false);
     }
     // If email confirmation is disabled, onAuthStateChange in _layout.tsx
     // picks up the new session automatically and redirects to (tabs)
   }
 
   async function handleGoogleSignIn() {
+    setErrorMessage('');
+    setSuccessMessage('');
     setGoogleLoading(true);
     try {
-      await signInWithGoogle();
+      await withAuthTimeout(signInWithGoogle());
     } catch (error: any) {
-      Alert.alert('Google Sign In Failed', error.message);
+      const message = getAuthErrorMessage(error);
+      setErrorMessage(message);
+      if (Platform.OS !== 'web') Alert.alert('Google Sign In Failed', message);
     } finally {
       setGoogleLoading(false);
     }
@@ -87,7 +117,7 @@ export default function SignupScreen() {
               testID="signup_name_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Display Name"
-              placeholderTextColor="#7a7d88"
+              placeholderTextColor="#8fa1b3"
               value={displayName}
               onChangeText={setDisplayName}
               autoCapitalize="words"
@@ -97,7 +127,7 @@ export default function SignupScreen() {
               testID="signup_email_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Email"
-              placeholderTextColor="#7a7d88"
+              placeholderTextColor="#8fa1b3"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -108,12 +138,28 @@ export default function SignupScreen() {
               testID="signup_password_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Password (min 6 characters)"
-              placeholderTextColor="#7a7d88"
+              placeholderTextColor="#8fa1b3"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               autoComplete="new-password"
             />
+
+            {errorMessage ? (
+              <View className="bg-accent-red/10 border border-accent-red/30 rounded-xl px-4 py-3">
+                <Text className="text-[#ff6b76] text-sm leading-5">
+                  {errorMessage}
+                </Text>
+              </View>
+            ) : null}
+
+            {successMessage ? (
+              <View className="bg-accent/10 border border-accent/30 rounded-xl px-4 py-3">
+                <Text className="text-accent text-sm leading-5">
+                  {successMessage}
+                </Text>
+              </View>
+            ) : null}
 
             <TouchableOpacity
               testID="signup_submit"
@@ -122,7 +168,7 @@ export default function SignupScreen() {
               disabled={loading || googleLoading}
             >
               {loading ? (
-                <ActivityIndicator color="#08080a" />
+                <ActivityIndicator color="#0b1118" />
               ) : (
                 <Text className="text-background font-semibold text-base">
                   Create Account

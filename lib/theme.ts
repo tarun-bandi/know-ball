@@ -1,0 +1,15 @@
+export const stadiumSlate = {
+  background: '#0b1118',
+  surface: '#111923',
+  surfaceElevated: '#172231',
+  surfaceRaised: '#1d2a3a',
+  border: '#2f4052',
+  borderStrong: '#466079',
+  accent: '#4ea1ff',
+  accentDim: '#2f7fd4',
+  success: '#31d0aa',
+  danger: '#ff6b76',
+  text: '#f6f8fb',
+  textMuted: '#8fa1b3',
+  textSubtle: '#64748b',
+} as const;

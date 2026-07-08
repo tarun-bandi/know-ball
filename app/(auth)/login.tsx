@@ -16,6 +16,7 @@ import { Link, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { supabase } from '@/lib/supabase';
 import { signInWithGoogle } from '@/lib/googleAuth';
+import { getAuthErrorMessage, withAuthTimeout } from '@/lib/authFeedback';
 import { PageContainer } from '@/components/PageContainer';
 import { getTeamLogoUrl } from '@/lib/teamLogo';
 
@@ -101,6 +102,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Staggered entrance animations
   const titleAnim = useRef(new Animated.Value(0)).current;
@@ -146,26 +148,44 @@ export default function LoginScreen() {
   });
 
   async function handleLogin() {
+    setErrorMessage('');
+
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      const message = 'Please fill in all fields';
+      setErrorMessage(message);
+      if (Platform.OS !== 'web') Alert.alert('Error', message);
       return;
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    try {
+      const { error } = await withAuthTimeout(
+        supabase.auth.signInWithPassword({ email, password })
+      );
 
-    if (error) {
-      Alert.alert('Login Failed', error.message);
+      if (error) {
+        const message = getAuthErrorMessage(error);
+        setErrorMessage(message);
+        if (Platform.OS !== 'web') Alert.alert('Login Failed', message);
+      }
+    } catch (error) {
+      const message = getAuthErrorMessage(error);
+      setErrorMessage(message);
+      if (Platform.OS !== 'web') Alert.alert('Login Failed', message);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function handleGoogleSignIn() {
+    setErrorMessage('');
     setGoogleLoading(true);
     try {
-      await signInWithGoogle();
+      await withAuthTimeout(signInWithGoogle());
     } catch (error: any) {
-      Alert.alert('Google Sign In Failed', error.message);
+      const message = getAuthErrorMessage(error);
+      setErrorMessage(message);
+      if (Platform.OS !== 'web') Alert.alert('Google Sign In Failed', message);
     } finally {
       setGoogleLoading(false);
     }
@@ -184,7 +204,7 @@ export default function LoginScreen() {
           <Animated.View style={[{ marginBottom: 6 }, fadeSlide(titleAnim)]}>
             <Text
               style={{
-                color: '#d4a843',
+                color: '#4ea1ff',
                 fontSize: 52,
                 fontWeight: '700',
                 letterSpacing: -2,
@@ -210,7 +230,7 @@ export default function LoginScreen() {
           <Animated.View style={[{ marginBottom: 40 }, fadeSlide(subtitleAnim)]}>
             <Text
               style={{
-                color: '#7a7d88',
+                color: '#8fa1b3',
                 fontSize: 15,
                 fontWeight: '400',
                 letterSpacing: 0.5,
@@ -226,7 +246,7 @@ export default function LoginScreen() {
               testID="auth_email_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Email"
-              placeholderTextColor="#7a7d88"
+              placeholderTextColor="#8fa1b3"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -237,12 +257,20 @@ export default function LoginScreen() {
               testID="auth_password_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Password"
-              placeholderTextColor="#7a7d88"
+              placeholderTextColor="#8fa1b3"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               autoComplete="password"
             />
+
+            {errorMessage ? (
+              <View className="bg-accent-red/10 border border-accent-red/30 rounded-xl px-4 py-3">
+                <Text className="text-[#ff6b76] text-sm leading-5">
+                  {errorMessage}
+                </Text>
+              </View>
+            ) : null}
 
             <TouchableOpacity
               testID="auth_login_submit"
@@ -252,7 +280,7 @@ export default function LoginScreen() {
               activeOpacity={0.85}
             >
               {loading ? (
-                <ActivityIndicator color="#08080a" />
+                <ActivityIndicator color="#0b1118" />
               ) : (
                 <Text className="text-background font-bold text-base tracking-wide">
                   Sign In

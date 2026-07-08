@@ -239,7 +239,7 @@ export default function LogModal({
                 {existingLog ? 'Edit Log' : 'Log This Game'}
               </Text>
               <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <X size={22} color="#7a7d88" />
+                <X size={22} color="#8fa1b3" />
               </TouchableOpacity>
             </View>
 
@@ -313,7 +313,7 @@ export default function LogModal({
                 <TextInput
                   className="bg-background border border-border rounded-xl px-4 py-3 text-white text-sm"
                   placeholder="What did you think of this game?"
-                  placeholderTextColor="#7a7d88"
+                  placeholderTextColor="#8fa1b3"
                   value={review}
                   onChangeText={setReview}
                   multiline
@@ -344,7 +344,7 @@ export default function LogModal({
                         onPress={() => handleRemoveImage(url)}
                         hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
                       >
-                        <XCircle size={20} color="#e63946" fill="#08080a" />
+                        <XCircle size={20} color="#ff6b76" fill="#0b1118" />
                       </TouchableOpacity>
                     </View>
                   ))}
@@ -356,9 +356,9 @@ export default function LogModal({
                       disabled={uploading}
                     >
                       {uploading ? (
-                        <ActivityIndicator color="#d4a843" size="small" />
+                        <ActivityIndicator color="#4ea1ff" size="small" />
                       ) : (
-                        <ImagePlus size={24} color="#7a7d88" />
+                        <ImagePlus size={24} color="#8fa1b3" />
                       )}
                     </TouchableOpacity>
                   )}
@@ -378,7 +378,7 @@ export default function LogModal({
                 <Switch
                   value={hasSpoilers}
                   onValueChange={setHasSpoilers}
-                  trackColor={{ false: '#2a2a30', true: '#d4a843' }}
+                  trackColor={{ false: '#2f4052', true: '#4ea1ff' }}
                   thumbColor="#ffffff"
                 />
               </View>
@@ -395,7 +395,7 @@ export default function LogModal({
                 disabled={saving || deleting || uploading}
               >
                 {saving ? (
-                  <ActivityIndicator color="#08080a" />
+                  <ActivityIndicator color="#0b1118" />
                 ) : (
                   <Text className="text-background font-semibold text-base">
                     {existingLog ? 'Save Changes' : 'Log Game'}
@@ -406,14 +406,14 @@ export default function LogModal({
               {/* Delete button (edit mode only) */}
               {existingLog && (
                 <TouchableOpacity
-                  className="rounded-xl py-4 items-center mb-8 border border-[#e63946]"
+                  className="rounded-xl py-4 items-center mb-8 border border-[#ff6b76]"
                   onPress={handleDelete}
                   disabled={saving || deleting}
                 >
                   {deleting ? (
-                    <ActivityIndicator color="#e63946" />
+                    <ActivityIndicator color="#ff6b76" />
                   ) : (
-                    <Text className="text-[#e63946] font-semibold text-base">
+                    <Text className="text-[#ff6b76] font-semibold text-base">
                       Delete Log
                     </Text>
                   )}

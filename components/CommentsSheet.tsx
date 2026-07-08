@@ -152,13 +152,13 @@ export default function CommentsSheet({
                 onPress={onClose}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <X size={22} color="#7a7d88" />
+                <X size={22} color="#8fa1b3" />
               </TouchableOpacity>
             </View>
 
             {loading ? (
               <View className="items-center py-8">
-                <ActivityIndicator color="#d4a843" />
+                <ActivityIndicator color="#4ea1ff" />
               </View>
             ) : (
               <FlatList
@@ -192,7 +192,7 @@ export default function CommentsSheet({
                             onPress={() => handleDelete(item.id)}
                             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                           >
-                            <Trash2 size={12} color="#e63946" />
+                            <Trash2 size={12} color="#ff6b76" />
                           </TouchableOpacity>
                         )}
                       </View>
@@ -211,7 +211,7 @@ export default function CommentsSheet({
               <TextInput
                 className="flex-1 bg-background border border-border rounded-xl px-4 py-3 text-white text-sm"
                 placeholder="Add a comment..."
-                placeholderTextColor="#7a7d88"
+                placeholderTextColor="#8fa1b3"
                 value={body}
                 onChangeText={setBody}
                 maxLength={500}
@@ -223,11 +223,11 @@ export default function CommentsSheet({
                 className="p-2"
               >
                 {posting ? (
-                  <ActivityIndicator color="#d4a843" size="small" />
+                  <ActivityIndicator color="#4ea1ff" size="small" />
                 ) : (
                   <Send
                     size={22}
-                    color={body.trim() ? '#d4a843' : '#7a7d88'}
+                    color={body.trim() ? '#4ea1ff' : '#8fa1b3'}
                   />
                 )}
               </TouchableOpacity>
