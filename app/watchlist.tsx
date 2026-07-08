@@ -124,7 +124,7 @@ export default function WatchlistScreen() {
                   onPress={() => handleRemove(item.game.id)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Trash2 size={16} color="#e63946" />
+                  <Trash2 size={16} color="#ff6b76" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -157,7 +157,7 @@ export default function WatchlistScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor="#d4a843"
+            tintColor="#4ea1ff"
           />
         }
         showsVerticalScrollIndicator={false}

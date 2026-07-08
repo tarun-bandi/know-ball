@@ -5,9 +5,14 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
+  Pressable,
+  Platform,
+  useWindowDimensions,
 } from 'react-native';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { Flame, Search, TrendingUp, UserPlus } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { enrichLogs } from '@/lib/enrichLogs';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -15,8 +20,12 @@ import GameCard from '@/components/GameCard';
 import TodaysGames from '@/components/TodaysGames';
 import ErrorState from '@/components/ErrorState';
 import { FeedSkeleton } from '@/components/Skeleton';
-import type { GameLogWithGame } from '@/types/database';
+import Avatar from '@/components/Avatar';
+import TeamLogo from '@/components/TeamLogo';
+import PlayoffBadge from '@/components/PlayoffBadge';
+import type { GameLogWithGame, GameWithTeams, UserProfile } from '@/types/database';
 import { PageContainer } from '@/components/PageContainer';
+import { stadiumSlate } from '@/lib/theme';
 
 const PAGE_SIZE = 20;
 
@@ -24,6 +33,22 @@ interface FeedPage {
   logs: GameLogWithGame[];
   nextOffset: number | null;
   favoriteTeamIds: string[];
+}
+
+interface DashboardGame {
+  game: GameWithTeams;
+  logCount: number;
+}
+
+interface DashboardUser {
+  profile: UserProfile;
+  logCount: number;
+}
+
+interface FeedDashboardData {
+  mostLogged: DashboardGame[];
+  suggestedUsers: DashboardUser[];
+  activeUsers: DashboardUser[];
 }
 
 async function fetchFeedPage(
@@ -49,9 +74,9 @@ async function fetchFeedPage(
 
   if (followsRes.error) throw followsRes.error;
 
-  const followedIds = (followsRes.data ?? []).map((f) => f.following_id);
-  const favoriteTeamIds = (favTeamsRes.data ?? []).map((f) => f.team_id);
-  const enabledSports = (profileRes.data?.enabled_sports as string[]) ?? ['nba'];
+  const followedIds = ((followsRes.data ?? []) as { following_id: string }[]).map((f) => f.following_id);
+  const favoriteTeamIds = ((favTeamsRes.data ?? []) as { team_id: string }[]).map((f) => f.team_id);
+  const enabledSports = ((profileRes.data as { enabled_sports?: string[] } | null)?.enabled_sports) ?? ['nba'];
   const userIds = [userId, ...followedIds];
 
   if (userIds.length === 0) return { logs: [], nextOffset: null, favoriteTeamIds };
@@ -85,7 +110,7 @@ async function fetchFeedPage(
       .from('user_profiles')
       .select('*')
       .in('user_id', logUserIds);
-    for (const p of profiles ?? []) {
+    for (const p of (profiles ?? []) as { user_id: string }[]) {
       profileMap[p.user_id] = p;
     }
   }
@@ -101,9 +126,462 @@ async function fetchFeedPage(
   return { logs, nextOffset, favoriteTeamIds };
 }
 
+async function fetchFeedDashboard(userId: string): Promise<FeedDashboardData> {
+  const sevenDaysAgo = new Date(
+    Date.now() - 7 * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
+  const [recentLogsRes, followsRes] = await Promise.all([
+    supabase
+      .from('game_logs')
+      .select('game_id, user_id')
+      .gte('logged_at', sevenDaysAgo),
+    supabase
+      .from('follows')
+      .select('following_id')
+      .eq('follower_id', userId),
+  ]);
+
+  if (recentLogsRes.error) throw recentLogsRes.error;
+  if (followsRes.error) throw followsRes.error;
+
+  const recentLogs = (recentLogsRes.data ?? []) as { game_id: string; user_id: string }[];
+  const followedIds = new Set(
+    ((followsRes.data ?? []) as { following_id: string }[]).map((f) => f.following_id),
+  );
+  const gameCount: Record<string, number> = {};
+  const userLogCount: Record<string, number> = {};
+
+  for (const log of recentLogs) {
+    gameCount[log.game_id] = (gameCount[log.game_id] ?? 0) + 1;
+    userLogCount[log.user_id] = (userLogCount[log.user_id] ?? 0) + 1;
+  }
+
+  const gameIds = Object.entries(gameCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([id]) => id);
+
+  const activeUserIds = Object.entries(userLogCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([id]) => id);
+
+  const suggestedUserIds = Object.entries(userLogCount)
+    .filter(([id]) => id !== userId && !followedIds.has(id))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([id]) => id);
+
+  const profileIds = [...new Set([...activeUserIds, ...suggestedUserIds])];
+
+  const [gamesRes, profilesRes] = await Promise.all([
+    gameIds.length > 0
+      ? supabase
+          .from('games')
+          .select(`
+            *,
+            home_team:teams!games_home_team_id_fkey (*),
+            away_team:teams!games_away_team_id_fkey (*),
+            season:seasons (*)
+          `)
+          .in('id', gameIds)
+      : Promise.resolve({ data: [], error: null }),
+    profileIds.length > 0
+      ? supabase
+          .from('user_profiles')
+          .select('*')
+          .in('user_id', profileIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  if (gamesRes.error) throw gamesRes.error;
+  if (profilesRes.error) throw profilesRes.error;
+
+  const gameMap: Record<string, GameWithTeams> = {};
+  for (const game of (gamesRes.data ?? []) as unknown as GameWithTeams[]) {
+    gameMap[game.id] = game;
+  }
+
+  const profileMap: Record<string, UserProfile> = {};
+  for (const profile of (profilesRes.data ?? []) as UserProfile[]) {
+    profileMap[profile.user_id] = profile;
+  }
+
+  return {
+    mostLogged: gameIds
+      .filter((id) => gameMap[id])
+      .map((id) => ({ game: gameMap[id], logCount: gameCount[id] })),
+    suggestedUsers: suggestedUserIds
+      .filter((id) => profileMap[id])
+      .map((id) => ({ profile: profileMap[id], logCount: userLogCount[id] })),
+    activeUsers: activeUserIds
+      .filter((id) => profileMap[id])
+      .map((id) => ({ profile: profileMap[id], logCount: userLogCount[id] })),
+  };
+}
+
+function formatGameDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function SectionTitle({
+  icon: Icon,
+  title,
+  color = '#4ea1ff',
+}: {
+  icon: any;
+  title: string;
+  color?: string;
+}) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+      <View
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: 7,
+          backgroundColor: `${color}18`,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon size={15} color={color} strokeWidth={2.4} />
+      </View>
+      <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '800' }}>
+        {title}
+      </Text>
+    </View>
+  );
+}
+
+function DashboardPanel({ children, style }: { children: ReactNode; style?: any }) {
+  return (
+    <View
+      style={[
+        {
+          borderRadius: 8,
+          borderWidth: 1,
+          borderColor: 'rgba(70,96,121,0.55)',
+          backgroundColor: stadiumSlate.surface,
+          padding: 16,
+          overflow: 'hidden',
+        },
+        Platform.OS === 'web'
+          ? ({
+              boxShadow: '0 18px 36px rgba(0,0,0,0.18)',
+            } as any)
+          : null,
+        style,
+      ]}
+    >
+      {children}
+    </View>
+  );
+}
+
+function MatchupRow({
+  item,
+  index,
+  compact = false,
+}: {
+  item: DashboardGame;
+  index: number;
+  compact?: boolean;
+}) {
+  const router = useRouter();
+  const { game, logCount } = item;
+
+  return (
+    <Pressable
+      onPress={() => router.push(`/game/${game.id}`)}
+      style={({ hovered, pressed }: any) => ({
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: hovered || pressed ? 'rgba(78,161,255,0.36)' : 'rgba(70,96,121,0.42)',
+        backgroundColor: hovered || pressed ? 'rgba(78,161,255,0.07)' : 'rgba(255,255,255,0.025)',
+        padding: compact ? 10 : 12,
+        marginBottom: 8,
+      })}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+          <View
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 6,
+              backgroundColor: index === 0 ? 'rgba(78,161,255,0.16)' : 'rgba(143,161,179,0.12)',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text style={{ color: index === 0 ? '#4ea1ff' : '#8fa1b3', fontSize: 11, fontWeight: '900' }}>
+              {index + 1}
+            </Text>
+          </View>
+          <TeamLogo abbreviation={game.away_team.abbreviation} sport={game.sport ?? 'nba'} size={22} />
+          <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '800' }}>
+            {game.away_team.abbreviation}
+          </Text>
+          <Text style={{ color: '#60636f', fontSize: 12 }}>@</Text>
+          <TeamLogo abbreviation={game.home_team.abbreviation} sport={game.sport ?? 'nba'} size={22} />
+          <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '800' }}>
+            {game.home_team.abbreviation}
+          </Text>
+          {game.playoff_round ? (
+            <PlayoffBadge round={game.playoff_round} sport={game.sport ?? 'nba'} />
+          ) : null}
+        </View>
+        <View
+          style={{
+            borderRadius: 999,
+            backgroundColor: 'rgba(78,161,255,0.11)',
+            paddingHorizontal: 9,
+            paddingVertical: 4,
+          }}
+        >
+          <Text style={{ color: '#4ea1ff', fontSize: 12, fontWeight: '800' }}>
+            {logCount}
+          </Text>
+        </View>
+      </View>
+      <Text style={{ color: '#747884', fontSize: 12, marginTop: 7, marginLeft: 32 }}>
+        {formatGameDate(game.game_date_utc)}
+      </Text>
+    </Pressable>
+  );
+}
+
+function UserRow({ item }: { item: DashboardUser }) {
+  const router = useRouter();
+  const { profile, logCount } = item;
+
+  return (
+    <Pressable
+      onPress={() => router.push(`/user/${profile.handle}`)}
+      style={({ hovered, pressed }: any) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 6,
+        backgroundColor: hovered || pressed ? 'rgba(78,161,255,0.07)' : 'transparent',
+      })}
+    >
+      <Avatar url={profile.avatar_url} name={profile.display_name} size={34} />
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: '#ffffff', fontSize: 13, fontWeight: '800' }} numberOfLines={1}>
+          {profile.display_name}
+        </Text>
+        <Text style={{ color: '#8fa1b3', fontSize: 12 }} numberOfLines={1}>
+          @{profile.handle}
+        </Text>
+      </View>
+      <Text style={{ color: '#4ea1ff', fontSize: 12, fontWeight: '800' }}>
+        {logCount}
+      </Text>
+    </Pressable>
+  );
+}
+
+function EmptyFeedNudge({ onSearch, onDiscover }: { onSearch: () => void; onDiscover: () => void }) {
+  return (
+    <DashboardPanel style={{ marginTop: 10, backgroundColor: stadiumSlate.surfaceElevated }}>
+      <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '800' }}>
+        Build your courtside feed
+      </Text>
+      <Text style={{ color: '#8c909c', fontSize: 14, lineHeight: 20, marginTop: 6 }}>
+        Follow fans or log a game. The timeline will fill in here, but the live board stays useful right away.
+      </Text>
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
+        <TouchableOpacity
+          onPress={onSearch}
+          activeOpacity={0.8}
+          style={{
+            borderRadius: 8,
+            backgroundColor: '#4ea1ff',
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <Search size={15} color="#0b1118" strokeWidth={2.5} />
+          <Text style={{ color: '#0b1118', fontSize: 13, fontWeight: '900' }}>
+            Log a game
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onDiscover}
+          activeOpacity={0.8}
+          style={{
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: 'rgba(70,96,121,0.6)',
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <UserPlus size={15} color="#ffffff" strokeWidth={2.3} />
+          <Text style={{ color: '#ffffff', fontSize: 13, fontWeight: '800' }}>
+            Find people
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </DashboardPanel>
+  );
+}
+
+function FeedDashboard({
+  dashboard,
+  hasLogs,
+}: {
+  dashboard?: FeedDashboardData;
+  hasLogs: boolean;
+}) {
+  const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 900;
+  const people = dashboard?.suggestedUsers.length
+    ? dashboard.suggestedUsers
+    : dashboard?.activeUsers ?? [];
+
+  return (
+    <View style={{ paddingHorizontal: isDesktop ? 24 : 16, paddingTop: isDesktop ? 8 : 14, paddingBottom: 12 }}>
+      <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 14 }}>
+        <View style={{ flex: isDesktop ? 1.9 : undefined, minWidth: 0 }}>
+          <DashboardPanel style={{ padding: 0, backgroundColor: stadiumSlate.background }}>
+            <View style={{ padding: 16, paddingBottom: 0 }}>
+              <View
+                style={{
+                  flexDirection: isDesktop ? 'row' : 'column',
+                  alignItems: isDesktop ? 'center' : 'flex-start',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                }}
+              >
+                <View style={{ flexShrink: 1 }}>
+                  <Text style={{ color: '#8fa1b3', fontSize: 12, fontWeight: '800', textTransform: 'uppercase' }}>
+                    Tonight in the NBA
+                  </Text>
+                  <Text style={{ color: '#ffffff', fontSize: isDesktop ? 28 : 22, fontWeight: '900', marginTop: 2 }}>
+                    Start from the scoreboard
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => router.push('/(tabs)/search')}
+                  activeOpacity={0.8}
+                  style={{
+                    borderRadius: 8,
+                    backgroundColor: '#4ea1ff',
+                    paddingHorizontal: 12,
+                    paddingVertical: 9,
+                    alignSelf: isDesktop ? 'auto' : 'flex-start',
+                  }}
+                >
+                  <Text style={{ color: '#0b1118', fontSize: 12, fontWeight: '900' }}>
+                    Log Game
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={{ marginTop: 8 }}>
+              <TodaysGames />
+            </View>
+          </DashboardPanel>
+
+          {!hasLogs ? (
+            <EmptyFeedNudge
+              onSearch={() => router.push('/(tabs)/search')}
+              onDiscover={() => router.push('/(tabs)/discover')}
+            />
+          ) : null}
+
+          {dashboard?.mostLogged.length ? (
+            <DashboardPanel style={{ marginTop: 14 }}>
+              <SectionTitle icon={Flame} title="Most Logged This Week" color="#ff6b76" />
+              {dashboard.mostLogged.map((item, index) => (
+                <MatchupRow key={item.game.id} item={item} index={index} />
+              ))}
+            </DashboardPanel>
+          ) : null}
+        </View>
+
+        <View style={{ width: isDesktop ? 330 : undefined, gap: 14 }}>
+          <DashboardPanel>
+            <SectionTitle icon={TrendingUp} title="Activity Pulse" />
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: '#ffffff', fontSize: 24, fontWeight: '900' }}>
+                  {dashboard?.mostLogged.length ?? 0}
+                </Text>
+                <Text style={{ color: '#8fa1b3', fontSize: 12, marginTop: 2 }}>
+                  hot games
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: '#ffffff', fontSize: 24, fontWeight: '900' }}>
+                  {people.length}
+                </Text>
+                <Text style={{ color: '#8fa1b3', fontSize: 12, marginTop: 2 }}>
+                  fans active
+                </Text>
+              </View>
+            </View>
+          </DashboardPanel>
+
+          {people.length ? (
+            <DashboardPanel>
+              <SectionTitle
+                icon={UserPlus}
+                title={dashboard?.suggestedUsers.length ? 'People to Follow' : 'Active Reviewers'}
+              />
+              {people.map((item) => (
+                <UserRow key={item.profile.user_id} item={item} />
+              ))}
+              <TouchableOpacity
+                onPress={() => router.push('/(tabs)/discover')}
+                activeOpacity={0.75}
+                style={{
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: 'rgba(78,161,255,0.32)',
+                  paddingVertical: 10,
+                  alignItems: 'center',
+                  marginTop: 4,
+                }}
+              >
+                <Text style={{ color: '#4ea1ff', fontSize: 13, fontWeight: '800' }}>
+                  Open Discover
+                </Text>
+              </TouchableOpacity>
+            </DashboardPanel>
+          ) : null}
+        </View>
+      </View>
+
+      {hasLogs ? (
+        <View style={{ marginTop: 16, marginBottom: 4 }}>
+          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '900' }}>
+            Latest from your feed
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 export default function FeedScreen() {
   const { user } = useAuthStore();
-  const router = useRouter();
 
   const {
     data,
@@ -119,6 +597,12 @@ export default function FeedScreen() {
     queryFn: ({ pageParam = 0 }) => fetchFeedPage(user!.id, pageParam),
     getNextPageParam: (lastPage) => lastPage.nextOffset,
     initialPageParam: 0,
+    enabled: !!user,
+  });
+
+  const { data: dashboard } = useQuery({
+    queryKey: ['feed-dashboard', user?.id],
+    queryFn: () => fetchFeedDashboard(user!.id),
     enabled: !!user,
   });
 
@@ -150,62 +634,25 @@ export default function FeedScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <PageContainer className="flex-1">
+      <PageContainer className="flex-1" showDesktopNav>
       <FlatList
         data={allLogs}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <GameCard log={item} showUser />}
-        ListHeaderComponent={
-          <View style={{ marginBottom: 8 }}>
-            <TodaysGames />
+        renderItem={({ item }) => (
+          <View style={{ paddingHorizontal: 16 }}>
+            <GameCard log={item} showUser />
           </View>
+        )}
+        ListHeaderComponent={
+          <FeedDashboard dashboard={dashboard} hasLogs={allLogs.length > 0} />
         }
         contentContainerStyle={
-          allLogs.length === 0
-            ? { flex: 1, justifyContent: 'center', alignItems: 'center' }
-            : { paddingTop: 4, paddingBottom: 24, paddingHorizontal: 16 }
-        }
-        ListEmptyComponent={
-          <View className="px-6 items-center" style={{ paddingTop: 40 }}>
-            <View style={{
-              width: 80, height: 80, borderRadius: 40,
-              backgroundColor: 'rgba(212, 168, 67, 0.1)',
-              alignItems: 'center', justifyContent: 'center',
-              marginBottom: 20,
-            }}>
-              <Text style={{ fontSize: 36 }}>{'\u{1F3C0}'}</Text>
-            </View>
-            <Text className="text-white font-bold mb-2" style={{ fontSize: 22 }}>
-              Nothing here yet
-            </Text>
-            <Text className="text-muted text-center mb-6" style={{ fontSize: 15, lineHeight: 22 }}>
-              Follow other fans or search for a game{'\n'}to log your first entry.
-            </Text>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#d4a843',
-                borderRadius: 14,
-                paddingHorizontal: 32,
-                paddingVertical: 14,
-                shadowColor: '#d4a843',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 12,
-                elevation: 8,
-              }}
-              onPress={() => router.push('/(tabs)/search')}
-              activeOpacity={0.8}
-            >
-              <Text className="font-bold text-base" style={{ color: '#08080a' }}>
-                Search Games
-              </Text>
-            </TouchableOpacity>
-          </View>
+          { paddingTop: 4, paddingBottom: 24, paddingHorizontal: 0 }
         }
         ListFooterComponent={
           isFetchingNextPage ? (
             <View className="py-4">
-              <ActivityIndicator color="#d4a843" />
+              <ActivityIndicator color="#4ea1ff" />
             </View>
           ) : null
         }
@@ -217,7 +664,7 @@ export default function FeedScreen() {
           <RefreshControl
             refreshing={isRefetching && !isFetchingNextPage}
             onRefresh={refetch}
-            tintColor="#d4a843"
+            tintColor="#4ea1ff"
           />
         }
         showsVerticalScrollIndicator={false}

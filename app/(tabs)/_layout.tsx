@@ -1,43 +1,47 @@
-import { View, TouchableOpacity, Platform } from 'react-native';
+import { View, TouchableOpacity, Platform, useWindowDimensions } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
 import { Home, Compass, Search, User, Bell } from 'lucide-react-native';
 
 export default function TabsLayout() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isDesktopWeb = Platform.OS === 'web' && width >= 900;
 
   return (
     <Tabs
       screenOptions={{
+        headerShown: !isDesktopWeb,
         tabBarStyle: {
-          backgroundColor: '#141416',
-          borderTopColor: '#2a2a30',
+          backgroundColor: '#111923',
+          borderTopColor: '#2f4052',
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
           paddingTop: 1,
+          display: isDesktopWeb ? 'none' : 'flex',
         },
         tabBarBackground: () => (
           <View style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: '#141416',
+            backgroundColor: '#111923',
           }}>
-            {/* Gold accent line at top */}
+            {/* Active accent line at top */}
             <View style={{
               height: 0.5,
-              backgroundColor: '#d4a843',
+              backgroundColor: '#4ea1ff',
               opacity: 0.2,
             }} />
           </View>
         ),
-        tabBarActiveTintColor: '#d4a843',
-        tabBarInactiveTintColor: '#4a4a55',
+        tabBarActiveTintColor: '#4ea1ff',
+        tabBarInactiveTintColor: '#64748b',
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
           letterSpacing: 0.5,
         },
         headerStyle: {
-          backgroundColor: '#141416',
+          backgroundColor: '#111923',
           ...(Platform.OS === 'web' ? {} : {
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
@@ -65,7 +69,7 @@ export default function TabsLayout() {
               style={{ marginRight: 16 }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Bell size={22} color="#7a7d88" />
+              <Bell size={22} color="#8fa1b3" />
             </TouchableOpacity>
           ),
         }}

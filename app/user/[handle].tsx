@@ -173,7 +173,7 @@ export default function UserProfileScreen() {
         <RefreshControl
           refreshing={isRefetching}
           onRefresh={refetch}
-          tintColor="#d4a843"
+          tintColor="#4ea1ff"
         />
       }
     >
@@ -210,7 +210,7 @@ export default function UserProfileScreen() {
             }}
             className="p-2"
           >
-            <Share2 size={20} color="#7a7d88" />
+            <Share2 size={20} color="#8fa1b3" />
           </TouchableOpacity>
           {!isOwnProfile && (
             <TouchableOpacity
@@ -225,14 +225,14 @@ export default function UserProfileScreen() {
               {followMutation.isPending ? (
                 <ActivityIndicator
                   size="small"
-                  color={isFollowing ? '#7a7d88' : '#08080a'}
+                  color={isFollowing ? '#8fa1b3' : '#0b1118'}
                 />
               ) : (
                 <>
                   {isFollowing ? (
-                    <UserMinus size={16} color="#7a7d88" />
+                    <UserMinus size={16} color="#8fa1b3" />
                   ) : (
-                    <UserPlus size={16} color="#08080a" />
+                    <UserPlus size={16} color="#0b1118" />
                   )}
                   <Text
                     className={`text-sm font-medium ${

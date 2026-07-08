@@ -14,7 +14,7 @@ function getInitials(name: string): string {
   return (parts[0]?.[0] ?? '?').toUpperCase();
 }
 
-const COLORS = ['#e63946', '#457b9d', '#2a9d8f', '#e9c46a', '#f4a261', '#264653', '#6a4c93'];
+const COLORS = ['#ff6b76', '#457b9d', '#2a9d8f', '#e9c46a', '#f4a261', '#264653', '#6a4c93'];
 
 function hashColor(name: string): string {
   let hash = 0;

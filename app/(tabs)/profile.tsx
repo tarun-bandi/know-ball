@@ -175,25 +175,25 @@ export default function ProfileScreen() {
         <RefreshControl
           refreshing={isRefetching}
           onRefresh={refetch}
-          tintColor="#d4a843"
+          tintColor="#4ea1ff"
         />
       }
     >
-      <PageContainer>
+      <PageContainer showDesktopNav>
       {/* Header */}
-      <View style={{ backgroundColor: '#141416', overflow: 'hidden' }}>
+      <View style={{ backgroundColor: '#111923', overflow: 'hidden' }}>
         {/* Ambient gold glow behind avatar */}
         <View style={{
           position: 'absolute', top: -30, left: -10,
           width: 140, height: 140, borderRadius: 70,
-          backgroundColor: '#d4a843', opacity: 0.04,
+          backgroundColor: '#4ea1ff', opacity: 0.04,
         }} />
         <View className="px-5 pt-5 pb-5">
           {/* Row 1: Avatar + Name + Settings gear */}
           <View className="flex-row items-center gap-4">
             <View style={{
               borderRadius: 44, padding: 2,
-              borderWidth: 2, borderColor: 'rgba(212, 168, 67, 0.3)',
+              borderWidth: 2, borderColor: 'rgba(78, 161, 255, 0.3)',
             }}>
               <Avatar
                 testID="profile_avatar"
@@ -214,7 +214,7 @@ export default function ProfileScreen() {
               onPress={() => router.push('/settings')}
               className="p-2"
             >
-              <Settings size={22} color="#7a7d88" />
+              <Settings size={22} color="#8fa1b3" />
             </TouchableOpacity>
           </View>
 
@@ -238,7 +238,7 @@ export default function ProfileScreen() {
               activeOpacity={0.7}
               style={{
                 borderWidth: 1,
-                borderColor: 'rgba(212, 168, 67, 0.4)',
+                borderColor: 'rgba(78, 161, 255, 0.4)',
                 borderRadius: 10,
                 paddingHorizontal: 14,
                 paddingVertical: 8,
@@ -252,20 +252,20 @@ export default function ProfileScreen() {
           <View className="flex-row gap-2 mt-4">
             <TouchableOpacity
               className="flex-1 rounded-xl py-3 flex-row items-center justify-center gap-2"
-              style={{ backgroundColor: 'rgba(212, 168, 67, 0.1)', borderWidth: 1, borderColor: 'rgba(212, 168, 67, 0.2)' }}
+              style={{ backgroundColor: 'rgba(78, 161, 255, 0.1)', borderWidth: 1, borderColor: 'rgba(78, 161, 255, 0.2)' }}
               onPress={() => router.push('/stats')}
               activeOpacity={0.7}
             >
-              <BarChart3 size={16} color="#d4a843" strokeWidth={2.5} />
+              <BarChart3 size={16} color="#4ea1ff" strokeWidth={2.5} />
               <Text className="text-accent font-bold text-sm">Stats</Text>
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-1 rounded-xl py-3 flex-row items-center justify-center gap-2"
-              style={{ backgroundColor: 'rgba(212, 168, 67, 0.1)', borderWidth: 1, borderColor: 'rgba(212, 168, 67, 0.2)' }}
+              style={{ backgroundColor: 'rgba(78, 161, 255, 0.1)', borderWidth: 1, borderColor: 'rgba(78, 161, 255, 0.2)' }}
               onPress={() => router.push('/rankings' as any)}
               activeOpacity={0.7}
             >
-              <Trophy size={16} color="#d4a843" strokeWidth={2.5} />
+              <Trophy size={16} color="#4ea1ff" strokeWidth={2.5} />
               <Text className="text-accent font-bold text-sm">Rankings</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -278,12 +278,12 @@ export default function ProfileScreen() {
               }}
               activeOpacity={0.7}
             >
-              <Share size={16} color="#7a7d88" />
+              <Share size={16} color="#8fa1b3" />
             </TouchableOpacity>
           </View>
         </View>
         {/* Bottom accent line */}
-        <View style={{ height: 0.5, backgroundColor: '#d4a843', opacity: 0.12 }} />
+        <View style={{ height: 0.5, backgroundColor: '#4ea1ff', opacity: 0.12 }} />
       </View>
 
       {/* Diary */}
@@ -300,7 +300,7 @@ export default function ProfileScreen() {
               Browse your logs by date
             </Text>
           </View>
-          <ChevronRight size={16} color="#7a7d88" />
+          <ChevronRight size={16} color="#8fa1b3" />
         </TouchableOpacity>
       </View>
 
@@ -401,7 +401,7 @@ export default function ProfileScreen() {
             onPress={() => setShowCreateList(true)}
             className="flex-row items-center gap-1"
           >
-            <Plus size={16} color="#d4a843" />
+            <Plus size={16} color="#4ea1ff" />
             <Text className="text-accent text-sm font-medium">New</Text>
           </TouchableOpacity>
         </View>
@@ -424,7 +424,7 @@ export default function ProfileScreen() {
                 <Text className="text-white font-medium" numberOfLines={1}>
                   {list.title}
                 </Text>
-                {list.is_private && <Lock size={12} color="#7a7d88" />}
+                {list.is_private && <Lock size={12} color="#8fa1b3" />}
               </View>
               {list.description && (
                 <Text className="text-muted text-xs mt-1" numberOfLines={1}>
@@ -444,12 +444,12 @@ export default function ProfileScreen() {
           activeOpacity={0.7}
         >
           <View className="flex-row items-center gap-3">
-            <Bookmark size={18} color="#7a7d88" />
+            <Bookmark size={18} color="#8fa1b3" />
             <Text className="text-white font-medium text-base">Watchlist</Text>
           </View>
           <View className="flex-row items-center gap-2">
             <Text className="text-muted text-sm">{watchlistCount}</Text>
-            <ChevronRight size={16} color="#7a7d88" />
+            <ChevronRight size={16} color="#8fa1b3" />
           </View>
         </TouchableOpacity>
       </View>

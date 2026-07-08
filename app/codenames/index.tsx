@@ -133,7 +133,7 @@ export default function CodenamesLanding() {
           >
             <Text
               className="text-center"
-              style={{ color: '#D4A843', fontSize: 13, letterSpacing: 4, fontWeight: '600' }}
+              style={{ color: '#4ea1ff', fontSize: 13, letterSpacing: 4, fontWeight: '600' }}
             >
               NBA
             </Text>
@@ -148,7 +148,7 @@ export default function CodenamesLanding() {
 
           <Animated.Text
             entering={FadeIn.delay(400).duration(600)}
-            style={{ color: '#7a7d88', fontSize: 15, lineHeight: 22, textAlign: 'center', marginTop: 20 }}
+            style={{ color: '#8fa1b3', fontSize: 15, lineHeight: 22, textAlign: 'center', marginTop: 20 }}
           >
             Guess the players. Don't hit the assassin.{'\n'}
             Two teams, one spymaster each.
@@ -168,7 +168,7 @@ export default function CodenamesLanding() {
                   disabled={creating}
                   activeOpacity={0.7}
                   style={{
-                    backgroundColor: '#D4A843',
+                    backgroundColor: '#4ea1ff',
                     borderRadius: 14,
                     paddingVertical: 18,
                     alignItems: 'center',
@@ -190,7 +190,7 @@ export default function CodenamesLanding() {
               </Animated.View>
 
               {createError ? (
-                <Text style={{ color: '#e63946', fontSize: 13, textAlign: 'center' }}>{createError}</Text>
+                <Text style={{ color: '#ff6b76', fontSize: 13, textAlign: 'center' }}>{createError}</Text>
               ) : null}
 
               <Animated.View
@@ -206,7 +206,7 @@ export default function CodenamesLanding() {
                     alignItems: 'center',
                     borderWidth: 1.5,
                     borderColor: '#3a3a40',
-                    backgroundColor: '#141416',
+                    backgroundColor: '#111923',
                   }}
                 >
                   <Text style={{ color: '#9a9aa0', fontSize: 17, letterSpacing: 1.5, fontWeight: '600' }}>

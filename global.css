@@ -10,8 +10,8 @@
     font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #08080a;
-    color: #f0f0f0;
+    background-color: #0b1118;
+    color: #f6f8fb;
   }
 }
 
@@ -28,7 +28,7 @@
     transform: translateX(-50%);
     width: 80%;
     height: 50%;
-    background: radial-gradient(ellipse at center, rgba(212, 168, 67, 0.03) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(78, 161, 255, 0.08) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
   }

@@ -116,7 +116,7 @@ export default function ListDetailScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color="#d4a843" size="large" />
+        <ActivityIndicator color="#4ea1ff" size="large" />
       </View>
     );
   }
@@ -124,7 +124,7 @@ export default function ListDetailScreen() {
   if (error || !data) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <Text className="text-[#e63946]">Failed to load list.</Text>
+        <Text className="text-[#ff6b76]">Failed to load list.</Text>
       </View>
     );
   }
@@ -141,7 +141,7 @@ export default function ListDetailScreen() {
           <Text className="text-white text-xl font-bold flex-1" numberOfLines={2}>
             {list.title}
           </Text>
-          {list.is_private && <Lock size={16} color="#7a7d88" />}
+          {list.is_private && <Lock size={16} color="#8fa1b3" />}
           <View className="flex-row items-center gap-1">
             <TouchableOpacity
               className="p-2"
@@ -152,7 +152,7 @@ export default function ListDetailScreen() {
               }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Share2 size={18} color="#7a7d88" />
+              <Share2 size={18} color="#8fa1b3" />
             </TouchableOpacity>
             {isOwner && (
               <>
@@ -161,14 +161,14 @@ export default function ListDetailScreen() {
                   onPress={() => setShowEditModal(true)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Pencil size={18} color="#d4a843" />
+                  <Pencil size={18} color="#4ea1ff" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="p-2"
                   onPress={handleDeleteList}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Trash2 size={18} color="#e63946" />
+                  <Trash2 size={18} color="#ff6b76" />
                 </TouchableOpacity>
               </>
             )}
@@ -226,7 +226,7 @@ export default function ListDetailScreen() {
                   onPress={() => handleRemoveGame(item.id)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                  <Trash2 size={16} color="#e63946" />
+                  <Trash2 size={16} color="#ff6b76" />
                 </TouchableOpacity>
               )}
             </View>

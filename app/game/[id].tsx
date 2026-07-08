@@ -268,7 +268,7 @@ function TeamToggle({ activeTeamId, game, onSelect }: { activeTeamId: string; ga
     <View className="flex-row bg-surface rounded-xl mb-3 p-1 self-start">
       <TouchableOpacity
         className={`py-2.5 px-6 rounded-lg items-center ${isAwayActive ? 'bg-accent' : ''}`}
-        style={isAwayActive ? { backgroundColor: '#d4a843' } : undefined}
+        style={isAwayActive ? { backgroundColor: '#4ea1ff' } : undefined}
         onPress={() => onSelect(game.away_team_id)}
         activeOpacity={0.7}
       >
@@ -278,7 +278,7 @@ function TeamToggle({ activeTeamId, game, onSelect }: { activeTeamId: string; ga
       </TouchableOpacity>
       <TouchableOpacity
         className={`py-2.5 px-6 rounded-lg items-center ${!isAwayActive ? 'bg-accent' : ''}`}
-        style={!isAwayActive ? { backgroundColor: '#d4a843' } : undefined}
+        style={!isAwayActive ? { backgroundColor: '#4ea1ff' } : undefined}
         onPress={() => onSelect(game.home_team_id)}
         activeOpacity={0.7}
       >
@@ -766,7 +766,7 @@ function PlayByPlaySection({ game }: { game: GameWithTeams }) {
   if (isLoading) {
     return (
       <View className="items-center py-8">
-        <ActivityIndicator color="#d4a843" size="small" />
+        <ActivityIndicator color="#4ea1ff" size="small" />
       </View>
     );
   }
@@ -798,7 +798,7 @@ function PlayByPlaySection({ game }: { game: GameWithTeams }) {
           <TouchableOpacity
             className="py-1.5 px-3 rounded-lg"
             style={
-              activePeriod == null ? { backgroundColor: '#d4a843' } : undefined
+              activePeriod == null ? { backgroundColor: '#4ea1ff' } : undefined
             }
             onPress={() => setSelectedPeriod(null)}
             activeOpacity={0.7}
@@ -817,7 +817,7 @@ function PlayByPlaySection({ game }: { game: GameWithTeams }) {
               className="py-1.5 px-3 rounded-lg"
               style={
                 activePeriod === p
-                  ? { backgroundColor: '#d4a843' }
+                  ? { backgroundColor: '#4ea1ff' }
                   : undefined
               }
               onPress={() => setSelectedPeriod(p)}
@@ -1018,7 +1018,7 @@ export default function GameDetailScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor="#d4a843"
+            tintColor="#4ea1ff"
           />
         }
       >
@@ -1092,7 +1092,7 @@ export default function GameDetailScreen() {
                 className={`flex-1 rounded-xl py-4 items-center ${
                   myLog ? 'bg-surface border border-accent' : 'bg-accent'
                 }`}
-                style={!myLog ? { backgroundColor: '#d4a843' } : undefined}
+                style={!myLog ? { backgroundColor: '#4ea1ff' } : undefined}
                 onPress={() => setShowLogModal(true)}
                 activeOpacity={0.8}
               >
@@ -1111,8 +1111,8 @@ export default function GameDetailScreen() {
               >
                 <Bookmark
                   size={22}
-                  color="#d4a843"
-                  fill={isBookmarked ? '#d4a843' : 'transparent'}
+                  color="#4ea1ff"
+                  fill={isBookmarked ? '#4ea1ff' : 'transparent'}
                 />
               </TouchableOpacity>
               <TouchableOpacity
@@ -1120,7 +1120,7 @@ export default function GameDetailScreen() {
                 onPress={() => setShowListModal(true)}
                 activeOpacity={0.8}
               >
-                <List size={22} color="#d4a843" />
+                <List size={22} color="#4ea1ff" />
               </TouchableOpacity>
               <TouchableOpacity
                 className="bg-surface border border-border rounded-xl w-12 py-4 items-center justify-center"
@@ -1131,7 +1131,7 @@ export default function GameDetailScreen() {
                 }}
                 activeOpacity={0.8}
               >
-                <Send size={22} color="#d4a843" />
+                <Send size={22} color="#4ea1ff" />
               </TouchableOpacity>
             </View>
 
@@ -1274,7 +1274,7 @@ export default function GameDetailScreen() {
             onPress={() => Linking.openURL(getHighlightsUrl(game))}
             activeOpacity={0.8}
           >
-            <Play size={18} color="#d4a843" />
+            <Play size={18} color="#4ea1ff" />
             <Text className="text-accent font-semibold text-base">Watch Highlights</Text>
           </TouchableOpacity>
         )}
@@ -1286,7 +1286,7 @@ export default function GameDetailScreen() {
               key={tab.key}
               onPress={() => setActiveTab(tab.key)}
               className="flex-1 py-2.5 rounded-lg items-center"
-              style={activeTab === tab.key ? { backgroundColor: '#d4a843' } : undefined}
+              style={activeTab === tab.key ? { backgroundColor: '#4ea1ff' } : undefined}
               activeOpacity={0.7}
             >
               <Text
@@ -1312,7 +1312,7 @@ export default function GameDetailScreen() {
                 <View className="flex-row bg-surface rounded-xl p-1 self-start mb-3">
                   <TouchableOpacity
                     className="py-2 px-4 rounded-lg"
-                    style={reviewSort === 'recent' ? { backgroundColor: '#d4a843' } : undefined}
+                    style={reviewSort === 'recent' ? { backgroundColor: '#4ea1ff' } : undefined}
                     onPress={() => setReviewSort('recent')}
                     activeOpacity={0.7}
                   >
@@ -1322,7 +1322,7 @@ export default function GameDetailScreen() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     className="py-2 px-4 rounded-lg"
-                    style={reviewSort === 'popular' ? { backgroundColor: '#d4a843' } : undefined}
+                    style={reviewSort === 'popular' ? { backgroundColor: '#4ea1ff' } : undefined}
                     onPress={() => setReviewSort('popular')}
                     activeOpacity={0.7}
                   >

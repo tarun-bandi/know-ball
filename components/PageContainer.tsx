@@ -1,13 +1,24 @@
-import { View } from "react-native";
+import { Platform, View } from "react-native";
+import type { ReactNode } from "react";
+import DesktopAppNav from "./DesktopAppNav";
 
 interface PageContainerProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
+  showDesktopNav?: boolean;
 }
 
-export function PageContainer({ children, className = "" }: PageContainerProps) {
+export function PageContainer({
+  children,
+  className = "",
+  showDesktopNav = false,
+}: PageContainerProps) {
   return (
-    <View className={`w-full max-w-screen-md self-center ${className}`}>
+    <View
+      className={`w-full self-center ${className}`}
+      style={{ maxWidth: Platform.OS === "web" && showDesktopNav ? 1180 : 768 }}
+    >
+      {showDesktopNav ? <DesktopAppNav /> : null}
       {children}
     </View>
   );

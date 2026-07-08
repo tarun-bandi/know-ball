@@ -117,7 +117,7 @@ export default function TagScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color="#d4a843" size="large" />
+        <ActivityIndicator color="#4ea1ff" size="large" />
       </View>
     );
   }
@@ -149,7 +149,7 @@ export default function TagScreen() {
         ListFooterComponent={
           isFetchingNextPage ? (
             <View className="py-4">
-              <ActivityIndicator color="#d4a843" />
+              <ActivityIndicator color="#4ea1ff" />
             </View>
           ) : null
         }
@@ -161,7 +161,7 @@ export default function TagScreen() {
           <RefreshControl
             refreshing={isRefetching && !isFetchingNextPage}
             onRefresh={refetch}
-            tintColor="#d4a843"
+            tintColor="#4ea1ff"
           />
         }
         showsVerticalScrollIndicator={false}

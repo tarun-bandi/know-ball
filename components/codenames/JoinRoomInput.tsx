@@ -54,7 +54,7 @@ export default function JoinRoomInput({ onJoin, onCancel }: Props) {
       </Animated.View>
 
       {error ? (
-        <Text style={{ color: '#e63946', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{error}</Text>
+        <Text style={{ color: '#ff6b76', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{error}</Text>
       ) : null}
 
       <Animated.View
@@ -72,7 +72,7 @@ export default function JoinRoomInput({ onJoin, onCancel }: Props) {
             borderRadius: 14,
           }}
         >
-          <Text style={{ color: '#7a7d88', fontSize: 16, fontWeight: '600' }}>Cancel</Text>
+          <Text style={{ color: '#8fa1b3', fontSize: 16, fontWeight: '600' }}>Cancel</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -84,7 +84,7 @@ export default function JoinRoomInput({ onJoin, onCancel }: Props) {
             borderRadius: 14,
             paddingVertical: 18,
             alignItems: 'center',
-            backgroundColor: ready ? '#D4A843' : '#2a2a30',
+            backgroundColor: ready ? '#4ea1ff' : '#2f4052',
           }}
         >
           {loading ? (

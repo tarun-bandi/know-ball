@@ -114,13 +114,13 @@ export default function OnboardingFavoriteTeams() {
               disabled={isDisabled}
               className="px-4 py-1.5 rounded-full border border-border bg-background"
               style={[
-                isActive ? { backgroundColor: '#d4a843', borderColor: '#d4a843' } : undefined,
+                isActive ? { backgroundColor: '#4ea1ff', borderColor: '#4ea1ff' } : undefined,
                 isDisabled ? { opacity: 0.35 } : undefined,
               ]}
             >
               <Text
                 className="text-sm font-medium text-muted"
-                style={isActive ? { color: '#08080a' } : undefined}
+                style={isActive ? { color: '#0b1118' } : undefined}
               >
                 {tab.label}
               </Text>
@@ -131,7 +131,7 @@ export default function OnboardingFavoriteTeams() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#d4a843" />
+          <ActivityIndicator color="#4ea1ff" />
         </View>
       ) : (
         <ScrollView
@@ -161,7 +161,7 @@ export default function OnboardingFavoriteTeams() {
                   >
                     {team.abbreviation}
                   </Text>
-                  {isSelected && <Check size={14} color="#d4a843" />}
+                  {isSelected && <Check size={14} color="#4ea1ff" />}
                 </TouchableOpacity>
               );
             })}
@@ -177,7 +177,7 @@ export default function OnboardingFavoriteTeams() {
           activeOpacity={0.8}
         >
           {saving ? (
-            <ActivityIndicator color="#08080a" />
+            <ActivityIndicator color="#0b1118" />
           ) : (
             <Text className="text-background font-semibold text-base">
               {selected.size > 0
