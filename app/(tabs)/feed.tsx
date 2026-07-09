@@ -12,7 +12,7 @@ import {
 import type { ReactNode } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { Flame, Search, TrendingUp, UserPlus } from 'lucide-react-native';
+import { Flame, Search, TrendingUp, Trophy, UserPlus } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { enrichLogs } from '@/lib/enrichLogs';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -498,6 +498,50 @@ function FeedDashboard({
               <TodaysGames />
             </View>
           </DashboardPanel>
+
+          <Pressable
+            onPress={() => router.push('/world-cup')}
+            style={({ hovered, pressed }: any) => ({
+              marginTop: 14,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: hovered || pressed ? 'rgba(78,161,255,0.62)' : 'rgba(70,96,121,0.6)',
+              backgroundColor: 'rgba(17,25,35,0.92)',
+              padding: 16,
+              flexDirection: isDesktop ? 'row' : 'column',
+              alignItems: isDesktop ? 'center' : 'flex-start',
+              justifyContent: 'space-between',
+              gap: 12,
+            })}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+              <View
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 8,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(78,161,255,0.14)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(78,161,255,0.32)',
+                }}
+              >
+                <Trophy size={19} color={stadiumSlate.accent} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '900' }}>
+                  World Cup 2026 hub
+                </Text>
+                <Text style={{ color: '#8fa1b3', fontSize: 13, marginTop: 3 }}>
+                  Standings, bracket, live matches, and the Golden Boot race.
+                </Text>
+              </View>
+            </View>
+            <Text style={{ color: stadiumSlate.accent, fontSize: 12, fontWeight: '900' }}>
+              Open hub
+            </Text>
+          </Pressable>
 
           {!hasLogs ? (
             <EmptyFeedNudge

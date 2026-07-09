@@ -48,6 +48,7 @@ export function useLiveScores(games: GameWithTeams[] | undefined) {
       const liveMap = new Map<number, LiveGameData>();
       const updates: Array<{
         provider_game_id: number;
+        sport: Sport;
         home_team_score: number;
         away_team_score: number;
         status: 'scheduled' | 'live' | 'final';
@@ -90,6 +91,7 @@ export function useLiveScores(games: GameWithTeams[] | undefined) {
             if (changed) {
               updates.push({
                 provider_game_id: typeof pg.id === 'number' ? pg.id : parseInt(pg.id as string, 10),
+                sport,
                 home_team_score: pg.homeScore,
                 away_team_score: pg.awayScore,
                 status: newStatus,
@@ -105,7 +107,7 @@ export function useLiveScores(games: GameWithTeams[] | undefined) {
       if (updates.length > 0) {
         await Promise.all(
           updates.map((u) =>
-            supabase
+            (supabase as any)
               .from('games')
               .update({
                 home_team_score: u.home_team_score,
@@ -114,7 +116,8 @@ export function useLiveScores(games: GameWithTeams[] | undefined) {
                 period: u.period,
                 time: u.time,
               })
-              .eq('provider_game_id', u.provider_game_id),
+              .eq('provider_game_id', u.provider_game_id)
+              .eq('sport', u.sport),
           ),
         );
 

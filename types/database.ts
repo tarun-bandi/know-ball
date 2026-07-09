@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export type Sport = 'nba' | 'nfl';
+export type Sport = 'nba' | 'nfl' | 'world_cup';
 export type SeasonType = 'regular' | 'playoffs';
 export type GameStatus = 'scheduled' | 'live' | 'final';
 export type WatchMode = 'live' | 'replay' | 'condensed' | 'highlights';
@@ -319,6 +319,90 @@ export interface Database {
           sentiment?: Sentiment | null;
           fan_of?: FanOf | null;
           image_urls?: string[] | null;
+          updated_at?: string;
+        };
+      };
+      world_cup_match_metadata: {
+        Row: {
+          game_id: string;
+          tournament_year: number;
+          stage: string;
+          group_code: string | null;
+          matchday: number | null;
+          bracket_slot: string | null;
+          home_seed_label: string | null;
+          away_seed_label: string | null;
+          home_penalties: number | null;
+          away_penalties: number | null;
+          status_note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          game_id: string;
+          tournament_year?: number;
+          stage: string;
+          group_code?: string | null;
+          matchday?: number | null;
+          bracket_slot?: string | null;
+          home_seed_label?: string | null;
+          away_seed_label?: string | null;
+          home_penalties?: number | null;
+          away_penalties?: number | null;
+          status_note?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          tournament_year?: number;
+          stage?: string;
+          group_code?: string | null;
+          matchday?: number | null;
+          bracket_slot?: string | null;
+          home_seed_label?: string | null;
+          away_seed_label?: string | null;
+          home_penalties?: number | null;
+          away_penalties?: number | null;
+          status_note?: string | null;
+          updated_at?: string;
+        };
+      };
+      world_cup_player_stats: {
+        Row: {
+          id: string;
+          tournament_year: number;
+          player_id: string;
+          team_id: string;
+          goals: number;
+          assists: number;
+          minutes: number;
+          matches_played: number;
+          penalties: number;
+          clean_sheets: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tournament_year?: number;
+          player_id: string;
+          team_id: string;
+          goals?: number;
+          assists?: number;
+          minutes?: number;
+          matches_played?: number;
+          penalties?: number;
+          clean_sheets?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          goals?: number;
+          assists?: number;
+          minutes?: number;
+          matches_played?: number;
+          penalties?: number;
+          clean_sheets?: number;
           updated_at?: string;
         };
       };
@@ -745,11 +829,17 @@ export type BoxScore = Database['public']['Tables']['box_scores']['Row'];
 export type GamePlayByPlay = Database['public']['Tables']['game_play_by_play']['Row'];
 export type Watchlist = Database['public']['Tables']['watchlist']['Row'];
 export type FavoritePlayer = Database['public']['Tables']['user_favorite_players']['Row'];
+export type WorldCupMatchMetadata = Database['public']['Tables']['world_cup_match_metadata']['Row'];
+export type WorldCupPlayerStat = Database['public']['Tables']['world_cup_player_stats']['Row'];
 // Joined types used in UI
 export type GameWithTeams = Game & {
   home_team: Team;
   away_team: Team;
   season: Season;
+};
+
+export type WorldCupGame = GameWithTeams & {
+  world_cup_match_metadata?: WorldCupMatchMetadata | null;
 };
 
 export type GamePrediction = Database['public']['Tables']['game_predictions']['Row'];

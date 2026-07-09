@@ -1,10 +1,11 @@
 import { Platform, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { usePathname, useRouter } from "expo-router";
-import { Bell, Compass, Home, Search, User } from "lucide-react-native";
+import { Bell, Compass, Home, Search, Trophy, User } from "lucide-react-native";
 import { stadiumSlate } from "@/lib/theme";
 
 const NAV_ITEMS = [
   { label: "Feed", href: "/(tabs)/feed", match: "/feed", icon: Home },
+  { label: "World Cup", href: "/world-cup", match: "/world-cup", icon: Trophy },
   { label: "Discover", href: "/(tabs)/discover", match: "/discover", icon: Compass },
   { label: "Search", href: "/(tabs)/search", match: "/search", icon: Search },
   { label: "Profile", href: "/(tabs)/profile", match: "/profile", icon: User },
