@@ -44,6 +44,14 @@ const KNOCKOUT_STAGES: WorldCupKnockoutStage[] = [
   'final',
 ];
 
+const worldCupSurface = 'rgba(12,22,32,0.96)';
+const worldCupSurfaceRaised = 'rgba(18,31,45,0.96)';
+const worldCupBorder = 'rgba(74,103,132,0.62)';
+const worldCupBorderSoft = 'rgba(74,103,132,0.36)';
+const worldCupBlue = '#5db7ff';
+const worldCupMuted = '#9db0c3';
+const worldCupPageBg = '#07111b';
+
 function parseGameDate(value: string): string {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -154,8 +162,8 @@ function MatchCard({ game, compact = false }: { game: WorldCupGame; compact?: bo
       style={({ hovered, pressed }: any) => ({
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: hovered || pressed ? 'rgba(78,161,255,0.55)' : 'rgba(70,96,121,0.62)',
-        backgroundColor: 'rgba(17,25,35,0.92)',
+        borderColor: hovered || pressed ? 'rgba(93,183,255,0.62)' : worldCupBorder,
+        backgroundColor: worldCupSurfaceRaised,
         padding: compact ? 12 : 16,
         minWidth: compact ? 220 : 260,
         transform: hovered || pressed ? [{ translateY: -1 }] : undefined,
@@ -196,8 +204,8 @@ function MatchCard({ game, compact = false }: { game: WorldCupGame; compact?: bo
         </View>
       ))}
 
-      <View style={{ height: 1, backgroundColor: 'rgba(70,96,121,0.55)', marginVertical: 14 }} />
-      <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontWeight: '700' }}>
+      <View style={{ height: 1, backgroundColor: worldCupBorderSoft, marginVertical: 14 }} />
+      <Text style={{ color: worldCupMuted, fontSize: 12, fontWeight: '700' }}>
         {parseGameDate(game.game_date_utc)}{game.broadcast ? ` / ${game.broadcast}` : ''}
       </Text>
     </Pressable>
@@ -216,28 +224,28 @@ function Hero({ games }: { games: WorldCupGame[] }) {
         borderRadius: 8,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(70,96,121,0.65)',
-        backgroundColor: stadiumSlate.surface,
+        borderColor: 'rgba(93,183,255,0.34)',
+        backgroundColor: worldCupSurface,
       }}
     >
       <View
         style={{
           padding: 22,
-          backgroundColor: 'rgba(17,25,35,0.96)',
+          backgroundColor: worldCupSurface,
           borderBottomWidth: 1,
-          borderBottomColor: 'rgba(78,161,255,0.18)',
+          borderBottomColor: 'rgba(93,183,255,0.18)',
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          <Trophy size={18} color={stadiumSlate.accent} />
-          <Text style={{ color: stadiumSlate.accent, fontSize: 12, fontWeight: '900', letterSpacing: 0 }}>
+          <Trophy size={18} color={worldCupBlue} />
+          <Text style={{ color: worldCupBlue, fontSize: 12, fontWeight: '900', letterSpacing: 0 }}>
             2026 FIFA WORLD CUP
           </Text>
         </View>
         <Text style={{ color: stadiumSlate.text, fontSize: 34, lineHeight: 38, fontWeight: '900', maxWidth: 680 }}>
           Tournament control room
         </Text>
-        <Text style={{ color: stadiumSlate.textMuted, fontSize: 15, lineHeight: 22, marginTop: 10, maxWidth: 620 }}>
+        <Text style={{ color: worldCupMuted, fontSize: 15, lineHeight: 22, marginTop: 10, maxWidth: 620 }}>
           Follow every match, group-table swing, knockout slot, and Golden Boot push from one focused dashboard.
         </Text>
 
@@ -245,15 +253,15 @@ function Hero({ games }: { games: WorldCupGame[] }) {
           <View style={{ borderRadius: 8, borderWidth: 1, borderColor: 'rgba(49,208,170,0.35)', backgroundColor: 'rgba(49,208,170,0.12)', paddingHorizontal: 12, paddingVertical: 8 }}>
             <Text style={{ color: stadiumSlate.success, fontSize: 12, fontWeight: '900' }}>{liveGames.length} live now</Text>
           </View>
-          <View style={{ borderRadius: 8, borderWidth: 1, borderColor: 'rgba(78,161,255,0.35)', backgroundColor: 'rgba(78,161,255,0.12)', paddingHorizontal: 12, paddingVertical: 8 }}>
+          <View style={{ borderRadius: 8, borderWidth: 1, borderColor: 'rgba(93,183,255,0.35)', backgroundColor: 'rgba(93,183,255,0.12)', paddingHorizontal: 12, paddingVertical: 8 }}>
             <Text style={{ color: '#d9ecff', fontSize: 12, fontWeight: '900' }}>{games.length} matches tracked</Text>
           </View>
         </View>
       </View>
 
       {featured ? (
-        <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: 'rgba(70,96,121,0.45)' }}>
-          <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontWeight: '800', marginBottom: 10 }}>
+        <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: worldCupBorderSoft }}>
+          <Text style={{ color: worldCupMuted, fontSize: 12, fontWeight: '800', marginBottom: 10 }}>
             Spotlight match
           </Text>
           <MatchCard game={featured} />
@@ -270,7 +278,7 @@ function SectionHeader({ icon, title, subtitle }: { icon: ReactNode; title: stri
         {icon}
         <View>
           <Text style={{ color: stadiumSlate.text, fontSize: 20, fontWeight: '900' }}>{title}</Text>
-          {subtitle ? <Text style={{ color: stadiumSlate.textMuted, fontSize: 13, marginTop: 2 }}>{subtitle}</Text> : null}
+          {subtitle ? <Text style={{ color: worldCupMuted, fontSize: 13, marginTop: 2 }}>{subtitle}</Text> : null}
         </View>
       </View>
     </View>
@@ -283,8 +291,8 @@ function StandingsTable({ games }: { games: WorldCupGame[] }) {
 
   if (groupEntries.length === 0) {
     return (
-      <View style={{ borderRadius: 8, borderWidth: 1, borderColor: stadiumSlate.border, padding: 16 }}>
-        <Text style={{ color: stadiumSlate.textMuted }}>Group standings will appear after World Cup data syncs.</Text>
+      <View style={{ borderRadius: 8, borderWidth: 1, borderColor: worldCupBorder, backgroundColor: worldCupSurfaceRaised, padding: 16 }}>
+        <Text style={{ color: worldCupMuted }}>Group standings will appear after World Cup data syncs.</Text>
       </View>
     );
   }
@@ -297,12 +305,12 @@ function StandingsTable({ games }: { games: WorldCupGame[] }) {
           style={{
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: 'rgba(70,96,121,0.62)',
-            backgroundColor: 'rgba(17,25,35,0.9)',
+            borderColor: worldCupBorder,
+            backgroundColor: worldCupSurfaceRaised,
             overflow: 'hidden',
           }}
         >
-          <View style={{ paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(70,96,121,0.48)' }}>
+          <View style={{ paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: worldCupBorderSoft }}>
             <Text style={{ color: stadiumSlate.text, fontSize: 16, fontWeight: '900' }}>Group {groupCode}</Text>
           </View>
           <View style={{ paddingHorizontal: 10, paddingVertical: 8 }}>
@@ -323,7 +331,7 @@ function StandingsTable({ games }: { games: WorldCupGame[] }) {
                     alignItems: 'center',
                     paddingVertical: 9,
                     borderTopWidth: 1,
-                    borderTopColor: 'rgba(70,96,121,0.34)',
+                    borderTopColor: worldCupBorderSoft,
                   }}
                 >
                   <Text style={{ width: 28, color: qualified ? stadiumSlate.success : stadiumSlate.textMuted, fontSize: 13, fontWeight: '900' }}>{row.rank}</Text>
@@ -360,8 +368,8 @@ function BracketSection({ games }: { games: WorldCupGame[] }) {
               </Text>
               <View style={{ gap: 10 }}>
                 {matches.length > 0 ? matches.map((match) => <BracketCard key={match.id} match={match} />) : (
-                  <View style={{ borderRadius: 8, borderWidth: 1, borderColor: 'rgba(70,96,121,0.42)', padding: 14, minHeight: 92 }}>
-                    <Text style={{ color: stadiumSlate.textSubtle, fontSize: 12, fontWeight: '700' }}>Slots will populate as the stage is set.</Text>
+                  <View style={{ borderRadius: 8, borderWidth: 1, borderColor: worldCupBorder, backgroundColor: worldCupSurfaceRaised, padding: 14, minHeight: 92 }}>
+                    <Text style={{ color: worldCupMuted, fontSize: 12, fontWeight: '700' }}>Slots will populate as the stage is set.</Text>
                   </View>
                 )}
               </View>
@@ -375,7 +383,7 @@ function BracketSection({ games }: { games: WorldCupGame[] }) {
 
 function BracketCard({ match }: { match: WorldCupBracketMatch }) {
   return (
-    <View style={{ borderRadius: 8, borderWidth: 1, borderColor: 'rgba(70,96,121,0.6)', backgroundColor: 'rgba(17,25,35,0.9)', padding: 12 }}>
+    <View style={{ borderRadius: 8, borderWidth: 1, borderColor: worldCupBorder, backgroundColor: worldCupSurfaceRaised, padding: 12 }}>
       <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '800', marginBottom: 8 }}>{match.slot}</Text>
       {[
         { team: match.awayTeam, seed: match.awaySeedLabel, score: match.awayScore, pens: match.awayPenalties },
@@ -401,8 +409,8 @@ function BracketCard({ match }: { match: WorldCupBracketMatch }) {
 function GoldenBootSection({ leaders }: { leaders: GoldenBootEntry[] }) {
   if (leaders.length === 0) {
     return (
-      <View style={{ borderRadius: 8, borderWidth: 1, borderColor: stadiumSlate.border, padding: 16 }}>
-        <Text style={{ color: stadiumSlate.textMuted }}>
+      <View style={{ borderRadius: 8, borderWidth: 1, borderColor: worldCupBorder, backgroundColor: worldCupSurfaceRaised, padding: 16 }}>
+        <Text style={{ color: worldCupMuted }}>
           Golden Boot data will appear as player stat data syncs from the provider.
         </Text>
       </View>
@@ -410,7 +418,7 @@ function GoldenBootSection({ leaders }: { leaders: GoldenBootEntry[] }) {
   }
 
   return (
-    <View style={{ borderRadius: 8, borderWidth: 1, borderColor: 'rgba(70,96,121,0.62)', backgroundColor: 'rgba(17,25,35,0.9)', overflow: 'hidden' }}>
+    <View style={{ borderRadius: 8, borderWidth: 1, borderColor: worldCupBorder, backgroundColor: worldCupSurfaceRaised, overflow: 'hidden' }}>
       {leaders.slice(0, 10).map((entry, index) => (
         <View
           key={entry.playerId}
@@ -420,7 +428,7 @@ function GoldenBootSection({ leaders }: { leaders: GoldenBootEntry[] }) {
             gap: 12,
             padding: 14,
             borderTopWidth: index === 0 ? 0 : 1,
-            borderTopColor: 'rgba(70,96,121,0.38)',
+            borderTopColor: worldCupBorderSoft,
           }}
         >
           <Text style={{ width: 24, color: index < 3 ? stadiumSlate.accent : stadiumSlate.textMuted, fontSize: 14, fontWeight: '900' }}>{index + 1}</Text>
@@ -465,16 +473,20 @@ export default function WorldCupScreen() {
 
   if (isLoading) {
     return (
-      <PageContainer showDesktopNav className="flex-1 px-4 py-8">
-        <ActivityIndicator color={stadiumSlate.accent} />
-      </PageContainer>
+      <View style={{ flex: 1, backgroundColor: worldCupPageBg }}>
+        <PageContainer showDesktopNav className="flex-1 px-4 py-8">
+          <ActivityIndicator color={worldCupBlue} />
+        </PageContainer>
+      </View>
     );
   }
 
   return (
+    <View style={{ flex: 1, backgroundColor: worldCupPageBg }}>
     <PageContainer showDesktopNav className="flex-1">
       <ScrollView
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={stadiumSlate.accent} />}
+        style={{ flex: 1, backgroundColor: worldCupPageBg }}
         contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: 48, gap: 24 }}
       >
         <Hero games={games} />
@@ -529,14 +541,15 @@ export default function WorldCupScreen() {
           ) : (
             <Pressable
               onPress={() => router.push('/(tabs)/feed')}
-              style={{ borderRadius: 8, borderWidth: 1, borderColor: stadiumSlate.border, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+              style={{ borderRadius: 8, borderWidth: 1, borderColor: worldCupBorder, backgroundColor: worldCupSurfaceRaised, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
             >
-              <Text style={{ color: stadiumSlate.textMuted, fontWeight: '700' }}>Run the World Cup sync to populate matches.</Text>
-              <ChevronRight size={18} color={stadiumSlate.textMuted} />
+              <Text style={{ color: worldCupMuted, fontWeight: '700' }}>Run the World Cup sync to populate matches.</Text>
+              <ChevronRight size={18} color={worldCupMuted} />
             </Pressable>
           )}
         </View>
       </ScrollView>
     </PageContainer>
+    </View>
   );
 }
