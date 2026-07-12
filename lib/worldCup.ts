@@ -28,6 +28,7 @@ export interface WorldCupBracketMatch {
   id: string;
   stage: WorldCupStage;
   slot: string;
+  label: string;
   date: string;
   homeTeam: Team | null;
   awayTeam: Team | null;
@@ -39,6 +40,8 @@ export interface WorldCupBracketMatch {
   awayPenalties: number | null;
   winnerTeamId: string | null;
   status: 'scheduled' | 'live' | 'final';
+  statusNote: string | null;
+  synthetic?: boolean;
 }
 
 export type WorldCupKnockoutStage = Exclude<WorldCupStage, 'group'>;
@@ -64,6 +67,15 @@ const KNOCKOUT_ORDER: WorldCupKnockoutStage[] = [
   'final',
 ];
 
+const STAGE_PREFIX: Record<WorldCupKnockoutStage, string> = {
+  round_of_32: 'R32',
+  round_of_16: 'R16',
+  quarterfinals: 'QF',
+  semifinals: 'SF',
+  third_place: '3P',
+  final: 'F',
+};
+
 export const WORLD_CUP_STAGE_LABELS: Record<WorldCupStage, string> = {
   group: 'Group Stage',
   round_of_32: 'Round of 32',
@@ -76,6 +88,10 @@ export const WORLD_CUP_STAGE_LABELS: Record<WorldCupStage, string> = {
 
 function getMetadata(game: WorldCupGame) {
   return game.world_cup_match_metadata ?? null;
+}
+
+function getBracketLabel(stage: WorldCupKnockoutStage, index: number): string {
+  return `${STAGE_PREFIX[stage]} ${index + 1}`;
 }
 
 function isGroupGame(game: WorldCupGame): boolean {
@@ -192,15 +208,29 @@ export function buildWorldCupBracket(games: WorldCupGame[]): Record<WorldCupKnoc
     {} as Record<WorldCupKnockoutStage, WorldCupBracketMatch[]>,
   );
 
-  for (const game of games) {
+  const knockoutGames = games
+    .filter((game) => {
+      const metadata = getMetadata(game);
+      const stage = metadata?.stage as WorldCupStage | undefined;
+      return Boolean(stage && stage !== 'group' && KNOCKOUT_ORDER.includes(stage));
+    })
+    .sort((a, b) => new Date(a.game_date_utc).getTime() - new Date(b.game_date_utc).getTime());
+
+  const stageCounts: Partial<Record<WorldCupKnockoutStage, number>> = {};
+
+  for (const game of knockoutGames) {
     const metadata = getMetadata(game);
     const stage = metadata?.stage as WorldCupStage | undefined;
     if (!stage || stage === 'group' || !KNOCKOUT_ORDER.includes(stage)) continue;
+    const bracketStage = stage as WorldCupKnockoutStage;
+    const index = stageCounts[bracketStage] ?? 0;
+    stageCounts[bracketStage] = index + 1;
 
-    bracket[stage].push({
+    bracket[bracketStage].push({
       id: game.id,
       stage,
       slot: metadata?.bracket_slot ?? game.provider_game_id.toString(),
+      label: getBracketLabel(bracketStage, index),
       date: game.game_date_utc,
       homeTeam: game.home_team,
       awayTeam: game.away_team,
@@ -212,14 +242,121 @@ export function buildWorldCupBracket(games: WorldCupGame[]): Record<WorldCupKnoc
       awayPenalties: metadata?.away_penalties ?? null,
       winnerTeamId: getWinnerTeamId(game),
       status: game.status,
+      statusNote: metadata?.status_note ?? null,
     });
   }
 
   for (const stage of KNOCKOUT_ORDER) {
-    bracket[stage].sort((a, b) => a.slot.localeCompare(b.slot));
+    bracket[stage].sort((a, b) => {
+      if (a.date !== b.date) return new Date(a.date).getTime() - new Date(b.date).getTime();
+      return a.slot.localeCompare(b.slot);
+    });
   }
 
+  synthesizeMissingFutureRounds(bracket);
+
   return bracket;
+}
+
+function getWinner(match: WorldCupBracketMatch): Team | null {
+  if (!match.winnerTeamId) return null;
+  if (match.homeTeam?.id === match.winnerTeamId) return match.homeTeam;
+  if (match.awayTeam?.id === match.winnerTeamId) return match.awayTeam;
+  return null;
+}
+
+function getLoser(match: WorldCupBracketMatch): Team | null {
+  if (!match.winnerTeamId) return null;
+  if (match.homeTeam?.id === match.winnerTeamId) return match.awayTeam;
+  if (match.awayTeam?.id === match.winnerTeamId) return match.homeTeam;
+  return null;
+}
+
+function makeSyntheticMatch(
+  stage: WorldCupKnockoutStage,
+  index: number,
+  homeTeam: Team | null,
+  awayTeam: Team | null,
+  homeSeedLabel: string,
+  awaySeedLabel: string,
+): WorldCupBracketMatch {
+  return {
+    id: `synthetic-${stage}-${index + 1}`,
+    stage,
+    slot: `${stage}-${index + 1}`,
+    label: getBracketLabel(stage, index),
+    date: '',
+    homeTeam,
+    awayTeam,
+    homeSeedLabel,
+    awaySeedLabel,
+    homeScore: null,
+    awayScore: null,
+    homePenalties: null,
+    awayPenalties: null,
+    winnerTeamId: null,
+    status: 'scheduled',
+    statusNote: null,
+    synthetic: true,
+  };
+}
+
+function synthesizeStageFromPreviousWinners(
+  bracket: Record<WorldCupKnockoutStage, WorldCupBracketMatch[]>,
+  previousStage: WorldCupKnockoutStage,
+  nextStage: WorldCupKnockoutStage,
+) {
+  if (bracket[nextStage].length > 0) return;
+  const previous = bracket[previousStage];
+  if (previous.length < 2) return;
+
+  const synthesized: WorldCupBracketMatch[] = [];
+  for (let i = 0; i < previous.length; i += 2) {
+    const first = previous[i];
+    const second = previous[i + 1];
+    if (!first || !second) continue;
+    synthesized.push(
+      makeSyntheticMatch(
+        nextStage,
+        synthesized.length,
+        getWinner(first),
+        getWinner(second),
+        `Winner ${first.label}`,
+        `Winner ${second.label}`,
+      ),
+    );
+  }
+  bracket[nextStage] = synthesized;
+}
+
+function synthesizeMissingFutureRounds(bracket: Record<WorldCupKnockoutStage, WorldCupBracketMatch[]>) {
+  synthesizeStageFromPreviousWinners(bracket, 'quarterfinals', 'semifinals');
+
+  if (bracket.final.length === 0 && bracket.semifinals.length >= 2) {
+    bracket.final = [
+      makeSyntheticMatch(
+        'final',
+        0,
+        getWinner(bracket.semifinals[0]),
+        getWinner(bracket.semifinals[1]),
+        `Winner ${bracket.semifinals[0].label}`,
+        `Winner ${bracket.semifinals[1].label}`,
+      ),
+    ];
+  }
+
+  if (bracket.third_place.length === 0 && bracket.semifinals.length >= 2) {
+    bracket.third_place = [
+      makeSyntheticMatch(
+        'third_place',
+        0,
+        getLoser(bracket.semifinals[0]),
+        getLoser(bracket.semifinals[1]),
+        `Loser ${bracket.semifinals[0].label}`,
+        `Loser ${bracket.semifinals[1].label}`,
+      ),
+    ];
+  }
 }
 
 export function sortGoldenBootRace(entries: GoldenBootEntry[]): GoldenBootEntry[] {

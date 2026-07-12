@@ -99,6 +99,10 @@ describe('world cup tournament helpers', () => {
   const france = team('2', 'FRA', 'France');
   const japan = team('3', 'JPN', 'Japan');
   const canada = team('4', 'CAN', 'Canada');
+  const brazil = team('5', 'BRA', 'Brazil');
+  const morocco = team('6', 'MAR', 'Morocco');
+  const spain = team('7', 'ESP', 'Spain');
+  const england = team('8', 'ENG', 'England');
 
   it('computes group standings by points, goal difference, then goals for', () => {
     const standings = computeWorldCupStandings([
@@ -135,9 +139,56 @@ describe('world cup tournament helpers', () => {
 
     expect(bracket.round_of_16[0]).toMatchObject({
       slot: 'R16-01',
+      label: 'R16 1',
       winnerTeamId: argentina.id,
       homePenalties: 4,
       awayPenalties: 3,
+    });
+  });
+
+  it('synthesizes semifinals and final placeholders from quarterfinal winners', () => {
+    const bracket = buildWorldCupBracket([
+      game('401', france, morocco, 2, 0, 'final', {
+        stage: 'quarterfinals',
+        group_code: null,
+        bracket_slot: 'quarterfinals-401',
+      }),
+      game('402', spain, brazil, 1, 0, 'final', {
+        stage: 'quarterfinals',
+        group_code: null,
+        bracket_slot: 'quarterfinals-402',
+      }),
+      game('403', england, canada, 3, 1, 'final', {
+        stage: 'quarterfinals',
+        group_code: null,
+        bracket_slot: 'quarterfinals-403',
+      }),
+      game('404', argentina, japan, 2, 1, 'final', {
+        stage: 'quarterfinals',
+        group_code: null,
+        bracket_slot: 'quarterfinals-404',
+      }),
+    ]);
+
+    expect(bracket.quarterfinals.map((match) => match.label)).toEqual(['QF 1', 'QF 2', 'QF 3', 'QF 4']);
+    expect(bracket.semifinals).toHaveLength(2);
+    expect(bracket.semifinals[0]).toMatchObject({
+      label: 'SF 1',
+      synthetic: true,
+      homeTeam: france,
+      awayTeam: spain,
+      homeSeedLabel: 'Winner QF 1',
+      awaySeedLabel: 'Winner QF 2',
+    });
+    expect(bracket.semifinals[1]).toMatchObject({
+      label: 'SF 2',
+      homeTeam: england,
+      awayTeam: argentina,
+    });
+    expect(bracket.final[0]).toMatchObject({
+      label: 'F 1',
+      homeSeedLabel: 'Winner SF 1',
+      awaySeedLabel: 'Winner SF 2',
     });
   });
 

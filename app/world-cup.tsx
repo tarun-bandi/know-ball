@@ -53,11 +53,20 @@ const worldCupMuted = '#9db0c3';
 const worldCupPageBg = '#07111b';
 
 function parseGameDate(value: string): string {
+  if (!value) return 'TBD';
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+  }).format(new Date(value));
+}
+
+function formatShortMatchDate(value: string): string {
+  if (!value) return 'TBD';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
   }).format(new Date(value));
 }
 
@@ -382,9 +391,16 @@ function BracketSection({ games }: { games: WorldCupGame[] }) {
 }
 
 function BracketCard({ match }: { match: WorldCupBracketMatch }) {
+  const subLabel = match.statusNote
+    ? `${match.statusNote} / ${formatShortMatchDate(match.date)}`
+    : formatShortMatchDate(match.date);
+
   return (
     <View style={{ borderRadius: 8, borderWidth: 1, borderColor: worldCupBorder, backgroundColor: worldCupSurfaceRaised, padding: 12 }}>
-      <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '800', marginBottom: 8 }}>{match.slot}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+        <Text style={{ color: worldCupBlue, fontSize: 11, fontWeight: '900' }}>{match.label}</Text>
+        <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '800' }}>{subLabel}</Text>
+      </View>
       {[
         { team: match.awayTeam, seed: match.awaySeedLabel, score: match.awayScore, pens: match.awayPenalties },
         { team: match.homeTeam, seed: match.homeSeedLabel, score: match.homeScore, pens: match.homePenalties },
