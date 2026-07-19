@@ -583,6 +583,52 @@ function FeedDashboard({
             </View>
           </DashboardPanel>
 
+          <DashboardPanel>
+            <SectionTitle icon={Trophy} title="Fan Passport" color={stadiumSlate.accent} />
+            <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '900', lineHeight: 23 }}>
+              Build receipts people can follow.
+            </Text>
+            <Text style={{ color: '#8fa1b3', fontSize: 13, lineHeight: 19, marginTop: 6 }}>
+              Logs, rankings, predictions, favorites, and World Cup history now roll into your public sports identity.
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+              {['Watched', 'Ranked', 'Predicted'].map((label) => (
+                <View
+                  key={label}
+                  style={{
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: 'rgba(70,96,121,0.55)',
+                    backgroundColor: 'rgba(255,255,255,0.035)',
+                    paddingHorizontal: 9,
+                    paddingVertical: 6,
+                  }}
+                >
+                  <Text style={{ color: '#d9e2ea', fontSize: 11, fontWeight: '800' }}>
+                    {label}
+                  </Text>
+                </View>
+              ))}
+            </View>
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/profile')}
+              activeOpacity={0.75}
+              style={{
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: 'rgba(78,161,255,0.32)',
+                paddingVertical: 10,
+                alignItems: 'center',
+                marginTop: 14,
+                backgroundColor: 'rgba(78,161,255,0.08)',
+              }}
+            >
+              <Text style={{ color: '#4ea1ff', fontSize: 13, fontWeight: '900' }}>
+                View Passport
+              </Text>
+            </TouchableOpacity>
+          </DashboardPanel>
+
           {people.length ? (
             <DashboardPanel>
               <SectionTitle

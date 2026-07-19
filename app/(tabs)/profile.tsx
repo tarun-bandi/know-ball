@@ -29,6 +29,13 @@ import { ProfileSkeleton } from '@/components/Skeleton';
 import ErrorState from '@/components/ErrorState';
 import { PageContainer } from '@/components/PageContainer';
 import { userUrl } from '@/lib/urls';
+import { stadiumSlate } from '@/lib/theme';
+import {
+  getFanPassportBadges,
+  getFanPassportLevel,
+  getFanPassportShareText,
+  type FanPassportInputs,
+} from '@/lib/fanPassport';
 import type { GameLogWithGame, UserProfile, List, Team, Player } from '@/types/database';
 
 interface ProfileData {
@@ -41,11 +48,12 @@ interface ProfileData {
   followerCount: number;
   followingCount: number;
   watchlistCount: number;
+  worldCupLogCount: number;
   predictionAccuracy: { correct: number; total: number } | null;
 }
 
 async function fetchProfile(userId: string): Promise<ProfileData> {
-  const [profileRes, logsRes, listsRes, favTeamsRes, favPlayersRes, followerRes, followingRes, watchlistRes] = await Promise.all([
+  const [profileRes, logsRes, logCountRes, worldCupLogCountRes, listsRes, favTeamsRes, favPlayersRes, followerRes, followingRes, watchlistRes] = await Promise.all([
     supabase
       .from('user_profiles')
       .select('*')
@@ -65,6 +73,15 @@ async function fetchProfile(userId: string): Promise<ProfileData> {
       .eq('user_id', userId)
       .order('logged_at', { ascending: false })
       .limit(20),
+    supabase
+      .from('game_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId),
+    supabase
+      .from('game_logs')
+      .select('game:games!inner(sport)', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('game.sport', 'world_cup'),
     supabase
       .from('lists')
       .select('*')
@@ -130,15 +147,166 @@ async function fetchProfile(userId: string): Promise<ProfileData> {
   return {
     profile: profileRes.data,
     logs,
-    stats: { count: logs.length },
+    stats: { count: logCountRes.count ?? logs.length },
     lists: (listsRes.data ?? []) as List[],
     favoriteTeams,
     favoritePlayers,
     followerCount: followerRes.count ?? 0,
     followingCount: followingRes.count ?? 0,
     watchlistCount: watchlistRes.count ?? 0,
+    worldCupLogCount: worldCupLogCountRes.count ?? 0,
     predictionAccuracy,
   };
+}
+
+function FanPassportPanel({
+  profile,
+  input,
+  onShare,
+}: {
+  profile: UserProfile;
+  input: FanPassportInputs;
+  onShare: () => void;
+}) {
+  const level = getFanPassportLevel(input);
+  const badges = getFanPassportBadges(input);
+  const predictionValue = input.predictionAccuracy
+    ? `${Math.round((input.predictionAccuracy.correct / Math.max(input.predictionAccuracy.total, 1)) * 100)}%`
+    : 'Start';
+  const metrics = [
+    { label: 'Watched', value: input.logsCount },
+    { label: 'Ranked', value: input.rankedCount },
+    { label: 'Social', value: input.followerCount + input.followingCount },
+    { label: 'Predict', value: predictionValue },
+  ];
+  const badgeColors = {
+    accent: { border: 'rgba(78,161,255,0.42)', bg: 'rgba(78,161,255,0.12)', text: '#d8eaff' },
+    success: { border: 'rgba(54,211,178,0.38)', bg: 'rgba(54,211,178,0.1)', text: '#c9fff1' },
+    warning: { border: 'rgba(255,204,102,0.32)', bg: 'rgba(255,204,102,0.1)', text: '#fff0c4' },
+    muted: { border: 'rgba(143,161,179,0.28)', bg: 'rgba(255,255,255,0.04)', text: '#d9e2ea' },
+  };
+
+  return (
+    <View className="px-4 pt-6">
+      <View
+        style={{
+          backgroundColor: stadiumSlate.surface,
+          borderColor: 'rgba(78,161,255,0.26)',
+          borderWidth: 1,
+          borderRadius: 10,
+          overflow: 'hidden',
+        }}
+      >
+        <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(70,96,121,0.45)' }}>
+          <View className="flex-row items-start justify-between gap-3">
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: stadiumSlate.accent, fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }}>
+                Fan Passport
+              </Text>
+              <Text style={{ color: '#ffffff', fontSize: 24, fontWeight: '900', marginTop: 4 }}>
+                {level.label}
+              </Text>
+              <Text style={{ color: stadiumSlate.textMuted, fontSize: 13, lineHeight: 19, marginTop: 6 }}>
+                {level.detail}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={onShare}
+              activeOpacity={0.75}
+              style={{
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: 'rgba(78,161,255,0.34)',
+                backgroundColor: 'rgba(78,161,255,0.1)',
+                paddingHorizontal: 12,
+                paddingVertical: 9,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 7,
+              }}
+            >
+              <Share size={15} color={stadiumSlate.accent} strokeWidth={2.4} />
+              <Text style={{ color: stadiumSlate.accent, fontSize: 12, fontWeight: '900' }}>
+                Share
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View className="flex-row flex-wrap" style={{ gap: 8, marginTop: 14 }}>
+            {badges.map((badge) => {
+              const colors = badgeColors[badge.tone];
+              return (
+                <View
+                  key={badge.key}
+                  style={{
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    backgroundColor: colors.bg,
+                    paddingHorizontal: 10,
+                    paddingVertical: 7,
+                  }}
+                >
+                  <Text style={{ color: colors.text, fontSize: 12, fontWeight: '900' }}>
+                    {badge.label}
+                  </Text>
+                  <Text style={{ color: stadiumSlate.textMuted, fontSize: 10, fontWeight: '700', marginTop: 1 }}>
+                    {badge.detail}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
+        <View className="flex-row flex-wrap">
+          {metrics.map((metric, index) => (
+            <View
+              key={metric.label}
+              style={{
+                width: '50%',
+                padding: 14,
+                borderRightWidth: index % 2 === 0 ? 1 : 0,
+                borderBottomWidth: index < 2 ? 1 : 0,
+                borderColor: 'rgba(70,96,121,0.38)',
+              }}
+            >
+              <Text style={{ color: '#ffffff', fontSize: 24, fontWeight: '900' }}>
+                {metric.value}
+              </Text>
+              <Text style={{ color: stadiumSlate.textMuted, fontSize: 11, fontWeight: '800', marginTop: 2, textTransform: 'uppercase' }}>
+                {metric.label}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <TouchableOpacity
+          onPress={onShare}
+          activeOpacity={0.75}
+          style={{
+            padding: 14,
+            borderTopWidth: 1,
+            borderTopColor: 'rgba(70,96,121,0.45)',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '900' }}>
+              Shareable sports identity
+            </Text>
+            <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, marginTop: 2 }}>
+              Ratings, rankings, follows, favorites, and predictions become public receipts.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={stadiumSlate.accent} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
 
 export default function ProfileScreen() {
@@ -165,7 +333,24 @@ export default function ProfileScreen() {
     return <ErrorState message="Failed to load profile" onRetry={refetch} />;
   }
 
-  const { profile, logs, stats, lists, favoriteTeams, favoritePlayers, followerCount, followingCount, watchlistCount, predictionAccuracy } = data;
+  const { profile, logs, stats, lists, favoriteTeams, favoritePlayers, followerCount, followingCount, watchlistCount, worldCupLogCount, predictionAccuracy } = data;
+  const passportInput: FanPassportInputs = {
+    logsCount: stats.count,
+    rankedCount: logs.filter((log) => log.position != null).length,
+    listCount: lists.length,
+    favoriteTeamCount: favoriteTeams.length,
+    favoritePlayerCount: favoritePlayers.length,
+    followerCount,
+    followingCount,
+    watchlistCount,
+    worldCupLogCount,
+    predictionAccuracy,
+  };
+  const sharePassport = () => {
+    const url = userUrl(profile.handle);
+    const message = getFanPassportShareText(profile, passportInput, url);
+    RNShare.share(Platform.OS === 'ios' ? { message, url } : { message });
+  };
 
   return (
     <ScrollView
@@ -271,11 +456,7 @@ export default function ProfileScreen() {
             <TouchableOpacity
               className="rounded-xl py-3 px-4 flex-row items-center justify-center gap-2"
               style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)' }}
-              onPress={() => {
-                const url = userUrl(profile.handle);
-                const message = `Follow me on Know Ball!\n${url}`;
-                RNShare.share(Platform.OS === 'ios' ? { message, url } : { message });
-              }}
+              onPress={sharePassport}
               activeOpacity={0.7}
             >
               <Share size={16} color="#8fa1b3" />
@@ -285,6 +466,12 @@ export default function ProfileScreen() {
         {/* Bottom accent line */}
         <View style={{ height: 0.5, backgroundColor: '#4ea1ff', opacity: 0.12 }} />
       </View>
+
+      <FanPassportPanel
+        profile={profile}
+        input={passportInput}
+        onShare={sharePassport}
+      />
 
       {/* Diary */}
       <View className="px-4 pt-6">
