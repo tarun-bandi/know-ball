@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Linking,
   Share as RNShare,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
@@ -18,7 +19,7 @@ import { enrichLogs } from '@/lib/enrichLogs';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getProvider } from '@/lib/providers';
 import type { BoxScoreColumnDef, BoxScoreCategory, TeamComparisonStatDef } from '@/lib/providers';
-import { List, Play, Bookmark, Send } from 'lucide-react-native';
+import { ChevronLeft, List, Play, Bookmark, Send } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import GameCard from '@/components/GameCard';
 import ErrorState from '@/components/ErrorState';
@@ -29,12 +30,15 @@ import RankBadge from '@/components/RankBadge';
 import { fetchGameRanking } from '@/lib/rankingService';
 import AddToListModal from '@/components/AddToListModal';
 import TeamLogo from '@/components/TeamLogo';
-import PlayoffBadge from '@/components/PlayoffBadge';
 import { GameDetailSkeleton } from '@/components/Skeleton';
 import { gameUrl } from '@/lib/urls';
 import type { GameWithTeams, GameLogWithGame, BoxScore, Sport, PeriodScores } from '@/types/database';
 import { PageContainer } from '@/components/PageContainer';
 import { usePlayByPlay, type PlayByPlayAction } from '@/hooks/usePlayByPlay';
+import { useGameStats } from '@/hooks/useGameStats';
+import { gamePath, isGameUuid, parseGameSlug, formatGameDateForSlug } from '@/lib/gameRoutes';
+import { stadiumSlate } from '@/lib/theme';
+import { GameScoreHero, GameStatsOverview, RemoteBoxScore } from '@/components/game/GameStatsPanels';
 
 interface PredictionTally {
   [teamId: string]: number;
@@ -95,7 +99,43 @@ interface GameDetail {
   myRanking: { position: number; total: number; sentiment: import('@/types/database').Sentiment | null; fanOf: import('@/types/database').FanOf | null } | null;
 }
 
-async function fetchGameDetail(gameId: string, userId: string): Promise<GameDetail> {
+async function resolveGameId(gameRef: string): Promise<string> {
+  if (isGameUuid(gameRef)) return gameRef;
+
+  const slug = parseGameSlug(gameRef);
+  if (!slug) throw new Error('Invalid game URL');
+
+  const { data: teams, error: teamError } = await supabase
+    .from('teams')
+    .select('id, abbreviation')
+    .eq('sport', slug.sport)
+    .in('abbreviation', [slug.awayAbbreviation, slug.homeAbbreviation]);
+
+  if (teamError) throw teamError;
+  const teamRows = (teams ?? []) as unknown as { id: string; abbreviation: string }[];
+  const awayTeamId = teamRows.find((team) => team.abbreviation === slug.awayAbbreviation)?.id;
+  const homeTeamId = teamRows.find((team) => team.abbreviation === slug.homeAbbreviation)?.id;
+  if (!awayTeamId || !homeTeamId) throw new Error('Game teams not found');
+
+  const dateCenter = Date.parse(`${slug.date}T12:00:00Z`);
+  const { data: games, error: gameError } = await supabase
+    .from('games')
+    .select('id, game_date_utc')
+    .eq('sport', slug.sport)
+    .eq('away_team_id', awayTeamId)
+    .eq('home_team_id', homeTeamId)
+    .gte('game_date_utc', new Date(dateCenter - 36 * 60 * 60 * 1000).toISOString())
+    .lte('game_date_utc', new Date(dateCenter + 36 * 60 * 60 * 1000).toISOString());
+
+  if (gameError) throw gameError;
+  const gameRows = (games ?? []) as unknown as { id: string; game_date_utc: string }[];
+  const game = gameRows.find((candidate) => formatGameDateForSlug(candidate.game_date_utc) === slug.date) ?? gameRows[0];
+  if (!game) throw new Error('Game not found');
+  return game.id;
+}
+
+async function fetchGameDetail(gameRef: string, userId: string): Promise<GameDetail> {
+  const gameId = await resolveGameId(gameRef);
   const [gameRes, logsRes, boxRes, watchlistRes, myPredRes, allPredsRes] = await Promise.all([
     supabase
       .from('games')
@@ -268,7 +308,7 @@ function TeamToggle({ activeTeamId, game, onSelect }: { activeTeamId: string; ga
     <View className="flex-row bg-surface rounded-xl mb-3 p-1 self-start">
       <TouchableOpacity
         className={`py-2.5 px-6 rounded-lg items-center ${isAwayActive ? 'bg-accent' : ''}`}
-        style={isAwayActive ? { backgroundColor: '#4ea1ff' } : undefined}
+        style={isAwayActive ? { backgroundColor: stadiumSlate.accent } : undefined}
         onPress={() => onSelect(game.away_team_id)}
         activeOpacity={0.7}
       >
@@ -278,7 +318,7 @@ function TeamToggle({ activeTeamId, game, onSelect }: { activeTeamId: string; ga
       </TouchableOpacity>
       <TouchableOpacity
         className={`py-2.5 px-6 rounded-lg items-center ${!isAwayActive ? 'bg-accent' : ''}`}
-        style={!isAwayActive ? { backgroundColor: '#4ea1ff' } : undefined}
+        style={!isAwayActive ? { backgroundColor: stadiumSlate.accent } : undefined}
         onPress={() => onSelect(game.home_team_id)}
         activeOpacity={0.7}
       >
@@ -766,7 +806,7 @@ function PlayByPlaySection({ game }: { game: GameWithTeams }) {
   if (isLoading) {
     return (
       <View className="items-center py-8">
-        <ActivityIndicator color="#4ea1ff" size="small" />
+        <ActivityIndicator color={stadiumSlate.accent} size="small" />
       </View>
     );
   }
@@ -798,7 +838,7 @@ function PlayByPlaySection({ game }: { game: GameWithTeams }) {
           <TouchableOpacity
             className="py-1.5 px-3 rounded-lg"
             style={
-              activePeriod == null ? { backgroundColor: '#4ea1ff' } : undefined
+              activePeriod == null ? { backgroundColor: stadiumSlate.accent } : undefined
             }
             onPress={() => setSelectedPeriod(null)}
             activeOpacity={0.7}
@@ -817,7 +857,7 @@ function PlayByPlaySection({ game }: { game: GameWithTeams }) {
               className="py-1.5 px-3 rounded-lg"
               style={
                 activePeriod === p
-                  ? { backgroundColor: '#4ea1ff' }
+                  ? { backgroundColor: stadiumSlate.accent }
                   : undefined
               }
               onPress={() => setSelectedPeriod(p)}
@@ -873,42 +913,45 @@ function PlayByPlaySection({ game }: { game: GameWithTeams }) {
 
 // ─── Main Screen ────────────────────────────────────────────────────────────
 
-type GameTab = 'box_score' | 'reviews' | 'stats' | 'plays' | 'details';
+type GameTab = 'overview' | 'box_score' | 'reviews' | 'plays';
 const TABS: { key: GameTab; label: string }[] = [
+  { key: 'overview', label: 'Overview' },
   { key: 'box_score', label: 'Box Score' },
+  { key: 'plays', label: 'Play-by-play' },
   { key: 'reviews', label: 'Reviews' },
-  { key: 'stats', label: 'Stats' },
-  { key: 'plays', label: 'Plays' },
-  { key: 'details', label: 'Details' },
 ];
 
 type ReviewSort = 'recent' | 'popular';
 
 export default function GameDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 900;
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const [showLogModal, setShowLogModal] = useState(false);
   const [showListModal, setShowListModal] = useState(false);
   const [showRankingFlow, setShowRankingFlow] = useState(false);
   const [isRerank, setIsRerank] = useState(false);
-  const [activeTab, setActiveTab] = useState<GameTab>('box_score');
+  const [activeTab, setActiveTab] = useState<GameTab>('overview');
   const [reviewSort, setReviewSort] = useState<ReviewSort>('recent');
 
   const bookmarkMutation = useMutation({
     mutationFn: async (bookmarked: boolean) => {
       if (!user) return;
+      const gameId = await resolveGameId(id);
       if (bookmarked) {
         const { error } = await supabase
           .from('watchlist')
           .delete()
           .eq('user_id', user.id)
-          .eq('game_id', id);
+          .eq('game_id', gameId);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('watchlist')
-          .insert({ user_id: user.id, game_id: id });
+          .insert({ user_id: user.id, game_id: gameId });
         if (error) throw error;
       }
     },
@@ -939,6 +982,7 @@ export default function GameDetailScreen() {
   const predictionMutation = useMutation({
     mutationFn: async (teamId: string) => {
       if (!user) return;
+      const gameId = await resolveGameId(id);
       const current = data?.myPrediction;
       if (current === teamId) {
         // Remove prediction
@@ -946,14 +990,14 @@ export default function GameDetailScreen() {
           .from('game_predictions')
           .delete()
           .eq('user_id', user.id)
-          .eq('game_id', id);
+          .eq('game_id', gameId);
         if (error) throw error;
       } else {
         // Upsert prediction
         const { error } = await supabase
           .from('game_predictions')
           .upsert(
-            { user_id: user.id, game_id: id, predicted_winner_team_id: teamId },
+            { user_id: user.id, game_id: gameId, predicted_winner_team_id: teamId },
             { onConflict: 'user_id,game_id' },
           );
         if (error) throw error;
@@ -985,6 +1029,19 @@ export default function GameDetailScreen() {
       queryClient.invalidateQueries({ queryKey: ['game-detail', id] });
     },
   });
+
+  const statsSport: Sport = data?.game.sport ?? 'nba';
+  const gameStatsQuery = useGameStats(
+    data?.game.provider_game_id,
+    data?.game.status,
+    statsSport,
+  );
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !data?.game || !id) return;
+    const canonicalPath = gamePath(data.game);
+    if (`/game/${id}` !== canonicalPath) router.replace(canonicalPath as any);
+  }, [data?.game, id, router]);
 
   const sortedLogs = useMemo(() => {
     if (!data) return [];
@@ -1018,71 +1075,26 @@ export default function GameDetailScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor="#4ea1ff"
+            tintColor={stadiumSlate.accent}
           />
         }
       >
-        <PageContainer>
-        {/* Score Card */}
-        <View className="bg-surface border-b border-border mx-4 mt-4 rounded-2xl p-6">
-          {/* Game label (week/primetime/playoff) */}
-          {(() => {
-            const label = getGameDetailLabel(game);
-            return label ? (
-              <Text className="text-muted text-xs text-center mb-3">{label}</Text>
-            ) : null;
-          })()}
-          <View className="flex-row justify-between items-center">
-            {/* Away Team */}
-            <View className="flex-1 items-center">
-              <TeamLogo abbreviation={game.away_team.abbreviation} sport={sport} size={64} />
-              <Text className="text-muted text-sm mt-2">{game.away_team.city}</Text>
-              <Text className="text-white text-2xl font-bold">
-                {game.away_team.abbreviation}
-              </Text>
-              <Text className="text-accent text-4xl font-bold mt-2">
-                {game.away_team_score ?? '\u2014'}
-              </Text>
-            </View>
+        <PageContainer showDesktopNav>
+        <View style={{ width: '100%', maxWidth: 1100, alignSelf: 'center', paddingHorizontal: isDesktop ? 20 : 12, paddingBottom: 48 }}>
+        {isDesktop ? (
+          <TouchableOpacity
+            onPress={() => router.back()}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Back to games"
+            style={{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 12, paddingRight: 14 }}
+          >
+            <ChevronLeft size={17} color={stadiumSlate.textMuted} />
+            <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontWeight: '700' }}>Back to games</Text>
+          </TouchableOpacity>
+        ) : <View style={{ height: 12 }} />}
 
-            {/* Center */}
-            <View className="items-center px-4">
-              <Text className="text-muted text-xs uppercase tracking-wider">
-                {game.status === 'final' ? 'Final' : game.status}
-              </Text>
-              {game.playoff_round && (
-                <View className="mt-1">
-                  <PlayoffBadge round={game.playoff_round} sport={sport} size="md" />
-                </View>
-              )}
-              <Text className="text-border text-2xl font-light mt-1">@</Text>
-              <Text className="text-muted text-xs mt-1">
-                {formatDate(game.game_date_utc)}
-              </Text>
-            </View>
-
-            {/* Home Team */}
-            <View className="flex-1 items-center">
-              <TeamLogo abbreviation={game.home_team.abbreviation} sport={sport} size={64} />
-              <Text className="text-muted text-sm mt-2">{game.home_team.city}</Text>
-              <Text className="text-white text-2xl font-bold">
-                {game.home_team.abbreviation}
-              </Text>
-              <Text className="text-accent text-4xl font-bold mt-2">
-                {game.home_team_score ?? '\u2014'}
-              </Text>
-            </View>
-          </View>
-
-          {/* Team records */}
-          {game.away_team_record && game.home_team_record && (
-            <View className="flex-row justify-between px-8 mt-1">
-              <Text className="text-muted text-xs">({game.away_team_record})</Text>
-              <Text className="text-muted text-xs">({game.home_team_record})</Text>
-            </View>
-          )}
-
-        </View>
+        <GameScoreHero game={game} stats={gameStatsQuery.data} isDesktop={isDesktop} />
 
         {/* Action Buttons */}
         {gamePlayedOrLive ? (
@@ -1092,9 +1104,11 @@ export default function GameDetailScreen() {
                 className={`flex-1 rounded-xl py-4 items-center ${
                   myLog ? 'bg-surface border border-accent' : 'bg-accent'
                 }`}
-                style={!myLog ? { backgroundColor: '#4ea1ff' } : undefined}
+                style={!myLog ? { backgroundColor: stadiumSlate.accent } : undefined}
                 onPress={() => setShowLogModal(true)}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={myLog ? 'Edit my game log' : 'Log this game'}
               >
                 <Text
                   className={`font-semibold text-base ${
@@ -1108,30 +1122,36 @@ export default function GameDetailScreen() {
                 className="bg-surface border border-border rounded-xl w-12 py-4 items-center justify-center"
                 onPress={() => bookmarkMutation.mutate(isBookmarked)}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={isBookmarked ? 'Remove game bookmark' : 'Bookmark game'}
               >
                 <Bookmark
                   size={22}
-                  color="#4ea1ff"
-                  fill={isBookmarked ? '#4ea1ff' : 'transparent'}
+                  color={stadiumSlate.accent}
+                  fill={isBookmarked ? stadiumSlate.accent : 'transparent'}
                 />
               </TouchableOpacity>
               <TouchableOpacity
                 className="bg-surface border border-border rounded-xl w-12 py-4 items-center justify-center"
                 onPress={() => setShowListModal(true)}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Add game to list"
               >
-                <List size={22} color="#4ea1ff" />
+                <List size={22} color={stadiumSlate.accent} />
               </TouchableOpacity>
               <TouchableOpacity
                 className="bg-surface border border-border rounded-xl w-12 py-4 items-center justify-center"
                 onPress={() => {
-                  const url = gameUrl(game.id);
+                  const url = gameUrl(game);
                   const message = `Check out ${game.away_team.abbreviation} @ ${game.home_team.abbreviation} on Know Ball\n${url}`;
                   RNShare.share(Platform.OS === 'ios' ? { message, url } : { message });
                 }}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Share game"
               >
-                <Send size={22} color="#4ea1ff" />
+                <Send size={22} color={stadiumSlate.accent} />
               </TouchableOpacity>
             </View>
 
@@ -1274,20 +1294,32 @@ export default function GameDetailScreen() {
             onPress={() => Linking.openURL(getHighlightsUrl(game))}
             activeOpacity={0.8}
           >
-            <Play size={18} color="#4ea1ff" />
+            <Play size={18} color={stadiumSlate.accent} />
             <Text className="text-accent font-semibold text-base">Watch Highlights</Text>
           </TouchableOpacity>
         )}
 
         {/* Tab Bar */}
-        <View className="flex-row mx-4 mt-4 bg-surface rounded-xl p-1">
+        <View
+          className="flex-row mx-4 mt-5"
+          style={{
+            minHeight: 50,
+            borderRadius: 16,
+            padding: 4,
+            backgroundColor: 'rgba(20,27,37,0.92)',
+            borderWidth: 1,
+            borderColor: 'rgba(255,255,255,0.08)',
+          }}
+        >
           {TABS.map((tab) => (
             <TouchableOpacity
               key={tab.key}
               onPress={() => setActiveTab(tab.key)}
-              className="flex-1 py-2.5 rounded-lg items-center"
-              style={activeTab === tab.key ? { backgroundColor: '#4ea1ff' } : undefined}
+              className="flex-1 py-2.5 rounded-xl items-center justify-center"
+              style={activeTab === tab.key ? { backgroundColor: stadiumSlate.accent } : undefined}
               activeOpacity={0.7}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: activeTab === tab.key }}
             >
               <Text
                 className={`text-xs font-semibold ${
@@ -1302,8 +1334,29 @@ export default function GameDetailScreen() {
 
         {/* Tab Content */}
         <View className="pb-8">
+          {activeTab === 'overview' && (
+            <View style={{ marginHorizontal: 16, marginTop: 16, gap: 16 }}>
+              <GameStatsOverview
+                stats={gameStatsQuery.data}
+                isLoading={gameStatsQuery.isLoading}
+                error={gameStatsQuery.error}
+              />
+              <DetailsSection game={game} />
+            </View>
+          )}
+
           {activeTab === 'box_score' && (
-            <BoxScoreSection boxScores={boxScores} game={game} playerNameMap={playerNameMap} />
+            <View style={{ marginHorizontal: 16, marginTop: 16 }}>
+              {sport === 'nba' && !(gameStatsQuery.error && boxScores.length > 0) ? (
+                <RemoteBoxScore
+                  stats={gameStatsQuery.data}
+                  isLoading={gameStatsQuery.isLoading}
+                  error={gameStatsQuery.error}
+                />
+              ) : (
+                <BoxScoreSection boxScores={boxScores} game={game} playerNameMap={playerNameMap} />
+              )}
+            </View>
           )}
 
           {activeTab === 'reviews' && (
@@ -1312,7 +1365,7 @@ export default function GameDetailScreen() {
                 <View className="flex-row bg-surface rounded-xl p-1 self-start mb-3">
                   <TouchableOpacity
                     className="py-2 px-4 rounded-lg"
-                    style={reviewSort === 'recent' ? { backgroundColor: '#4ea1ff' } : undefined}
+                    style={reviewSort === 'recent' ? { backgroundColor: stadiumSlate.accent } : undefined}
                     onPress={() => setReviewSort('recent')}
                     activeOpacity={0.7}
                   >
@@ -1322,7 +1375,7 @@ export default function GameDetailScreen() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     className="py-2 px-4 rounded-lg"
-                    style={reviewSort === 'popular' ? { backgroundColor: '#4ea1ff' } : undefined}
+                    style={reviewSort === 'popular' ? { backgroundColor: stadiumSlate.accent } : undefined}
                     onPress={() => setReviewSort('popular')}
                     activeOpacity={0.7}
                   >
@@ -1347,20 +1400,10 @@ export default function GameDetailScreen() {
             </View>
           )}
 
-          {activeTab === 'stats' && (
-            <>
-              <PeriodScoreTable game={game} />
-              <TeamComparisonStats boxScores={boxScores} game={game} />
-            </>
-          )}
-
           {activeTab === 'plays' && (
             <PlayByPlaySection game={game} />
           )}
-
-          {activeTab === 'details' && (
-            <DetailsSection game={game} />
-          )}
+        </View>
         </View>
         </PageContainer>
       </ScrollView>
@@ -1368,7 +1411,7 @@ export default function GameDetailScreen() {
       {/* Log Modal */}
       {showLogModal && (
         <LogModal
-          gameId={id}
+          gameId={game.id}
           existingLog={myLog}
           onClose={() => setShowLogModal(false)}
           onSuccess={(result?: LogModalResult) => {
@@ -1390,7 +1433,7 @@ export default function GameDetailScreen() {
       {data?.game && (
         <RankingFlowModal
           visible={showRankingFlow}
-          gameId={id}
+          gameId={game.id}
           game={data.game}
           isRerank={isRerank}
           onClose={() => setShowRankingFlow(false)}
@@ -1405,7 +1448,7 @@ export default function GameDetailScreen() {
       {/* Add to List Modal */}
       {showListModal && (
         <AddToListModal
-          gameId={id}
+          gameId={game.id}
           onClose={() => setShowListModal(false)}
         />
       )}

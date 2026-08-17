@@ -1,7 +1,9 @@
-export const WEB_BASE = 'https://know-ball.vercel.app';
+import { gamePath, type SluggableGame } from '@/lib/gameRoutes';
 
-export function gameUrl(gameId: string) {
-  return `${WEB_BASE}/game/${gameId}`;
+export const WEB_BASE = 'https://knoball.vercel.app';
+
+export function gameUrl(game: SluggableGame | string) {
+  return `${WEB_BASE}${gamePath(game)}`;
 }
 
 export function userUrl(handle: string) {

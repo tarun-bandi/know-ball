@@ -1,6 +1,6 @@
 import '../global.css';
 import { useEffect, useRef } from 'react';
-import { View, StatusBar, Image, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
+import { View, StatusBar, Image, ActivityIndicator, TouchableOpacity, Text, Platform } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -169,7 +169,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="game/[id]"
               options={{
-                headerShown: true,
+                headerShown: Platform.OS !== 'web',
                 title: 'Game',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
