@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Share as RNShare, Platform, ScrollView, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Share as RNShare, Platform, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useCallback, memo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -109,6 +109,8 @@ function getTopReactions(reactions?: Record<ReactionType, number>): { type: Reac
 
 function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardProps) {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isWide = Platform.OS === 'web' && width >= 720;
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const [spoilerRevealed, setSpoilerRevealed] = useState(false);
@@ -337,6 +339,12 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
   const topReactions = getTopReactions(log.reactions);
   const totalReactionCount = log.like_count ?? 0;
   const myReaction = log.my_reaction;
+  const gameLabel = getGameLabel(game);
+  const loggedAtLabel = new Date(log.logged_at).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
   const cardContent = (
     <>
@@ -358,335 +366,412 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
         <Text style={{ fontSize: 72 }}>{'\uD83D\uDD25'}</Text>
       </Animated.View>
 
-        {/* Game label (date/week/primetime) */}
-        {(() => {
-          const label = getGameLabel(game);
-          return label ? (
-            <Text className="text-muted text-xs text-center mb-1">{label}</Text>
-          ) : null;
-        })()}
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+          backgroundColor: stadiumSlate.accent,
+          ...(Platform.OS === 'web'
+            ? ({ backgroundImage: `linear-gradient(90deg, ${awayAccent}, ${homeAccent})` } as any)
+            : null),
+        }}
+      />
 
-        {/* Matchup header strip */}
-        <View className="mb-2">
+      {/* Post identity comes first, like a real social feed. */}
+      {showUser && log.user_profile ? (
+        <TouchableOpacity
+          onPress={() => router.push(`/user/${log.user_profile!.handle}`)}
+          accessibilityRole="button"
+          accessibilityLabel={`Open ${log.user_profile.display_name}'s profile`}
+          activeOpacity={0.72}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+        >
           <View
             style={{
-              borderRadius: 12,
-              paddingHorizontal: 8,
-              paddingVertical: 6,
+              borderRadius: 999,
+              padding: 2,
               borderWidth: 1,
-              borderColor: withAlpha(stadiumSlate.borderStrong, 0.52),
-              backgroundColor: withAlpha(stadiumSlate.surfaceRaised, 0.78),
-              overflow: 'hidden',
+              borderColor: avatarRingColor,
+              backgroundColor: stadiumSlate.surfaceRaised,
             }}
           >
-            <View
-              pointerEvents="none"
-              style={{
-                position: 'absolute',
-                left: -18,
-                top: -22,
-                width: 76,
-                height: 76,
-                borderRadius: 999,
-                backgroundColor: withAlpha(awayAccent, 0.05),
-              }}
+            <Avatar
+              url={log.user_profile.avatar_url}
+              name={log.user_profile.display_name}
+              size={38}
             />
+          </View>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
+              <Text style={{ color: stadiumSlate.text, fontSize: 15, fontWeight: '900' }} numberOfLines={1}>
+                {log.user_profile.display_name}
+              </Text>
+              <Text style={{ color: stadiumSlate.textSubtle, fontSize: 12 }} numberOfLines={1}>
+                @{log.user_profile.handle}
+              </Text>
+            </View>
+            <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, marginTop: 3 }}>
+              Logged a game · {loggedAtLabel}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <Text style={{ color: stadiumSlate.textMuted, fontSize: 12 }}>{loggedAtLabel}</Text>
+      )}
+
+      {/* Matchup presented as embedded content instead of a stretched mobile pill. */}
+      <View
+        style={{
+          marginTop: 18,
+          borderRadius: isWide ? 18 : 15,
+          borderWidth: 1,
+          borderColor: withAlpha(stadiumSlate.borderStrong, 0.72),
+          backgroundColor: stadiumSlate.surfaceRaised,
+          paddingHorizontal: isWide ? 18 : 13,
+          paddingVertical: isWide ? 16 : 13,
+          overflow: 'hidden',
+          ...(Platform.OS === 'web'
+            ? ({
+                backgroundImage: `linear-gradient(115deg, ${withAlpha(awayAccent, 0.11)}, transparent 38%, transparent 62%, ${withAlpha(homeAccent, 0.11)})`,
+              } as any)
+            : null),
+        }}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
             <View
-              pointerEvents="none"
               style={{
-                position: 'absolute',
-                right: -18,
-                top: -22,
-                width: 76,
-                height: 76,
                 borderRadius: 999,
-                backgroundColor: withAlpha(homeAccent, 0.05),
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                backgroundColor: game.home_team_score !== null ? 'rgba(163,230,53,0.11)' : 'rgba(255,255,255,0.06)',
               }}
-            />
-            <View className="flex-row items-center justify-center gap-2">
-              <View
+            >
+              <Text
                 style={{
-                  borderRadius: 999,
-                  padding: 1,
-                  shadowColor: awayAccent,
-                  shadowOpacity: 0.2,
-                  shadowRadius: 4,
-                  shadowOffset: { width: 0, height: 0 },
-                  elevation: 2,
+                  color: game.home_team_score !== null ? '#c7f277' : stadiumSlate.textMuted,
+                  fontSize: 9,
+                  fontWeight: '900',
+                  letterSpacing: 1.1,
                 }}
               >
-                <TeamLogo abbreviation={game.away_team.abbreviation} sport={game.sport ?? 'nba'} size={24} />
-              </View>
+                {game.home_team_score !== null ? 'FINAL' : 'UPCOMING'}
+              </Text>
+            </View>
+            {gameLabel ? (
+              <Text style={{ color: stadiumSlate.textMuted, fontSize: 11 }} numberOfLines={1}>
+                {gameLabel}
+              </Text>
+            ) : null}
+          </View>
+          {game.playoff_round ? (
+            <PlayoffBadge round={game.playoff_round} sport={game.sport ?? 'nba'} />
+          ) : null}
+          {showLoggedBadge ? (
+            <View
+              style={{
+                borderRadius: 999,
+                borderWidth: 1,
+                borderColor: withAlpha(stadiumSlate.accent, 0.4),
+                backgroundColor: withAlpha(stadiumSlate.accent, 0.12),
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+              }}
+            >
+              <Text style={{ color: stadiumSlate.accentSoft, fontSize: 10, fontWeight: '800' }}>Logged</Text>
+            </View>
+          ) : null}
+        </View>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 13 }}>
+          <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <TeamLogo abbreviation={game.away_team.abbreviation} sport={game.sport ?? 'nba'} size={isWide ? 34 : 28} />
+            <View style={{ minWidth: 0, flex: 1 }}>
               <Text
-                className="font-bold text-sm"
-                style={{
-                  color: withAlpha(ensureTextContrast(awayAccent), 0.9),
-                  textShadowColor: withAlpha(awayAccent, 0.15),
-                  textShadowRadius: 4,
-                }}
+                style={{ color: ensureTextContrast(awayAccent), fontSize: isWide ? 16 : 14, fontWeight: '900' }}
+                numberOfLines={1}
               >
                 {game.away_team.abbreviation}
               </Text>
-              {game.home_team_score !== null ? (
-                <>
-                  <Text className="text-white font-bold text-base">
-                    {game.away_team_score}
-                  </Text>
-                  <Text className="text-muted text-sm">{'\u2014'}</Text>
-                  <Text className="text-white font-bold text-base">
-                    {game.home_team_score}
-                  </Text>
-                </>
-              ) : (
-                <Text className="text-muted text-xs">
-                  {formatDate(game.game_date_utc)}
+              {isWide ? (
+                <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11, marginTop: 2 }} numberOfLines={1}>
+                  {game.away_team.full_name}
                 </Text>
-              )}
+              ) : null}
+            </View>
+          </View>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: isWide ? 12 : 8, paddingHorizontal: isWide ? 18 : 8 }}>
+            <Text style={{ color: stadiumSlate.text, fontSize: isWide ? 28 : 23, fontWeight: '900', letterSpacing: -1 }}>
+              {game.away_team_score ?? '–'}
+            </Text>
+            <Text style={{ color: stadiumSlate.textSubtle, fontSize: 13 }}>—</Text>
+            <Text style={{ color: stadiumSlate.text, fontSize: isWide ? 28 : 23, fontWeight: '900', letterSpacing: -1 }}>
+              {game.home_team_score ?? '–'}
+            </Text>
+          </View>
+
+          <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
+            <View style={{ minWidth: 0, flex: 1, alignItems: 'flex-end' }}>
               <Text
-                className="font-bold text-sm"
-                style={{
-                  color: withAlpha(ensureTextContrast(homeAccent), 0.9),
-                  textShadowColor: withAlpha(homeAccent, 0.15),
-                  textShadowRadius: 4,
-                }}
+                style={{ color: ensureTextContrast(homeAccent), fontSize: isWide ? 16 : 14, fontWeight: '900' }}
+                numberOfLines={1}
               >
                 {game.home_team.abbreviation}
               </Text>
-              <View
-                style={{
-                  borderRadius: 999,
-                  padding: 1,
-                  shadowColor: homeAccent,
-                  shadowOpacity: 0.2,
-                  shadowRadius: 4,
-                  shadowOffset: { width: 0, height: 0 },
-                  elevation: 2,
-                }}
-              >
-                <TeamLogo abbreviation={game.home_team.abbreviation} sport={game.sport ?? 'nba'} size={24} />
-              </View>
-              {game.playoff_round && (
-                <View className="ml-1">
-                  <PlayoffBadge round={game.playoff_round} sport={game.sport ?? 'nba'} />
-                </View>
-              )}
-              {showLoggedBadge && (
-                <View className="bg-accent/20 border border-accent/40 rounded-full px-2 py-0.5 ml-1">
-                  <Text className="text-accent text-xs font-medium">Logged</Text>
-                </View>
-              )}
+              {isWide ? (
+                <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11, marginTop: 2 }} numberOfLines={1}>
+                  {game.home_team.full_name}
+                </Text>
+              ) : null}
             </View>
+            <TeamLogo abbreviation={game.home_team.abbreviation} sport={game.sport ?? 'nba'} size={isWide ? 34 : 28} />
           </View>
         </View>
 
-        {/* Team records */}
-        {game.away_team_record && game.home_team_record && (
-          <View className="flex-row items-center justify-center gap-2 mb-2">
-            <View style={{ width: 24 }} />
-            <Text className="text-muted text-xs">({game.away_team_record})</Text>
-            <View style={{ flex: 1 }} />
-            <Text className="text-muted text-xs">({game.home_team_record})</Text>
-            <View style={{ width: 24 }} />
+        {game.away_team_record && game.home_team_record ? (
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, paddingHorizontal: 2 }}>
+            <Text style={{ color: stadiumSlate.textSubtle, fontSize: 10 }}>{game.away_team_record}</Text>
+            <Text style={{ color: stadiumSlate.textSubtle, fontSize: 10 }}>{game.home_team_record}</Text>
           </View>
-        )}
+        ) : null}
+      </View>
 
-        {/* Team-tinted divider */}
-        <View className="mb-3" style={{ position: 'relative' }}>
-          <View className="flex-row h-[1.5px] overflow-hidden rounded-full">
-            <View style={{ flex: 1, backgroundColor: withAlpha(stadiumSlate.borderStrong, 0.95) }} />
-            <View style={{ flex: 1, backgroundColor: withAlpha(stadiumSlate.accent, 0.58) }} />
-          </View>
-        </View>
-
-        {/* User info (feed mode) */}
-        {showUser && log.user_profile && (
-          <TouchableOpacity
-            onPress={() => router.push(`/user/${log.user_profile!.handle}`)}
-            className="flex-row items-center gap-2 mb-3"
-          >
+      {(log.watch_mode || (log.position != null && log.rank_total != null)) ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9, marginTop: 14, flexWrap: 'wrap' }}>
+          {log.watch_mode ? (
             <View
               style={{
                 borderRadius: 999,
-                padding: 1.5,
-                borderWidth: 1.5,
-                borderColor: avatarRingColor,
-                shadowColor: avatarRingColor,
-                shadowOpacity: 0.18,
-                shadowRadius: 3,
-                shadowOffset: { width: 0, height: 0 },
-                elevation: 2,
+                borderWidth: 1,
+                borderColor: withAlpha(stadiumSlate.borderStrong, 0.72),
+                backgroundColor: 'rgba(255,255,255,0.035)',
+                paddingHorizontal: 10,
+                paddingVertical: 5,
               }}
             >
-              <Avatar
-                url={log.user_profile.avatar_url}
-                name={log.user_profile.display_name}
-                size={28}
-              />
-            </View>
-            <Text className="text-muted text-sm">
-              <Text className="text-accent font-medium">
-                {log.user_profile.display_name}
+              <Text style={{ color: stadiumSlate.textMuted, fontSize: 11, fontWeight: '700' }}>
+                {WATCH_MODE_LABEL[log.watch_mode!]}
               </Text>
-              {' '}logged a game
+            </View>
+          ) : null}
+          {log.position != null && log.rank_total != null ? (
+            <RankBadge position={log.position} total={log.rank_total} fanOf={log.fan_of} />
+          ) : null}
+        </View>
+      ) : null}
+
+      {log.tags && log.tags.length > 0 ? (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: 11 }}>
+          {log.tags.map((tag) => (
+            <TouchableOpacity
+              key={tag.id}
+              onPress={() => router.push(`/tag/${tag.slug}`)}
+              activeOpacity={0.7}
+              style={{
+                borderRadius: 999,
+                borderWidth: 1,
+                borderColor: withAlpha(stadiumSlate.accent, 0.32),
+                backgroundColor: withAlpha(stadiumSlate.accent, 0.09),
+                paddingHorizontal: 9,
+                paddingVertical: 5,
+              }}
+            >
+              <Text style={{ color: stadiumSlate.accentSoft, fontSize: 11 }}>{tag.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      ) : null}
+
+      {log.review ? (
+        log.has_spoilers && !spoilerRevealed ? (
+          <TouchableOpacity
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setSpoilerRevealed(true);
+            }}
+            activeOpacity={0.7}
+            style={{
+              marginTop: 16,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: stadiumSlate.border,
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              paddingHorizontal: 13,
+              paddingVertical: 11,
+            }}
+          >
+            <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontStyle: 'italic' }}>
+              {'\u26A0'} Spoiler — tap to reveal
             </Text>
           </TouchableOpacity>
-        )}
+        ) : (
+          <Text
+            style={{
+              color: stadiumSlate.text,
+              fontSize: isWide ? 16 : 15,
+              lineHeight: isWide ? 25 : 23,
+              marginTop: 17,
+              letterSpacing: -0.1,
+            }}
+            numberOfLines={4}
+          >
+            {log.review}
+          </Text>
+        )
+      ) : null}
 
-        {/* Watch mode + rank */}
-        <View className="flex-row items-center gap-3 mt-3">
-          {log.watch_mode && (
-            <View className="bg-background border border-border rounded-full px-2.5 py-0.5">
-              <Text className="text-muted text-xs">
-                {WATCH_MODE_LABEL[log.watch_mode]}
+      {log.image_urls && log.image_urls.length > 0 ? (
+        log.image_urls.length === 1 ? (
+          <Image
+            source={{ uri: log.image_urls[0] }}
+            style={{ width: '100%', height: isWide ? 280 : 205, borderRadius: 16, marginTop: 16 }}
+            contentFit="cover"
+          />
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 10, marginTop: 16 }}
+          >
+            {log.image_urls.map((url) => (
+              <Image
+                key={url}
+                source={{ uri: url }}
+                style={{ width: isWide ? 280 : 220, height: isWide ? 220 : 175, borderRadius: 16 }}
+                contentFit="cover"
+              />
+            ))}
+          </ScrollView>
+        )
+      ) : null}
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 9,
+          marginTop: 18,
+          paddingTop: 14,
+          borderTopWidth: 1,
+          borderTopColor: 'rgba(255,255,255,0.075)',
+        }}
+      >
+        <View style={{ position: 'relative' }}>
+          {showReactionPicker ? (
+            <ReactionPicker
+              currentReaction={myReaction ?? null}
+              onSelect={handleReaction}
+              onClose={() => setShowReactionPicker(false)}
+            />
+          ) : null}
+          <Animated.View style={reactionButtonAnimStyle}>
+            <TouchableOpacity
+              onPress={handleReactionButtonPress}
+              onLongPress={handleReactionButtonLongPress}
+              accessibilityRole="button"
+              accessibilityLabel={myReaction ? 'Remove reaction' : 'React to this log'}
+              activeOpacity={0.66}
+              style={{
+                minHeight: 38,
+                borderRadius: 11,
+                borderWidth: 1,
+                borderColor: myReaction ? withAlpha(stadiumSlate.accent, 0.36) : 'rgba(255,255,255,0.08)',
+                backgroundColor: myReaction ? withAlpha(stadiumSlate.accent, 0.09) : 'rgba(255,255,255,0.025)',
+                paddingHorizontal: isWide ? 12 : 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 7,
+              }}
+            >
+              {myReaction ? (
+                <Text style={{ fontSize: 17 }}>{REACTION_EMOJI[myReaction]}</Text>
+              ) : (
+                <Heart size={17} color={stadiumSlate.textMuted} fill="transparent" />
+              )}
+              <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontWeight: '700' }}>
+                {isWide ? 'React' : totalReactionCount || ''}
               </Text>
-            </View>
-          )}
-          {log.position != null && log.rank_total != null && (
-            <RankBadge position={log.position} total={log.rank_total} fanOf={log.fan_of} />
-          )}
+              {isWide && totalReactionCount > 0 ? (
+                <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11 }}>{totalReactionCount}</Text>
+              ) : null}
+            </TouchableOpacity>
+          </Animated.View>
         </View>
 
-        {/* Tags */}
-        {log.tags && log.tags.length > 0 && (
-          <View className="flex-row flex-wrap gap-1.5 mt-2">
-            {log.tags.map((tag) => (
-              <TouchableOpacity
-                key={tag.id}
-                className="bg-accent/10 border border-accent/30 rounded-full px-2 py-0.5"
-                onPress={() => router.push(`/tag/${tag.slug}`)}
-                activeOpacity={0.7}
-              >
-                <Text className="text-accent text-xs">{tag.name}</Text>
-              </TouchableOpacity>
+        <Animated.View style={commentButtonAnimStyle}>
+          <TouchableOpacity
+            onPress={() => {
+              animateIconTap(commentScale, commentGlow);
+              setShowComments(true);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Open comments"
+            activeOpacity={0.66}
+            style={{
+              minHeight: 38,
+              borderRadius: 11,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.08)',
+              backgroundColor: 'rgba(255,255,255,0.025)',
+              paddingHorizontal: isWide ? 12 : 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 7,
+            }}
+          >
+            <MessageCircle size={17} color={stadiumSlate.textMuted} />
+            <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontWeight: '700' }}>
+              {isWide ? 'Comment' : commentCount || ''}
+            </Text>
+            {isWide && commentCount > 0 ? (
+              <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11 }}>{commentCount}</Text>
+            ) : null}
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.View style={shareButtonAnimStyle}>
+          <TouchableOpacity
+            onPress={() => {
+              animateIconTap(shareScale, shareGlow);
+              handleShare();
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Share this game log"
+            activeOpacity={0.66}
+            style={{
+              minHeight: 38,
+              borderRadius: 11,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.08)',
+              backgroundColor: 'rgba(255,255,255,0.025)',
+              paddingHorizontal: isWide ? 12 : 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 7,
+            }}
+          >
+            <Share2 size={17} color={stadiumSlate.textMuted} />
+            {isWide ? (
+              <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontWeight: '700' }}>Share</Text>
+            ) : null}
+          </TouchableOpacity>
+        </Animated.View>
+
+        {isWide && topReactions.length > 0 ? (
+          <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            {topReactions.map((reaction) => (
+              <Text key={reaction.type} style={{ color: stadiumSlate.textMuted, fontSize: 12 }}>
+                {REACTION_EMOJI[reaction.type]} {reaction.count}
+              </Text>
             ))}
           </View>
-        )}
-
-        {/* Review */}
-        {log.review ? (
-          log.has_spoilers && !spoilerRevealed ? (
-            <TouchableOpacity
-              className="mt-3 bg-background border border-border rounded-lg px-3 py-2"
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setSpoilerRevealed(true);
-              }}
-              activeOpacity={0.7}
-            >
-              <Text className="text-muted text-xs italic">
-                {'\u26A0'} Spoiler {'\u2014'} tap to reveal
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <Text className="text-white text-sm mt-3 leading-relaxed" numberOfLines={3}>
-              {log.review}
-            </Text>
-          )
         ) : null}
-
-        {/* Images */}
-        {log.image_urls && log.image_urls.length > 0 && (
-          log.image_urls.length === 1 ? (
-            <Image
-              source={{ uri: log.image_urls[0] }}
-              style={{ width: '100%', height: 160, borderRadius: 10, marginTop: 12 }}
-              contentFit="cover"
-            />
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 8, marginTop: 12 }}
-            >
-              {log.image_urls.map((url) => (
-                <Image
-                  key={url}
-                  source={{ uri: url }}
-                  style={{ width: 200, height: 160, borderRadius: 10 }}
-                  contentFit="cover"
-                />
-              ))}
-            </ScrollView>
-          )
-        )}
-
-        {/* Actions: share + comments + reactions */}
-        <View
-          className="flex-row items-center justify-end gap-4 mt-4 pt-3"
-          style={{ borderTopWidth: 1, borderTopColor: withAlpha(stadiumSlate.borderStrong, 0.65) }}
-        >
-          <Animated.View style={shareButtonAnimStyle}>
-            <TouchableOpacity
-              className="flex-row items-center gap-1.5"
-              onPress={() => {
-                animateIconTap(shareScale, shareGlow);
-                handleShare();
-              }}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              activeOpacity={0.6}
-            >
-              <Share2 size={17} color="#9aa6b5" />
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={commentButtonAnimStyle}>
-            <TouchableOpacity
-              className="flex-row items-center gap-1.5"
-              onPress={() => {
-                animateIconTap(commentScale, commentGlow);
-                setShowComments(true);
-              }}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              activeOpacity={0.6}
-            >
-              <MessageCircle size={18} color="#9aa6b5" />
-              {commentCount > 0 && (
-                <Text className="text-xs font-medium text-muted">
-                  {commentCount}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </Animated.View>
-
-          {/* Reaction button area */}
-          <View style={{ position: 'relative' }}>
-            {showReactionPicker && (
-              <ReactionPicker
-                currentReaction={myReaction ?? null}
-                onSelect={handleReaction}
-                onClose={() => setShowReactionPicker(false)}
-              />
-            )}
-            <Animated.View style={reactionButtonAnimStyle}>
-              <TouchableOpacity
-                className="flex-row items-center gap-1.5"
-                onPress={handleReactionButtonPress}
-                onLongPress={handleReactionButtonLongPress}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                activeOpacity={0.6}
-              >
-                {myReaction ? (
-                  <Text style={{ fontSize: 18 }}>{REACTION_EMOJI[myReaction]}</Text>
-                ) : (
-                  <Heart size={18} color="#9aa6b5" fill="transparent" />
-                )}
-                {topReactions.length > 0 ? (
-                  <View className="flex-row items-center gap-1">
-                    {topReactions.map((r) => (
-                      <Text key={r.type} className="text-xs">
-                        {REACTION_EMOJI[r.type]}{' '}
-                        <Text className="text-muted font-medium">{r.count}</Text>
-                      </Text>
-                    ))}
-                  </View>
-                ) : totalReactionCount > 0 ? (
-                  <Text className="text-xs font-medium text-muted">
-                    {totalReactionCount}
-                  </Text>
-                ) : null}
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
-        </View>
+      </View>
 
       {showComments && (
         <CommentsSheet
@@ -701,24 +786,26 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
   if (Platform.OS === 'web') {
     return (
       <Pressable
-        className="rounded-2xl p-4 mb-5"
         style={({ pressed, hovered }: any) => [
           {
             position: 'relative',
             overflow: 'hidden',
+            borderRadius: 22,
+            padding: isWide ? 22 : 16,
+            marginBottom: isWide ? 18 : 14,
             borderWidth: 1,
             borderColor: pressed
               ? withAlpha(stadiumSlate.accent, 0.72)
               : hovered
-                ? withAlpha(stadiumSlate.accent, 0.5)
-                : withAlpha(stadiumSlate.borderStrong, 0.62),
-            transform: [{ translateY: pressed ? 0 : hovered ? -2 : 0 }],
+                ? withAlpha(stadiumSlate.borderStrong, 0.95)
+                : withAlpha(stadiumSlate.borderStrong, 0.7),
+            transform: [{ translateY: pressed ? 0 : hovered ? -1 : 0 }],
             backgroundColor: hovered ? stadiumSlate.surfaceElevated : stadiumSlate.surface,
           },
           {
             boxShadow: hovered
-              ? `0 16px 34px ${withAlpha('#020617', 0.34)}, 0 0 0 1px ${withAlpha(stadiumSlate.accent, 0.16)}`
-              : `0 8px 18px ${withAlpha('#020617', 0.24)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.05)}`,
+              ? `0 20px 46px ${withAlpha('#020617', 0.34)}, 0 0 0 1px ${withAlpha('#ffffff', 0.035)}`
+              : `0 12px 28px ${withAlpha('#020617', 0.28)}, inset 0 1px 0 ${withAlpha('#ffffff', 0.055)}`,
             transitionDuration: '160ms',
             transitionTimingFunction: 'ease-out',
             transitionProperty: 'transform, box-shadow, border-color, background-color',
@@ -735,10 +822,12 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
   return (
     <GestureDetector gesture={composed}>
       <Animated.View
-        className="rounded-2xl p-4 mb-5"
         style={{
           position: 'relative',
           overflow: 'hidden',
+          borderRadius: 18,
+          padding: 16,
+          marginBottom: 14,
           backgroundColor: stadiumSlate.surface,
           borderWidth: 1,
           borderColor: withAlpha(stadiumSlate.borderStrong, 0.62),

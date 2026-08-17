@@ -779,11 +779,54 @@ function FeedDashboard({
       </View>
 
       {hasLogs ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 22, marginBottom: 10 }}>
-          <View style={{ width: 28, height: 3, borderRadius: 999, backgroundColor: stadiumSlate.accent }} />
-          <Text style={{ color: stadiumSlate.text, fontSize: 17, fontWeight: '900', letterSpacing: -0.3 }}>
-            Latest from your feed
-          </Text>
+        <View
+          style={{
+            width: '100%',
+            maxWidth: 800,
+            alignSelf: 'center',
+            marginTop: isDesktop ? 36 : 26,
+            marginBottom: 14,
+            paddingHorizontal: isDesktop ? 20 : 0,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+            <View style={{ minWidth: 0, flex: 1 }}>
+              <Text
+                style={{
+                  color: stadiumSlate.accent,
+                  fontSize: 10,
+                  fontWeight: '900',
+                  letterSpacing: 1.8,
+                  textTransform: 'uppercase',
+                }}
+              >
+                Your feed
+              </Text>
+              <Text
+                style={{
+                  color: stadiumSlate.text,
+                  fontSize: isDesktop ? 25 : 21,
+                  fontWeight: '900',
+                  letterSpacing: -0.8,
+                  marginTop: 5,
+                }}
+              >
+                Latest activity
+              </Text>
+            </View>
+            {isDesktop ? (
+              <Text style={{ color: stadiumSlate.textSubtle, fontSize: 12, paddingBottom: 3 }}>
+                Fresh logs from your circle
+              </Text>
+            ) : null}
+          </View>
+          <View
+            style={{
+              height: 1,
+              marginTop: 14,
+              backgroundColor: 'rgba(255,255,255,0.08)',
+            }}
+          />
         </View>
       ) : null}
     </View>
@@ -845,13 +888,24 @@ export default function FeedScreen() {
   }
 
   return (
-    <View className="flex-1 bg-background">
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: stadiumSlate.background,
+        ...(Platform.OS === 'web'
+          ? ({
+              backgroundImage:
+                'radial-gradient(circle at 8% 0%, rgba(255,112,72,0.10), transparent 28%), linear-gradient(180deg, #111923 0%, #0b1017 54%)',
+            } as any)
+          : null),
+      }}
+    >
       <PageContainer className="flex-1" showDesktopNav>
       <FlatList
         data={allLogs}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={{ width: '100%', maxWidth: 800, alignSelf: 'center', paddingHorizontal: isDesktop ? 20 : 14 }}>
+          <View style={{ width: '100%', maxWidth: 800, alignSelf: 'center', paddingHorizontal: isDesktop ? 20 : 12 }}>
             <GameCard log={item} showUser />
           </View>
         )}
@@ -859,7 +913,7 @@ export default function FeedScreen() {
           <FeedDashboard dashboard={dashboard} hasLogs={allLogs.length > 0} />
         }
         contentContainerStyle={
-          { paddingTop: 4, paddingBottom: 32, paddingHorizontal: 0 }
+          { paddingTop: 4, paddingBottom: 48, paddingHorizontal: 0 }
         }
         ListFooterComponent={
           isFetchingNextPage ? (

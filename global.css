@@ -10,8 +10,8 @@
     font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #07090d;
-    color: #f8f5ef;
+    background-color: #0b1017;
+    color: #f7f8fa;
     min-height: 100%;
   }
 
@@ -20,8 +20,8 @@
   }
 
   ::selection {
-    color: #07090d;
-    background: #ff6a3d;
+    color: #0b1017;
+    background: #ff7048;
   }
 }
 
@@ -37,11 +37,12 @@
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(circle at 10% -10%, rgba(255, 106, 61, 0.14), transparent 32%),
-      radial-gradient(circle at 92% 18%, rgba(73, 102, 255, 0.10), transparent 28%),
-      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-    background-size: auto, auto, 48px 48px, 48px 48px;
+      radial-gradient(circle at 8% -8%, rgba(255, 112, 72, 0.18), transparent 34%),
+      radial-gradient(circle at 94% 20%, rgba(77, 124, 255, 0.12), transparent 30%),
+      linear-gradient(180deg, #111923 0%, #0b1017 52%, #0b1017 100%),
+      linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+    background-size: auto, auto, auto, 56px 56px, 56px 56px;
     mask-image: linear-gradient(to bottom, black, transparent 78%);
     pointer-events: none;
     z-index: -1;
@@ -49,7 +50,7 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #344154 transparent;
+    scrollbar-color: #3b4b60 transparent;
   }
 }
 
