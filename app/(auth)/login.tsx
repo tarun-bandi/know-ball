@@ -204,7 +204,7 @@ export default function LoginScreen() {
           <Animated.View style={[{ marginBottom: 6 }, fadeSlide(titleAnim)]}>
             <Text
               style={{
-                color: '#4ea1ff',
+                color: '#ff6a3d',
                 fontSize: 52,
                 fontWeight: '700',
                 letterSpacing: -2,
@@ -230,7 +230,7 @@ export default function LoginScreen() {
           <Animated.View style={[{ marginBottom: 40 }, fadeSlide(subtitleAnim)]}>
             <Text
               style={{
-                color: '#8fa1b3',
+                color: '#9aa6b5',
                 fontSize: 15,
                 fontWeight: '400',
                 letterSpacing: 0.5,
@@ -246,7 +246,7 @@ export default function LoginScreen() {
               testID="auth_email_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Email"
-              placeholderTextColor="#8fa1b3"
+              placeholderTextColor="#9aa6b5"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -257,7 +257,7 @@ export default function LoginScreen() {
               testID="auth_password_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Password"
-              placeholderTextColor="#8fa1b3"
+              placeholderTextColor="#9aa6b5"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -266,7 +266,7 @@ export default function LoginScreen() {
 
             {errorMessage ? (
               <View className="bg-accent-red/10 border border-accent-red/30 rounded-xl px-4 py-3">
-                <Text className="text-[#ff6b76] text-sm leading-5">
+                <Text className="text-[#ff4d6d] text-sm leading-5">
                   {errorMessage}
                 </Text>
               </View>
@@ -280,7 +280,7 @@ export default function LoginScreen() {
               activeOpacity={0.85}
             >
               {loading ? (
-                <ActivityIndicator color="#0b1118" />
+                <ActivityIndicator color="#07090d" />
               ) : (
                 <Text className="text-background font-bold text-base tracking-wide">
                   Sign In

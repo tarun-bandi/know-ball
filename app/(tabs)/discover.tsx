@@ -196,7 +196,7 @@ function formatDate(dateStr: string) {
   });
 }
 
-function SectionHeader({ icon: Icon, title, color = '#4ea1ff' }: { icon: any; title: string; color?: string }) {
+function SectionHeader({ icon: Icon, title, color = '#ff6a3d' }: { icon: any; title: string; color?: string }) {
   return (
     <View className="flex-row items-center gap-2 mb-3">
       <View style={{ backgroundColor: color + '20', borderRadius: 8, padding: 6 }}>
@@ -262,7 +262,7 @@ export default function DiscoverScreen() {
         <RefreshControl
           refreshing={isRefetching}
           onRefresh={refetch}
-          tintColor="#4ea1ff"
+          tintColor="#ff6a3d"
         />
       }
     >
@@ -280,9 +280,9 @@ export default function DiscoverScreen() {
           }}
         >
           <View style={{
-            backgroundColor: '#111923',
+            backgroundColor: '#0d1117',
             borderWidth: 1,
-            borderColor: 'rgba(78, 161, 255, 0.15)',
+            borderColor: 'rgba(255, 106, 61, 0.15)',
             borderRadius: 16,
             padding: 20,
             flexDirection: 'row',
@@ -293,14 +293,14 @@ export default function DiscoverScreen() {
             <View style={{
               position: 'absolute', top: -20, right: -20,
               width: 100, height: 100, borderRadius: 50,
-              backgroundColor: 'rgba(78, 161, 255, 0.06)',
+              backgroundColor: 'rgba(255, 106, 61, 0.06)',
             }} />
             <View style={{
-              backgroundColor: 'rgba(78, 161, 255, 0.15)',
+              backgroundColor: 'rgba(255, 106, 61, 0.15)',
               width: 44, height: 44, borderRadius: 12,
               alignItems: 'center', justifyContent: 'center',
             }}>
-              <Users size={22} color="#4ea1ff" strokeWidth={2.2} />
+              <Users size={22} color="#ff6a3d" strokeWidth={2.2} />
             </View>
             <View style={{ flex: 1 }}>
               <Text className="text-white font-bold text-base">Find Friends</Text>
@@ -319,9 +319,9 @@ export default function DiscoverScreen() {
           }}
         >
           <View style={{
-            backgroundColor: '#111923',
+            backgroundColor: '#0d1117',
             borderWidth: 1,
-            borderColor: 'rgba(78, 161, 255, 0.1)',
+            borderColor: 'rgba(255, 106, 61, 0.1)',
             borderRadius: 16,
             padding: 20,
             flexDirection: 'row',
@@ -335,22 +335,22 @@ export default function DiscoverScreen() {
               backgroundColor: 'rgba(255, 107, 118, 0.04)',
             }} />
             <View style={{
-              backgroundColor: 'rgba(78, 161, 255, 0.12)',
+              backgroundColor: 'rgba(255, 106, 61, 0.12)',
               width: 44, height: 44, borderRadius: 12,
               alignItems: 'center', justifyContent: 'center',
             }}>
-              <Gamepad2 size={22} color="#4ea1ff" strokeWidth={2.2} />
+              <Gamepad2 size={22} color="#ff6a3d" strokeWidth={2.2} />
             </View>
             <View style={{ flex: 1 }}>
               <Text className="text-white font-bold text-base">NBA Codenames</Text>
               <Text className="text-muted text-xs mt-0.5">Real-time multiplayer word game</Text>
             </View>
             <View style={{
-              backgroundColor: 'rgba(78, 161, 255, 0.15)',
+              backgroundColor: 'rgba(255, 106, 61, 0.15)',
               borderRadius: 20,
               paddingHorizontal: 10, paddingVertical: 4,
             }}>
-              <Text style={{ color: '#4ea1ff', fontSize: 11, fontWeight: '700' }}>PLAY</Text>
+              <Text style={{ color: '#ff6a3d', fontSize: 11, fontWeight: '700' }}>PLAY</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -390,8 +390,8 @@ export default function DiscoverScreen() {
                 disabled={followMutation.isPending}
                 activeOpacity={0.7}
               >
-                <UserPlus size={14} color="#0b1118" strokeWidth={2.5} />
-                <Text style={{ color: '#0b1118', fontSize: 12, fontWeight: '700' }}>Follow</Text>
+                <UserPlus size={14} color="#07090d" strokeWidth={2.5} />
+                <Text style={{ color: '#07090d', fontSize: 12, fontWeight: '700' }}>Follow</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -409,17 +409,17 @@ export default function DiscoverScreen() {
                 onPress={() => router.push(`/tag/${item.tag.slug}`)}
                 activeOpacity={0.7}
                 style={{
-                  backgroundColor: 'rgba(78, 161, 255, 0.1)',
+                  backgroundColor: 'rgba(255, 106, 61, 0.1)',
                   borderWidth: 1,
-                  borderColor: 'rgba(78, 161, 255, 0.25)',
+                  borderColor: 'rgba(255, 106, 61, 0.25)',
                   borderRadius: 20,
                   paddingHorizontal: 14,
                   paddingVertical: 7,
                 }}
               >
-                <Text style={{ color: '#4ea1ff', fontSize: 13, fontWeight: '600' }}>
+                <Text style={{ color: '#ff6a3d', fontSize: 13, fontWeight: '600' }}>
                   {item.tag.name}
-                  <Text style={{ color: '#8fa1b3' }}> {item.count}</Text>
+                  <Text style={{ color: '#9aa6b5' }}> {item.count}</Text>
                 </Text>
               </TouchableOpacity>
             ))}
@@ -429,7 +429,7 @@ export default function DiscoverScreen() {
 
       {/* Most Logged This Week */}
       <View className="px-4 pt-6">
-        <SectionHeader icon={Flame} title="Most Logged This Week" color="#ff6b76" />
+        <SectionHeader icon={Flame} title="Most Logged This Week" color="#ff4d6d" />
         {mostLogged.length === 0 ? (
           <View className="items-center py-6 mb-4">
             <Text className="text-muted text-sm">No activity this week yet</Text>
@@ -446,11 +446,11 @@ export default function DiscoverScreen() {
                 <View className="flex-row items-center gap-2">
                   <View style={{
                     width: 24, height: 24, borderRadius: 12,
-                    backgroundColor: idx === 0 ? 'rgba(78, 161, 255, 0.2)' : 'rgba(143, 161, 179, 0.1)',
+                    backgroundColor: idx === 0 ? 'rgba(255, 106, 61, 0.2)' : 'rgba(143, 161, 179, 0.1)',
                     alignItems: 'center', justifyContent: 'center',
                   }}>
                     <Text style={{
-                      color: idx === 0 ? '#4ea1ff' : '#8fa1b3',
+                      color: idx === 0 ? '#ff6a3d' : '#9aa6b5',
                       fontSize: 11, fontWeight: '800',
                     }}>
                       {idx + 1}
@@ -468,11 +468,11 @@ export default function DiscoverScreen() {
                   {item.game.playoff_round && <PlayoffBadge round={item.game.playoff_round} sport={item.game.sport ?? 'nba'} />}
                 </View>
                 <View style={{
-                  backgroundColor: 'rgba(78, 161, 255, 0.1)',
+                  backgroundColor: 'rgba(255, 106, 61, 0.1)',
                   borderRadius: 12,
                   paddingHorizontal: 8, paddingVertical: 3,
                 }}>
-                  <Text style={{ color: '#4ea1ff', fontSize: 12, fontWeight: '700' }}>
+                  <Text style={{ color: '#ff6a3d', fontSize: 12, fontWeight: '700' }}>
                     {item.logCount}
                   </Text>
                 </View>
@@ -512,11 +512,11 @@ export default function DiscoverScreen() {
                 <Text className="text-muted text-sm">@{item.profile.handle}</Text>
               </View>
               <View style={{
-                backgroundColor: 'rgba(78, 161, 255, 0.1)',
+                backgroundColor: 'rgba(255, 106, 61, 0.1)',
                 borderRadius: 12,
                 paddingHorizontal: 8, paddingVertical: 3,
               }}>
-                <Text style={{ color: '#4ea1ff', fontSize: 12, fontWeight: '700' }}>
+                <Text style={{ color: '#ff6a3d', fontSize: 12, fontWeight: '700' }}>
                   {item.logCount}
                 </Text>
               </View>

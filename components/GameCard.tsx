@@ -134,7 +134,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
 
   const reactionButtonAnimStyle = useAnimatedStyle(() => ({
     transform: [{ scale: reactionButtonScale.value }],
-    shadowColor: '#4ea1ff',
+    shadowColor: '#ff6a3d',
     shadowOpacity: reactionGlow.value * 0.25,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 0 },
@@ -625,7 +625,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.6}
             >
-              <Share2 size={17} color="#8fa1b3" />
+              <Share2 size={17} color="#9aa6b5" />
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={commentButtonAnimStyle}>
@@ -638,7 +638,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.6}
             >
-              <MessageCircle size={18} color="#8fa1b3" />
+              <MessageCircle size={18} color="#9aa6b5" />
               {commentCount > 0 && (
                 <Text className="text-xs font-medium text-muted">
                   {commentCount}
@@ -667,7 +667,7 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
                 {myReaction ? (
                   <Text style={{ fontSize: 18 }}>{REACTION_EMOJI[myReaction]}</Text>
                 ) : (
-                  <Heart size={18} color="#8fa1b3" fill="transparent" />
+                  <Heart size={18} color="#9aa6b5" fill="transparent" />
                 )}
                 {topReactions.length > 0 ? (
                   <View className="flex-row items-center gap-1">

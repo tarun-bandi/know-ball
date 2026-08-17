@@ -12,7 +12,16 @@ import {
 import type { ReactNode } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { Flame, Search, TrendingUp, Trophy, UserPlus } from 'lucide-react-native';
+import {
+  ArrowUpRight,
+  Flame,
+  Radio,
+  Search,
+  Sparkles,
+  TrendingUp,
+  Trophy,
+  UserPlus,
+} from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { enrichLogs } from '@/lib/enrichLogs';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -231,27 +240,29 @@ function formatGameDate(dateStr: string) {
 function SectionTitle({
   icon: Icon,
   title,
-  color = '#4ea1ff',
+  color = '#ff6a3d',
 }: {
   icon: any;
   title: string;
   color?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: 16 }}>
       <View
         style={{
-          width: 28,
-          height: 28,
-          borderRadius: 7,
+          width: 30,
+          height: 30,
+          borderRadius: 10,
           backgroundColor: `${color}18`,
+          borderWidth: 1,
+          borderColor: `${color}30`,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
         <Icon size={15} color={color} strokeWidth={2.4} />
       </View>
-      <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '800' }}>
+      <Text style={{ color: stadiumSlate.text, fontSize: 13, fontWeight: '900', letterSpacing: 0.8, textTransform: 'uppercase' }}>
         {title}
       </Text>
     </View>
@@ -263,16 +274,16 @@ function DashboardPanel({ children, style }: { children: ReactNode; style?: any 
     <View
       style={[
         {
-          borderRadius: 8,
+          borderRadius: 22,
           borderWidth: 1,
-          borderColor: 'rgba(70,96,121,0.55)',
+          borderColor: 'rgba(255,255,255,0.09)',
           backgroundColor: stadiumSlate.surface,
-          padding: 16,
+          padding: 18,
           overflow: 'hidden',
         },
         Platform.OS === 'web'
           ? ({
-              boxShadow: '0 18px 36px rgba(0,0,0,0.18)',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.035)',
             } as any)
           : null,
         style,
@@ -299,10 +310,10 @@ function MatchupRow({
     <Pressable
       onPress={() => router.push(`/game/${game.id}`)}
       style={({ hovered, pressed }: any) => ({
-        borderRadius: 8,
+        borderRadius: 14,
         borderWidth: 1,
-        borderColor: hovered || pressed ? 'rgba(78,161,255,0.36)' : 'rgba(70,96,121,0.42)',
-        backgroundColor: hovered || pressed ? 'rgba(78,161,255,0.07)' : 'rgba(255,255,255,0.025)',
+        borderColor: hovered || pressed ? 'rgba(255,106,61,0.38)' : 'rgba(255,255,255,0.07)',
+        backgroundColor: hovered || pressed ? 'rgba(255,106,61,0.07)' : 'rgba(255,255,255,0.025)',
         padding: compact ? 10 : 12,
         marginBottom: 8,
       })}
@@ -314,12 +325,12 @@ function MatchupRow({
               width: 24,
               height: 24,
               borderRadius: 6,
-              backgroundColor: index === 0 ? 'rgba(78,161,255,0.16)' : 'rgba(143,161,179,0.12)',
+              backgroundColor: index === 0 ? 'rgba(255,106,61,0.16)' : 'rgba(143,161,179,0.12)',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Text style={{ color: index === 0 ? '#4ea1ff' : '#8fa1b3', fontSize: 11, fontWeight: '900' }}>
+            <Text style={{ color: index === 0 ? stadiumSlate.accent : stadiumSlate.textMuted, fontSize: 11, fontWeight: '900' }}>
               {index + 1}
             </Text>
           </View>
@@ -339,12 +350,12 @@ function MatchupRow({
         <View
           style={{
             borderRadius: 999,
-            backgroundColor: 'rgba(78,161,255,0.11)',
+            backgroundColor: 'rgba(255,106,61,0.11)',
             paddingHorizontal: 9,
             paddingVertical: 4,
           }}
         >
-          <Text style={{ color: '#4ea1ff', fontSize: 12, fontWeight: '800' }}>
+          <Text style={{ color: stadiumSlate.accent, fontSize: 12, fontWeight: '800' }}>
             {logCount}
           </Text>
         </View>
@@ -367,10 +378,10 @@ function UserRow({ item }: { item: DashboardUser }) {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
-        borderRadius: 8,
+        borderRadius: 13,
         padding: 10,
         marginBottom: 6,
-        backgroundColor: hovered || pressed ? 'rgba(78,161,255,0.07)' : 'transparent',
+        backgroundColor: hovered || pressed ? 'rgba(255,106,61,0.07)' : 'transparent',
       })}
     >
       <Avatar url={profile.avatar_url} name={profile.display_name} size={34} />
@@ -378,11 +389,11 @@ function UserRow({ item }: { item: DashboardUser }) {
         <Text style={{ color: '#ffffff', fontSize: 13, fontWeight: '800' }} numberOfLines={1}>
           {profile.display_name}
         </Text>
-        <Text style={{ color: '#8fa1b3', fontSize: 12 }} numberOfLines={1}>
+        <Text style={{ color: '#9aa6b5', fontSize: 12 }} numberOfLines={1}>
           @{profile.handle}
         </Text>
       </View>
-      <Text style={{ color: '#4ea1ff', fontSize: 12, fontWeight: '800' }}>
+      <Text style={{ color: stadiumSlate.accent, fontSize: 12, fontWeight: '800' }}>
         {logCount}
       </Text>
     </Pressable>
@@ -391,29 +402,47 @@ function UserRow({ item }: { item: DashboardUser }) {
 
 function EmptyFeedNudge({ onSearch, onDiscover }: { onSearch: () => void; onDiscover: () => void }) {
   return (
-    <DashboardPanel style={{ marginTop: 10, backgroundColor: stadiumSlate.surfaceElevated }}>
-      <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '800' }}>
-        Build your courtside feed
-      </Text>
-      <Text style={{ color: '#8c909c', fontSize: 14, lineHeight: 20, marginTop: 6 }}>
-        Follow fans or log a game. The timeline will fill in here, but the live board stays useful right away.
-      </Text>
-      <View style={{ flexDirection: 'row', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
+    <DashboardPanel style={{ marginTop: 14, backgroundColor: stadiumSlate.surfaceElevated, padding: 20 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 14 }}>
+        <View
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255,106,61,0.12)',
+            borderWidth: 1,
+            borderColor: 'rgba(255,106,61,0.24)',
+          }}
+        >
+          <Sparkles size={19} color={stadiumSlate.accent} />
+        </View>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={{ color: stadiumSlate.text, fontSize: 19, fontWeight: '900', letterSpacing: -0.4 }}>
+            Your feed starts with one take.
+          </Text>
+          <Text style={{ color: stadiumSlate.textMuted, fontSize: 13, lineHeight: 19, marginTop: 5 }}>
+            Log a game or follow a few fans. We’ll turn it into a timeline worth checking after every final buzzer.
+          </Text>
+        </View>
+      </View>
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 18, flexWrap: 'wrap' }}>
         <TouchableOpacity
           onPress={onSearch}
           activeOpacity={0.8}
           style={{
-            borderRadius: 8,
-            backgroundColor: '#4ea1ff',
-            paddingHorizontal: 14,
-            paddingVertical: 10,
+            borderRadius: 13,
+            backgroundColor: stadiumSlate.accent,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
             flexDirection: 'row',
             alignItems: 'center',
             gap: 8,
           }}
         >
-          <Search size={15} color="#0b1118" strokeWidth={2.5} />
-          <Text style={{ color: '#0b1118', fontSize: 13, fontWeight: '900' }}>
+          <Search size={15} color={stadiumSlate.background} strokeWidth={2.5} />
+          <Text style={{ color: stadiumSlate.background, fontSize: 13, fontWeight: '900' }}>
             Log a game
           </Text>
         </TouchableOpacity>
@@ -421,11 +450,12 @@ function EmptyFeedNudge({ onSearch, onDiscover }: { onSearch: () => void; onDisc
           onPress={onDiscover}
           activeOpacity={0.8}
           style={{
-            borderRadius: 8,
+            borderRadius: 13,
             borderWidth: 1,
-            borderColor: 'rgba(70,96,121,0.6)',
-            paddingHorizontal: 14,
-            paddingVertical: 10,
+            borderColor: 'rgba(255,255,255,0.1)',
+            backgroundColor: 'rgba(255,255,255,0.035)',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
             flexDirection: 'row',
             alignItems: 'center',
             gap: 8,
@@ -456,92 +486,159 @@ function FeedDashboard({
     : dashboard?.activeUsers ?? [];
 
   return (
-    <View style={{ paddingHorizontal: isDesktop ? 24 : 16, paddingTop: isDesktop ? 8 : 14, paddingBottom: 12 }}>
-      <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 14 }}>
-        <View style={{ flex: isDesktop ? 1.9 : undefined, minWidth: 0 }}>
-          <DashboardPanel style={{ padding: 0, backgroundColor: stadiumSlate.background }}>
-            <View style={{ padding: 16, paddingBottom: 0 }}>
-              <View
+    <View style={{ width: '100%', minWidth: 0, paddingHorizontal: isDesktop ? 20 : 14, paddingTop: isDesktop ? 10 : 14, paddingBottom: 14 }}>
+      <View style={{ flexDirection: isDesktop ? 'row' : 'column', alignItems: 'flex-start', gap: 16, width: '100%', minWidth: 0 }}>
+        <View style={{ flex: isDesktop ? 1 : undefined, width: '100%', minWidth: 0 }}>
+          <DashboardPanel
+            style={{
+              padding: 0,
+              minHeight: isDesktop ? 300 : undefined,
+              backgroundColor: '#0a0d12',
+              ...(Platform.OS === 'web'
+                ? ({
+                    backgroundImage:
+                      'radial-gradient(circle at 84% 18%, rgba(255,106,61,0.20), transparent 30%), radial-gradient(circle at 12% 105%, rgba(73,102,255,0.14), transparent 34%)',
+                  } as any)
+                : null),
+            }}
+          >
+            <View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                right: isDesktop ? 34 : -26,
+                top: isDesktop ? 22 : 80,
+                width: isDesktop ? 170 : 120,
+                height: isDesktop ? 170 : 120,
+                borderRadius: 999,
+                borderWidth: 28,
+                borderColor: 'rgba(255,106,61,0.055)',
+              }}
+            />
+            <View style={{ padding: isDesktop ? 30 : 20 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 999,
+                    backgroundColor: stadiumSlate.accent,
+                    ...(Platform.OS === 'web' ? ({ boxShadow: '0 0 18px rgba(255,106,61,0.9)' } as any) : null),
+                  }}
+                />
+                <Text style={{ color: stadiumSlate.accentSoft, fontSize: 11, fontWeight: '900', letterSpacing: 1.7 }}>
+                  YOUR COURTSIDE
+                </Text>
+              </View>
+
+              <Text
                 style={{
-                  flexDirection: isDesktop ? 'row' : 'column',
-                  alignItems: isDesktop ? 'center' : 'flex-start',
-                  justifyContent: 'space-between',
-                  gap: 12,
+                  color: stadiumSlate.text,
+                  fontSize: isDesktop ? 46 : 33,
+                  lineHeight: isDesktop ? 48 : 36,
+                  fontWeight: '900',
+                  letterSpacing: isDesktop ? -2.2 : -1.4,
+                  maxWidth: 610,
+                  marginTop: 14,
                 }}
               >
-                <View style={{ flexShrink: 1 }}>
-                  <Text style={{ color: '#8fa1b3', fontSize: 12, fontWeight: '800', textTransform: 'uppercase' }}>
-                    Tonight in the NBA
-                  </Text>
-                  <Text style={{ color: '#ffffff', fontSize: isDesktop ? 28 : 22, fontWeight: '900', marginTop: 2 }}>
-                    Start from the scoreboard
-                  </Text>
-                </View>
+                Every game. Every take. One feed.
+              </Text>
+              <Text
+                style={{
+                  color: stadiumSlate.textMuted,
+                  fontSize: isDesktop ? 15 : 14,
+                  lineHeight: isDesktop ? 23 : 21,
+                  maxWidth: 560,
+                  marginTop: 12,
+                }}
+              >
+                Track the games you watch, rank the classics, and keep up with the people who actually know ball.
+              </Text>
+
+              <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap', marginTop: 24 }}>
                 <TouchableOpacity
                   onPress={() => router.push('/(tabs)/search')}
-                  activeOpacity={0.8}
+                  activeOpacity={0.82}
                   style={{
-                    borderRadius: 8,
-                    backgroundColor: '#4ea1ff',
-                    paddingHorizontal: 12,
-                    paddingVertical: 9,
-                    alignSelf: isDesktop ? 'auto' : 'flex-start',
+                    minHeight: 46,
+                    borderRadius: 14,
+                    backgroundColor: stadiumSlate.accent,
+                    paddingHorizontal: 18,
+                    paddingVertical: 12,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 9,
                   }}
                 >
-                  <Text style={{ color: '#0b1118', fontSize: 12, fontWeight: '900' }}>
-                    Log Game
-                  </Text>
+                  <Search size={17} color={stadiumSlate.background} strokeWidth={2.7} />
+                  <Text style={{ color: stadiumSlate.background, fontSize: 13, fontWeight: '900' }}>Browse games</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => router.push('/rankings')}
+                  activeOpacity={0.75}
+                  style={{
+                    minHeight: 46,
+                    borderRadius: 14,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.11)',
+                    backgroundColor: 'rgba(255,255,255,0.035)',
+                    paddingHorizontal: 17,
+                    paddingVertical: 12,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 9,
+                  }}
+                >
+                  <Trophy size={16} color={stadiumSlate.text} strokeWidth={2.5} />
+                  <Text style={{ color: stadiumSlate.text, fontSize: 13, fontWeight: '800' }}>Open rankings</Text>
                 </TouchableOpacity>
               </View>
             </View>
-            <View style={{ marginTop: 8 }}>
-              <TodaysGames />
+
+            <View
+              style={{
+                borderTopWidth: 1,
+                borderTopColor: 'rgba(255,255,255,0.075)',
+                backgroundColor: 'rgba(255,255,255,0.018)',
+                paddingHorizontal: isDesktop ? 30 : 20,
+                paddingVertical: 16,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              {[
+                { value: dashboard?.mostLogged.length ?? 0, label: 'hot games' },
+                { value: people.length, label: 'fans moving' },
+                { value: hasLogs ? 'LIVE' : 'READY', label: 'your feed' },
+              ].map((metric, index) => (
+                <View
+                  key={metric.label}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    paddingLeft: index ? 14 : 0,
+                    marginLeft: index ? 14 : 0,
+                    borderLeftWidth: index ? 1 : 0,
+                    borderLeftColor: 'rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <Text style={{ color: stadiumSlate.text, fontSize: typeof metric.value === 'number' ? 19 : 13, fontWeight: '900', letterSpacing: -0.3 }}>
+                    {metric.value}
+                  </Text>
+                  <Text style={{ color: stadiumSlate.textSubtle, fontSize: 10, fontWeight: '700', marginTop: 2 }} numberOfLines={1}>
+                    {metric.label}
+                  </Text>
+                </View>
+              ))}
             </View>
           </DashboardPanel>
 
-          <Pressable
-            onPress={() => router.push('/world-cup')}
-            style={({ hovered, pressed }: any) => ({
-              marginTop: 14,
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: hovered || pressed ? 'rgba(78,161,255,0.62)' : 'rgba(70,96,121,0.6)',
-              backgroundColor: 'rgba(17,25,35,0.92)',
-              padding: 16,
-              flexDirection: isDesktop ? 'row' : 'column',
-              alignItems: isDesktop ? 'center' : 'flex-start',
-              justifyContent: 'space-between',
-              gap: 12,
-            })}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
-              <View
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 8,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'rgba(78,161,255,0.14)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(78,161,255,0.32)',
-                }}
-              >
-                <Trophy size={19} color={stadiumSlate.accent} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '900' }}>
-                  World Cup 2026 hub
-                </Text>
-                <Text style={{ color: '#8fa1b3', fontSize: 13, marginTop: 3 }}>
-                  Standings, bracket, live matches, and the Golden Boot race.
-                </Text>
-              </View>
-            </View>
-            <Text style={{ color: stadiumSlate.accent, fontSize: 12, fontWeight: '900' }}>
-              Open hub
-            </Text>
-          </Pressable>
+          <View style={{ marginTop: 14, width: '100%', minWidth: 0 }}>
+            <TodaysGames />
+          </View>
 
           {!hasLogs ? (
             <EmptyFeedNudge
@@ -552,7 +649,7 @@ function FeedDashboard({
 
           {dashboard?.mostLogged.length ? (
             <DashboardPanel style={{ marginTop: 14 }}>
-              <SectionTitle icon={Flame} title="Most Logged This Week" color="#ff6b76" />
+              <SectionTitle icon={Flame} title="Most Logged This Week" color={stadiumSlate.danger} />
               {dashboard.mostLogged.map((item, index) => (
                 <MatchupRow key={item.game.id} item={item} index={index} />
               ))}
@@ -560,53 +657,74 @@ function FeedDashboard({
           ) : null}
         </View>
 
-        <View style={{ width: isDesktop ? 330 : undefined, gap: 14 }}>
-          <DashboardPanel>
-            <SectionTitle icon={TrendingUp} title="Activity Pulse" />
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: '#ffffff', fontSize: 24, fontWeight: '900' }}>
-                  {dashboard?.mostLogged.length ?? 0}
-                </Text>
-                <Text style={{ color: '#8fa1b3', fontSize: 12, marginTop: 2 }}>
-                  hot games
-                </Text>
+        <View style={{ width: isDesktop ? 352 : '100%', minWidth: 0, gap: 16 }}>
+          <Pressable
+            onPress={() => router.push('/world-cup')}
+            style={({ hovered, pressed }: any) => ({
+              minHeight: 190,
+              borderRadius: 22,
+              borderWidth: 1,
+              borderColor: hovered || pressed ? 'rgba(114,135,255,0.52)' : 'rgba(114,135,255,0.25)',
+              backgroundColor: hovered || pressed ? '#151b31' : '#111629',
+              padding: 20,
+              overflow: 'hidden',
+              ...(Platform.OS === 'web'
+                ? ({
+                    backgroundImage: 'radial-gradient(circle at 92% 8%, rgba(114,135,255,0.32), transparent 38%)',
+                    boxShadow: '0 20px 45px rgba(0,0,0,0.22)',
+                  } as any)
+                : null),
+            })}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View
+                style={{
+                  borderRadius: 999,
+                  borderWidth: 1,
+                  borderColor: 'rgba(165,178,255,0.28)',
+                  backgroundColor: 'rgba(165,178,255,0.1)',
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Radio size={12} color="#a5b2ff" />
+                <Text style={{ color: '#a5b2ff', fontSize: 10, fontWeight: '900', letterSpacing: 1.1 }}>TOURNAMENT WATCH</Text>
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: '#ffffff', fontSize: 24, fontWeight: '900' }}>
-                  {people.length}
-                </Text>
-                <Text style={{ color: '#8fa1b3', fontSize: 12, marginTop: 2 }}>
-                  fans active
-                </Text>
-              </View>
+              <ArrowUpRight size={18} color="#a5b2ff" />
             </View>
-          </DashboardPanel>
+            <Text style={{ color: stadiumSlate.text, fontSize: 24, lineHeight: 27, fontWeight: '900', letterSpacing: -0.8, marginTop: 24 }}>
+              World Cup 2026
+            </Text>
+            <Text style={{ color: '#9aa7cb', fontSize: 13, lineHeight: 19, marginTop: 7 }}>
+              Live matches, the bracket, standings, and Golden Boot race—without leaving your feed.
+            </Text>
+          </Pressable>
 
           <DashboardPanel>
             <SectionTitle icon={Trophy} title="Fan Passport" color={stadiumSlate.accent} />
-            <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '900', lineHeight: 23 }}>
-              Build receipts people can follow.
+            <Text style={{ color: stadiumSlate.text, fontSize: 21, fontWeight: '900', lineHeight: 25, letterSpacing: -0.5 }}>
+              Keep the receipts.
             </Text>
-            <Text style={{ color: '#8fa1b3', fontSize: 13, lineHeight: 19, marginTop: 6 }}>
-              Logs, rankings, predictions, favorites, and World Cup history now roll into your public sports identity.
+            <Text style={{ color: stadiumSlate.textMuted, fontSize: 13, lineHeight: 19, marginTop: 7 }}>
+              Your logs, rankings, predictions, and favorites become a sports identity that is unmistakably yours.
             </Text>
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: 14 }}>
               {['Watched', 'Ranked', 'Predicted'].map((label) => (
                 <View
                   key={label}
                   style={{
                     borderRadius: 999,
                     borderWidth: 1,
-                    borderColor: 'rgba(70,96,121,0.55)',
+                    borderColor: 'rgba(255,255,255,0.09)',
                     backgroundColor: 'rgba(255,255,255,0.035)',
-                    paddingHorizontal: 9,
-                    paddingVertical: 6,
+                    paddingHorizontal: 10,
+                    paddingVertical: 7,
                   }}
                 >
-                  <Text style={{ color: '#d9e2ea', fontSize: 11, fontWeight: '800' }}>
-                    {label}
-                  </Text>
+                  <Text style={{ color: stadiumSlate.textMuted, fontSize: 10, fontWeight: '800' }}>{label}</Text>
                 </View>
               ))}
             </View>
@@ -614,25 +732,27 @@ function FeedDashboard({
               onPress={() => router.push('/(tabs)/profile')}
               activeOpacity={0.75}
               style={{
-                borderRadius: 8,
+                borderRadius: 14,
                 borderWidth: 1,
-                borderColor: 'rgba(78,161,255,0.32)',
-                paddingVertical: 10,
+                borderColor: 'rgba(255,106,61,0.3)',
+                paddingVertical: 12,
+                paddingHorizontal: 14,
+                flexDirection: 'row',
                 alignItems: 'center',
-                marginTop: 14,
-                backgroundColor: 'rgba(78,161,255,0.08)',
+                justifyContent: 'space-between',
+                marginTop: 16,
+                backgroundColor: 'rgba(255,106,61,0.07)',
               }}
             >
-              <Text style={{ color: '#4ea1ff', fontSize: 13, fontWeight: '900' }}>
-                View Passport
-              </Text>
+              <Text style={{ color: stadiumSlate.accentSoft, fontSize: 13, fontWeight: '900' }}>View your passport</Text>
+              <ArrowUpRight size={16} color={stadiumSlate.accent} />
             </TouchableOpacity>
           </DashboardPanel>
 
           {people.length ? (
             <DashboardPanel>
               <SectionTitle
-                icon={UserPlus}
+                icon={TrendingUp}
                 title={dashboard?.suggestedUsers.length ? 'People to Follow' : 'Active Reviewers'}
               />
               {people.map((item) => (
@@ -642,17 +762,16 @@ function FeedDashboard({
                 onPress={() => router.push('/(tabs)/discover')}
                 activeOpacity={0.75}
                 style={{
-                  borderRadius: 8,
+                  borderRadius: 13,
                   borderWidth: 1,
-                  borderColor: 'rgba(78,161,255,0.32)',
-                  paddingVertical: 10,
+                  borderColor: 'rgba(255,255,255,0.09)',
+                  paddingVertical: 11,
                   alignItems: 'center',
                   marginTop: 4,
+                  backgroundColor: 'rgba(255,255,255,0.025)',
                 }}
               >
-                <Text style={{ color: '#4ea1ff', fontSize: 13, fontWeight: '800' }}>
-                  Open Discover
-                </Text>
+                <Text style={{ color: stadiumSlate.text, fontSize: 13, fontWeight: '800' }}>Open Discover</Text>
               </TouchableOpacity>
             </DashboardPanel>
           ) : null}
@@ -660,8 +779,9 @@ function FeedDashboard({
       </View>
 
       {hasLogs ? (
-        <View style={{ marginTop: 16, marginBottom: 4 }}>
-          <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '900' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 22, marginBottom: 10 }}>
+          <View style={{ width: 28, height: 3, borderRadius: 999, backgroundColor: stadiumSlate.accent }} />
+          <Text style={{ color: stadiumSlate.text, fontSize: 17, fontWeight: '900', letterSpacing: -0.3 }}>
             Latest from your feed
           </Text>
         </View>
@@ -672,6 +792,8 @@ function FeedDashboard({
 
 export default function FeedScreen() {
   const { user } = useAuthStore();
+  const { width } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 900;
 
   const {
     data,
@@ -729,7 +851,7 @@ export default function FeedScreen() {
         data={allLogs}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={{ paddingHorizontal: 16 }}>
+          <View style={{ width: '100%', maxWidth: 800, alignSelf: 'center', paddingHorizontal: isDesktop ? 20 : 14 }}>
             <GameCard log={item} showUser />
           </View>
         )}
@@ -737,12 +859,12 @@ export default function FeedScreen() {
           <FeedDashboard dashboard={dashboard} hasLogs={allLogs.length > 0} />
         }
         contentContainerStyle={
-          { paddingTop: 4, paddingBottom: 24, paddingHorizontal: 0 }
+          { paddingTop: 4, paddingBottom: 32, paddingHorizontal: 0 }
         }
         ListFooterComponent={
           isFetchingNextPage ? (
             <View className="py-4">
-              <ActivityIndicator color="#4ea1ff" />
+              <ActivityIndicator color="#ff6a3d" />
             </View>
           ) : null
         }
@@ -754,7 +876,7 @@ export default function FeedScreen() {
           <RefreshControl
             refreshing={isRefetching && !isFetchingNextPage}
             onRefresh={refetch}
-            tintColor="#4ea1ff"
+            tintColor="#ff6a3d"
           />
         }
         showsVerticalScrollIndicator={false}

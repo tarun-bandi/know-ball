@@ -22,47 +22,54 @@ export default function DesktopAppNav() {
   return (
     <View
       style={{
-        paddingHorizontal: 24,
-        paddingTop: 18,
-        paddingBottom: 12,
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        paddingBottom: 14,
       }}
     >
       <View
         style={{
-          minHeight: 56,
-          borderRadius: 8,
+          minHeight: 68,
+          borderRadius: 22,
           borderWidth: 1,
-          borderColor: "rgba(70,96,121,0.55)",
-          backgroundColor: "rgba(17,25,35,0.9)",
-          paddingHorizontal: 16,
+          borderColor: "rgba(255,255,255,0.09)",
+          backgroundColor: "rgba(13,17,23,0.88)",
+          paddingHorizontal: 14,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          boxShadow: "0 18px 40px rgba(0,0,0,0.24)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          boxShadow: "0 18px 50px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04)",
         } as any}
       >
         <Pressable
           onPress={() => router.push("/(tabs)/feed")}
-          style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
+          style={{ flexDirection: "row", alignItems: "center", gap: 11, paddingHorizontal: 4 }}
         >
           <View
             style={{
-              width: 28,
-              height: 28,
-              borderRadius: 6,
+              width: 38,
+              height: 38,
+              borderRadius: 12,
               backgroundColor: stadiumSlate.accent,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Text style={{ color: stadiumSlate.background, fontWeight: "900", fontSize: 14 }}>KB</Text>
+            <Text style={{ color: stadiumSlate.background, fontWeight: "900", fontSize: 13, letterSpacing: -0.5 }}>KB</Text>
           </View>
-          <Text style={{ color: "#ffffff", fontSize: 15, fontWeight: "800" }}>
-            Know Ball
-          </Text>
+          <View>
+            <Text style={{ color: stadiumSlate.text, fontSize: 16, fontWeight: "900", letterSpacing: -0.4 }}>
+              KNOW BALL
+            </Text>
+            <Text style={{ color: stadiumSlate.textSubtle, fontSize: 9, fontWeight: "800", letterSpacing: 1.6, marginTop: 1 }}>
+              BASKETBALL SOCIAL
+            </Text>
+          </View>
         </Pressable>
 
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const active = pathname?.includes(item.match);
@@ -71,14 +78,14 @@ export default function DesktopAppNav() {
                 key={item.href}
                 onPress={() => router.push(item.href as any)}
                 style={({ hovered, pressed }: any) => ({
-                  height: 36,
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
+                  height: 40,
+                  borderRadius: 12,
+                  paddingHorizontal: 13,
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 8,
                   backgroundColor: active
-                    ? "rgba(78,161,255,0.16)"
+                    ? "rgba(255,106,61,0.13)"
                     : hovered || pressed
                       ? "rgba(255,255,255,0.06)"
                       : "transparent",
@@ -86,12 +93,12 @@ export default function DesktopAppNav() {
               >
                 <Icon
                   size={16}
-                  color={active ? "#4ea1ff" : "#8fa1b3"}
+                  color={active ? stadiumSlate.accent : stadiumSlate.textMuted}
                   strokeWidth={2.2}
                 />
                 <Text
                   style={{
-                    color: active ? "#d9ecff" : "#a7b6c8",
+                    color: active ? stadiumSlate.text : stadiumSlate.textMuted,
                     fontSize: 13,
                     fontWeight: active ? "800" : "600",
                   }}
@@ -106,12 +113,14 @@ export default function DesktopAppNav() {
         <Pressable
           onPress={() => router.push("/notifications")}
           style={({ hovered, pressed }: any) => ({
-            width: 36,
-            height: 36,
-            borderRadius: 8,
+            width: 40,
+            height: 40,
+            borderRadius: 12,
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: hovered || pressed ? "rgba(255,255,255,0.06)" : "transparent",
+            borderWidth: 1,
+            borderColor: "rgba(255,255,255,0.08)",
+            backgroundColor: hovered || pressed ? "rgba(255,106,61,0.10)" : "rgba(255,255,255,0.025)",
           })}
         >
           <Bell size={17} color={stadiumSlate.textMuted} />

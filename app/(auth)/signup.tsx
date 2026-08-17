@@ -117,7 +117,7 @@ export default function SignupScreen() {
               testID="signup_name_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Display Name"
-              placeholderTextColor="#8fa1b3"
+              placeholderTextColor="#9aa6b5"
               value={displayName}
               onChangeText={setDisplayName}
               autoCapitalize="words"
@@ -127,7 +127,7 @@ export default function SignupScreen() {
               testID="signup_email_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Email"
-              placeholderTextColor="#8fa1b3"
+              placeholderTextColor="#9aa6b5"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -138,7 +138,7 @@ export default function SignupScreen() {
               testID="signup_password_input"
               className="bg-surface border border-border rounded-xl px-4 py-3.5 text-white text-base"
               placeholder="Password (min 6 characters)"
-              placeholderTextColor="#8fa1b3"
+              placeholderTextColor="#9aa6b5"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -147,7 +147,7 @@ export default function SignupScreen() {
 
             {errorMessage ? (
               <View className="bg-accent-red/10 border border-accent-red/30 rounded-xl px-4 py-3">
-                <Text className="text-[#ff6b76] text-sm leading-5">
+                <Text className="text-[#ff4d6d] text-sm leading-5">
                   {errorMessage}
                 </Text>
               </View>
@@ -168,7 +168,7 @@ export default function SignupScreen() {
               disabled={loading || googleLoading}
             >
               {loading ? (
-                <ActivityIndicator color="#0b1118" />
+                <ActivityIndicator color="#07090d" />
               ) : (
                 <Text className="text-background font-semibold text-base">
                   Create Account

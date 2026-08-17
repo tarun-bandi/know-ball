@@ -16,7 +16,12 @@ export function PageContainer({
   return (
     <View
       className={`w-full self-center ${className}`}
-      style={{ maxWidth: Platform.OS === "web" && showDesktopNav ? 1180 : 768 }}
+      style={{
+        width: "100%",
+        minWidth: 0,
+        maxWidth: Platform.OS === "web" && showDesktopNav ? 1240 : 768,
+        alignSelf: "center",
+      }}
     >
       {showDesktopNav ? <DesktopAppNav /> : null}
       {children}

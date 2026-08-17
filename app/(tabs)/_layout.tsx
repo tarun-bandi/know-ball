@@ -12,36 +12,32 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: !isDesktopWeb,
         tabBarStyle: {
-          backgroundColor: '#111923',
-          borderTopColor: '#2f4052',
-          borderTopWidth: 0,
+          backgroundColor: '#0d1117',
+          borderTopColor: 'rgba(255,255,255,0.08)',
+          borderTopWidth: 1,
           elevation: 0,
           shadowOpacity: 0,
-          paddingTop: 1,
+          height: 72,
+          paddingTop: 7,
+          paddingBottom: 7,
           display: isDesktopWeb ? 'none' : 'flex',
         },
         tabBarBackground: () => (
           <View style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: '#111923',
+            backgroundColor: '#0d1117',
           }}>
-            {/* Active accent line at top */}
-            <View style={{
-              height: 0.5,
-              backgroundColor: '#4ea1ff',
-              opacity: 0.2,
-            }} />
           </View>
         ),
-        tabBarActiveTintColor: '#4ea1ff',
-        tabBarInactiveTintColor: '#64748b',
+        tabBarActiveTintColor: '#ff6a3d',
+        tabBarInactiveTintColor: '#667383',
         tabBarLabelStyle: {
           fontSize: 10,
-          fontWeight: '600',
-          letterSpacing: 0.5,
+          fontWeight: '800',
+          letterSpacing: 0.3,
         },
         headerStyle: {
-          backgroundColor: '#111923',
+          backgroundColor: '#0d1117',
           ...(Platform.OS === 'web' ? {} : {
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
@@ -51,13 +47,13 @@ export default function TabsLayout() {
           }),
         },
         headerTintColor: '#ffffff',
-        headerTitleStyle: { fontWeight: '700', fontSize: 18 },
+        headerTitleStyle: { fontWeight: '900', fontSize: 20, letterSpacing: -0.5 },
       }}
     >
       <Tabs.Screen
         name="feed"
         options={{
-          title: 'Feed',
+          title: 'Courtside',
           tabBarTestID: 'tab_feed',
           tabBarIcon: ({ color, size }) => (
             <Home color={color} size={size - 1} strokeWidth={2.2} />
@@ -69,7 +65,7 @@ export default function TabsLayout() {
               style={{ marginRight: 16 }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Bell size={22} color="#8fa1b3" />
+              <Bell size={21} color="#9aa6b5" />
             </TouchableOpacity>
           ),
         }}
