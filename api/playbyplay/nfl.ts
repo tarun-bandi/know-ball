@@ -30,10 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // ESPN game summary includes play-by-play
-    const summaryRes = await fetch(
-      `${ESPN_NFL_BASE}/summary?event=${gameId}`,
-      { headers: { 'User-Agent': 'know-ball/1.0' } },
-    );
+    const summaryRes = await fetch(`${ESPN_NFL_BASE}/summary?event=${gameId}`);
 
     if (!summaryRes.ok) {
       return res.status(502).json({ error: `ESPN summary returned ${summaryRes.status}` });

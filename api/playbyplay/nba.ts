@@ -118,9 +118,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: 'Could not resolve ESPN event id for this game' });
     }
 
-    const summaryRes = await fetch(`${ESPN_NBA_SUMMARY}?event=${resolvedProviderGameId}`, {
-      headers: { 'User-Agent': 'know-ball/1.0' },
-    });
+    const summaryRes = await fetch(`${ESPN_NBA_SUMMARY}?event=${resolvedProviderGameId}`);
 
     if (!summaryRes.ok) {
       return res.status(502).json({ error: `ESPN summary returned ${summaryRes.status}` });

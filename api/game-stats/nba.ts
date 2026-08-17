@@ -32,7 +32,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const upstream = await fetch(`${ESPN_NBA_SUMMARY}?event=${encodeURIComponent(eventId)}`, {
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'know-ball/1.0 (+https://knoball.vercel.app)',
       },
       signal: AbortSignal.timeout(8_000),
     });
