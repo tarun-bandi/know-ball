@@ -43,20 +43,23 @@ function displayTeamStat(key: string, value: string): string {
 
 function LineScore({ stats, isDesktop }: { stats: GameStatsResponse; isDesktop: boolean }) {
   if (stats.periods.length === 0) return null;
+  const fitsPhoneWidth = !isDesktop && stats.periods.length <= 6;
+  const teamWidth = isDesktop ? 82 : 50;
+  const totalWidth = isDesktop ? 52 : 34;
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexGrow: isDesktop ? 1 : 0 }}>
-      <View style={{ minWidth: isDesktop ? '100%' : 520, paddingHorizontal: isDesktop ? 30 : 18 }}>
+    <ScrollView horizontal={!fitsPhoneWidth} showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+      <View style={{ width: fitsPhoneWidth || isDesktop ? '100%' : undefined, minWidth: isDesktop ? '100%' : fitsPhoneWidth ? 0 : 520, paddingHorizontal: isDesktop ? 30 : 14 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 8 }}>
-          <Text style={{ width: 82, color: stadiumSlate.textSubtle, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 }}>
+          <Text style={{ width: teamWidth, color: stadiumSlate.textSubtle, fontSize: 10, fontWeight: '800', letterSpacing: isDesktop ? 1.2 : 0.6 }}>
             LINE SCORE
           </Text>
           {stats.periods.map((period) => (
-            <Text key={period.label} style={{ flex: 1, minWidth: 42, textAlign: 'center', color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '800' }}>
+            <Text key={period.label} style={{ flex: 1, minWidth: fitsPhoneWidth ? 0 : 42, textAlign: 'center', color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '800' }}>
               {period.label}
             </Text>
           ))}
-          <Text style={{ width: 52, textAlign: 'right', color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '800' }}>T</Text>
+          <Text style={{ width: totalWidth, textAlign: 'right', color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '800' }}>T</Text>
         </View>
         {[
           { team: stats.awayTeam, values: stats.periods.map((period) => period.away) },
@@ -72,13 +75,13 @@ function LineScore({ stats, isDesktop }: { stats: GameStatsResponse; isDesktop: 
               borderTopColor: 'rgba(255,255,255,0.07)',
             }}
           >
-            <Text style={{ width: 82, color: stadiumSlate.text, fontSize: 13, fontWeight: '900' }}>{row.team.abbreviation}</Text>
+            <Text style={{ width: teamWidth, color: stadiumSlate.text, fontSize: 13, fontWeight: '900' }}>{row.team.abbreviation}</Text>
             {row.values.map((value, periodIndex) => (
-              <Text key={`${index}-${periodIndex}`} style={{ flex: 1, minWidth: 42, textAlign: 'center', color: stadiumSlate.textMuted, fontSize: 13, fontWeight: '600' }}>
+              <Text key={`${index}-${periodIndex}`} style={{ flex: 1, minWidth: fitsPhoneWidth ? 0 : 42, textAlign: 'center', color: stadiumSlate.textMuted, fontSize: 13, fontWeight: '600' }}>
                 {value}
               </Text>
             ))}
-            <Text style={{ width: 52, textAlign: 'right', color: stadiumSlate.text, fontSize: 14, fontWeight: '900' }}>{row.team.score}</Text>
+            <Text style={{ width: totalWidth, textAlign: 'right', color: stadiumSlate.text, fontSize: 14, fontWeight: '900' }}>{row.team.score}</Text>
           </View>
         ))}
       </View>
