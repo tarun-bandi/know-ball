@@ -1083,7 +1083,7 @@ export default function GameDetailScreen() {
         <View style={{ width: '100%', maxWidth: 1100, alignSelf: 'center', paddingHorizontal: isDesktop ? 20 : 12, paddingBottom: 48 }}>
         {isDesktop ? (
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => router.replace('/(tabs)/feed')}
             activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel="Back to games"
