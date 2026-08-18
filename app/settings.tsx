@@ -19,6 +19,8 @@ import { inviteUrl } from '@/lib/urls';
 import Avatar from '@/components/Avatar';
 import FindFriendsSheet from '@/components/FindFriendsSheet';
 import { PageContainer } from '@/components/PageContainer';
+import DesktopPageHeader from '@/components/DesktopPageHeader';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 import { useQueryClient } from '@tanstack/react-query';
 import type { UserProfile, WatchMode, Sport } from '@/types/database';
 
@@ -87,7 +89,14 @@ export default function SettingsScreen() {
       className="flex-1 bg-background"
       showsVerticalScrollIndicator={false}
     >
-      <PageContainer>
+      <PageContainer showDesktopNav>
+      <DesktopPageHeader
+        eyebrow="Personalize Know Ball"
+        title="Settings"
+        description="Manage your account, sports, defaults, and social preferences."
+        maxWidth={900}
+      />
+      <DesktopContentColumn maxWidth={900}>
       {/* Account */}
       <View className="px-4 pt-4">
         <Text className="text-muted text-xs font-semibold uppercase tracking-wider mb-3">
@@ -332,6 +341,7 @@ export default function SettingsScreen() {
       {showFindFriends && (
         <FindFriendsSheet onClose={() => setShowFindFriends(false)} />
       )}
+      </DesktopContentColumn>
       </PageContainer>
     </ScrollView>
   );

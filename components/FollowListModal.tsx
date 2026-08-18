@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  Modal,
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { X } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import Avatar from './Avatar';
+import ResponsiveModalFrame from './ResponsiveModalFrame';
 import type { UserProfile } from '@/types/database';
 
 interface FollowListModalProps {
@@ -62,26 +60,13 @@ export default function FollowListModal({
   }, [userId, mode]);
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
+    <ResponsiveModalFrame
+      onClose={onClose}
+      maxWidth={600}
+      desktopMaxHeight={640}
+      mobileMaxHeight="72%"
     >
-      <View className="flex-1 justify-end bg-black/60">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View
-            className="bg-surface rounded-t-3xl border-t border-border"
-            style={{ maxHeight: '70%' }}
-          >
-            <View className="items-center pt-3 pb-1">
-              <View className="w-10 h-1 bg-border rounded-full" />
-            </View>
-
-            <View className="flex-row justify-between items-center px-5 pt-2 pb-3">
+            <View className="flex-row justify-between items-center px-5 pt-5 pb-3 border-b border-border">
               <Text className="text-white text-lg font-semibold">
                 {mode === 'followers' ? 'Followers' : 'Following'}
               </Text>
@@ -140,9 +125,6 @@ export default function FollowListModal({
                 showsVerticalScrollIndicator={false}
               />
             )}
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+    </ResponsiveModalFrame>
   );
 }

@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  Modal,
   FlatList,
   Platform,
 } from 'react-native';
@@ -21,6 +20,7 @@ import {
   type FriendMatch,
 } from '@/lib/contactSync';
 import Avatar from './Avatar';
+import ResponsiveModalFrame from './ResponsiveModalFrame';
 
 interface FindFriendsSheetProps {
   onClose: () => void;
@@ -98,13 +98,13 @@ export default function FindFriendsSheet({ onClose }: FindFriendsSheetProps) {
   });
 
   return (
-    <Modal
-      visible
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
+    <ResponsiveModalFrame
+      onClose={onClose}
+      maxWidth={640}
+      desktopMaxHeight={720}
+      mobileMaxHeight="88%"
     >
-      <View className="flex-1 bg-background">
+      <View className="bg-surface" style={{ minHeight: 460, maxHeight: '100%' }}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-4 border-b border-border">
           <Text className="text-white text-lg font-bold">Find Friends</Text>
@@ -200,6 +200,6 @@ export default function FindFriendsSheet({ onClose }: FindFriendsSheetProps) {
           />
         )}
       </View>
-    </Modal>
+    </ResponsiveModalFrame>
   );
 }

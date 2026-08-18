@@ -15,7 +15,6 @@ import { useRouter } from 'expo-router';
 import {
   ArrowUpRight,
   Flame,
-  Radio,
   Search,
   Sparkles,
   TrendingUp,
@@ -658,51 +657,6 @@ function FeedDashboard({
         </View>
 
         <View style={{ width: isDesktop ? 352 : '100%', minWidth: 0, gap: 16 }}>
-          <Pressable
-            onPress={() => router.push('/world-cup')}
-            style={({ hovered, pressed }: any) => ({
-              minHeight: 190,
-              borderRadius: 22,
-              borderWidth: 1,
-              borderColor: hovered || pressed ? 'rgba(114,135,255,0.52)' : 'rgba(114,135,255,0.25)',
-              backgroundColor: hovered || pressed ? '#151b31' : '#111629',
-              padding: 20,
-              overflow: 'hidden',
-              ...(Platform.OS === 'web'
-                ? ({
-                    backgroundImage: 'radial-gradient(circle at 92% 8%, rgba(114,135,255,0.32), transparent 38%)',
-                    boxShadow: '0 20px 45px rgba(0,0,0,0.22)',
-                  } as any)
-                : null),
-            })}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <View
-                style={{
-                  borderRadius: 999,
-                  borderWidth: 1,
-                  borderColor: 'rgba(165,178,255,0.28)',
-                  backgroundColor: 'rgba(165,178,255,0.1)',
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
-                <Radio size={12} color="#a5b2ff" />
-                <Text style={{ color: '#a5b2ff', fontSize: 10, fontWeight: '900', letterSpacing: 1.1 }}>TOURNAMENT WATCH</Text>
-              </View>
-              <ArrowUpRight size={18} color="#a5b2ff" />
-            </View>
-            <Text style={{ color: stadiumSlate.text, fontSize: 24, lineHeight: 27, fontWeight: '900', letterSpacing: -0.8, marginTop: 24 }}>
-              World Cup 2026
-            </Text>
-            <Text style={{ color: '#9aa7cb', fontSize: 13, lineHeight: 19, marginTop: 7 }}>
-              Live matches, the bracket, standings, and Golden Boot race—without leaving your feed.
-            </Text>
-          </Pressable>
-
           <DashboardPanel>
             <SectionTitle icon={Trophy} title="Fan Passport" color={stadiumSlate.accent} />
             <Text style={{ color: stadiumSlate.text, fontSize: 21, fontWeight: '900', lineHeight: 25, letterSpacing: -0.5 }}>

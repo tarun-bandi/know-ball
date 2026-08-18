@@ -7,6 +7,8 @@ import { enrichLogs } from '@/lib/enrichLogs';
 import DiaryCalendar from '@/components/DiaryCalendar';
 import GameCard from '@/components/GameCard';
 import { PageContainer } from '@/components/PageContainer';
+import DesktopPageHeader from '@/components/DesktopPageHeader';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 import type { GameLogWithGame } from '@/types/database';
 
 function toLocalDateStr(date: Date): string {
@@ -106,7 +108,14 @@ export default function DiaryScreen() {
         />
       }
     >
-      <PageContainer>
+      <PageContainer showDesktopNav>
+        <DesktopPageHeader
+          eyebrow="Your season"
+          title="Diary"
+          description="Every game you logged, organized by the day you watched it."
+          maxWidth={900}
+        />
+        <DesktopContentColumn maxWidth={900}>
         <View className="px-4 pt-4">
           <DiaryCalendar
             userId={user.id}
@@ -157,6 +166,7 @@ export default function DiaryScreen() {
             </View>
           )}
         </View>
+        </DesktopContentColumn>
       </PageContainer>
     </ScrollView>
   );

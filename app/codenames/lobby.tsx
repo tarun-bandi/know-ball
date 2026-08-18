@@ -156,6 +156,7 @@ export default function CodenamesLobby() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+      <View style={{ width: '100%', maxWidth: 1120, alignSelf: 'center', flex: 1 }}>
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity
@@ -328,6 +329,7 @@ export default function CodenamesLobby() {
           </View>
         </View>
       )}
+      </View>
     </SafeAreaView>
   );
 }

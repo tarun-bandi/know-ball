@@ -16,6 +16,8 @@ import Avatar from '@/components/Avatar';
 import { REACTION_EMOJI } from '@/components/ReactionPicker';
 import type { UserProfile, ReactionType } from '@/types/database';
 import { PageContainer } from '@/components/PageContainer';
+import DesktopPageHeader from '@/components/DesktopPageHeader';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 
 type NotificationType = 'like' | 'comment' | 'follow';
 
@@ -188,7 +190,14 @@ export default function NotificationsScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <PageContainer className="flex-1">
+      <PageContainer className="flex-1" showDesktopNav>
+      <DesktopPageHeader
+        eyebrow="Activity"
+        title="Notifications"
+        description="Reactions, replies, and new people following your game diary."
+        maxWidth={900}
+      />
+      <DesktopContentColumn maxWidth={900} fill>
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.id}
@@ -247,6 +256,7 @@ export default function NotificationsScreen() {
         }
         showsVerticalScrollIndicator={false}
       />
+      </DesktopContentColumn>
       </PageContainer>
     </View>
   );

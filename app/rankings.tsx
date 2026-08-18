@@ -10,6 +10,8 @@ import TeamLogo from '@/components/TeamLogo';
 import PlayoffBadge from '@/components/PlayoffBadge';
 import ErrorState from '@/components/ErrorState';
 import { PageContainer } from '@/components/PageContainer';
+import DesktopPageHeader from '@/components/DesktopPageHeader';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 import RankingsShareCard from '@/components/RankingsShareCard';
 import DraggableFlatList, {
   type RenderItemParams,
@@ -42,7 +44,7 @@ export default function RankingsScreen() {
 
   if (error) {
     return (
-      <PageContainer>
+      <PageContainer showDesktopNav>
         <ErrorState message="Failed to load rankings" onRetry={refetch} />
       </PageContainer>
     );
@@ -160,6 +162,14 @@ export default function RankingsScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#0b1118' }}>
+      <PageContainer className="flex-1" showDesktopNav>
+      <DesktopPageHeader
+        eyebrow="Your all-time list"
+        title="My rankings"
+        description="Drag to reorder the games you watched and keep your personal top ten honest."
+        maxWidth={1000}
+      />
+      <DesktopContentColumn maxWidth={1000} fill>
       <DraggableFlatList
         containerStyle={{ backgroundColor: '#0b1118' }}
         data={data ?? []}
@@ -216,12 +226,14 @@ export default function RankingsScreen() {
           )
         }
       />
+      </DesktopContentColumn>
       {/* Hidden share card for capture — use opacity:0 so it stays rendered */}
       {data && data.length > 0 && (
         <View style={{ position: 'absolute', opacity: 0 }} pointerEvents="none" collapsable={false}>
           <RankingsShareCard ref={shareCardRef} games={data} />
         </View>
       )}
+      </PageContainer>
     </GestureHandlerRootView>
   );
 }

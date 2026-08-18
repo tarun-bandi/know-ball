@@ -1,14 +1,32 @@
-import { ScrollView, Text, View } from 'react-native';
+import type { ReactNode } from 'react';
+import { Platform, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { PageContainer } from '@/components/PageContainer';
+import DesktopPageHeader from '@/components/DesktopPageHeader';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 
 export default function PrivacyPolicy() {
+  const { width } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 900;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0b1118' }}>
-      <ScrollView style={{ flex: 1, padding: 24 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 48 }}>
+      <PageContainer showDesktopNav>
+      <DesktopPageHeader
+        eyebrow="Know Ball"
+        title="Privacy policy"
+        description="A plain-English overview of what we collect and how we protect it."
+        maxWidth={820}
+      />
+      <DesktopContentColumn maxWidth={820}>
+      <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
+        {!isDesktop ? (
         <Text style={{ color: '#ffffff', fontSize: 28, fontWeight: 'bold', marginBottom: 8 }}>
           Privacy Policy
         </Text>
-        <Text style={{ color: '#999999', fontSize: 14, marginBottom: 24 }}>
+        ) : null}
+        <Text style={{ color: '#999999', fontSize: 14, marginBottom: 24, marginTop: isDesktop ? 0 : undefined }}>
           Last updated: March 1, 2026
         </Text>
 
@@ -83,12 +101,15 @@ These services have their own privacy policies governing their use of your data.
         </Section>
 
         <View style={{ height: 48 }} />
+      </View>
+      </DesktopContentColumn>
+      </PageContainer>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function Section({ title, children }: { title: string; children: string }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View style={{ marginBottom: 24 }}>
       <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '600', marginBottom: 8 }}>

@@ -2,21 +2,19 @@ import { useState } from 'react';
 import {
   View,
   Text,
-  Modal,
   TextInput,
   TouchableOpacity,
   Switch,
   ScrollView,
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { X } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useToastStore } from '@/lib/store/toastStore';
 import type { List } from '@/types/database';
+import ResponsiveModalFrame from './ResponsiveModalFrame';
 
 interface CreateListModalProps {
   existingList?: List | null;
@@ -83,22 +81,13 @@ export default function CreateListModal({
   }
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
+    <ResponsiveModalFrame
+      onClose={onClose}
+      maxWidth={600}
+      desktopMaxHeight={680}
+      mobileMaxHeight="88%"
+      keyboardAware
     >
-      <View className="flex-1 justify-end bg-black/60">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View className="bg-surface rounded-t-3xl border-t border-border">
-            <View className="items-center pt-3 pb-1">
-              <View className="w-10 h-1 bg-border rounded-full" />
-            </View>
-
             <View className="flex-row justify-between items-center px-5 pt-2 pb-4">
               <Text className="text-white text-lg font-semibold">
                 {existingList ? 'Edit List' : 'New List'}
@@ -170,9 +159,6 @@ export default function CreateListModal({
                 )}
               </TouchableOpacity>
             </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+    </ResponsiveModalFrame>
   );
 }

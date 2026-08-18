@@ -25,6 +25,7 @@ import { UserProfileSkeleton } from '@/components/Skeleton';
 import { userUrl } from '@/lib/urls';
 import type { GameLogWithGame, UserProfile } from '@/types/database';
 import { PageContainer } from '@/components/PageContainer';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 
 interface PublicProfileData {
   profile: UserProfile;
@@ -177,7 +178,8 @@ export default function UserProfileScreen() {
         />
       }
     >
-      <PageContainer>
+      <PageContainer showDesktopNav>
+      <DesktopContentColumn maxWidth={900}>
       {/* Header */}
       <View className="bg-surface border-b border-border px-6 pt-6 pb-7">
         <View className="flex-row justify-between items-start">
@@ -292,6 +294,7 @@ export default function UserProfileScreen() {
           onClose={() => setShowFollowList(null)}
         />
       )}
+      </DesktopContentColumn>
       </PageContainer>
     </ScrollView>
   );

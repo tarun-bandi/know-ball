@@ -704,34 +704,50 @@ function GameCard({ log, showUser = false, showLoggedBadge = false }: GameCardPr
         </View>
 
         <Animated.View style={commentButtonAnimStyle}>
-          <TouchableOpacity
-            onPress={() => {
+          <Pressable
+            onPress={(event) => {
+              event.stopPropagation();
               animateIconTap(commentScale, commentGlow);
               setShowComments(true);
             }}
             accessibilityRole="button"
             accessibilityLabel="Open comments"
-            activeOpacity={0.66}
-            style={{
+            style={({ hovered, pressed }: any) => ({
               minHeight: 38,
               borderRadius: 11,
               borderWidth: 1,
-              borderColor: 'rgba(255,255,255,0.08)',
-              backgroundColor: 'rgba(255,255,255,0.025)',
+              borderColor: hovered || pressed
+                ? withAlpha(stadiumSlate.accent, 0.34)
+                : 'rgba(255,255,255,0.08)',
+              backgroundColor: hovered || pressed
+                ? withAlpha(stadiumSlate.accent, 0.09)
+                : 'rgba(255,255,255,0.025)',
               paddingHorizontal: isWide ? 12 : 10,
               flexDirection: 'row',
               alignItems: 'center',
               gap: 7,
-            }}
+            })}
           >
-            <MessageCircle size={17} color={stadiumSlate.textMuted} />
+            <MessageCircle size={17} color={isWide ? stadiumSlate.accentSoft : stadiumSlate.textMuted} />
             <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontWeight: '700' }}>
-              {isWide ? 'Comment' : commentCount || ''}
+              {isWide ? 'Comments' : commentCount || ''}
             </Text>
             {isWide && commentCount > 0 ? (
-              <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11 }}>{commentCount}</Text>
+              <View
+                style={{
+                  minWidth: 19,
+                  height: 19,
+                  paddingHorizontal: 5,
+                  borderRadius: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: withAlpha(stadiumSlate.accent, 0.14),
+                }}
+              >
+                <Text style={{ color: stadiumSlate.accentSoft, fontSize: 10, fontWeight: '800' }}>{commentCount}</Text>
+              </View>
             ) : null}
-          </TouchableOpacity>
+          </Pressable>
         </Animated.View>
 
         <Animated.View style={shareButtonAnimStyle}>

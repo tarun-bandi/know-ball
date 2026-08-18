@@ -5,6 +5,9 @@ import {
   Modal,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
+  Pressable,
+  useWindowDimensions,
 } from 'react-native';
 import { X, Trophy, Heart } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -100,6 +103,8 @@ export default function RankingFlowModal({
 }: RankingFlowModalProps) {
   const { user } = useAuthStore();
   const toast = useToastStore();
+  const { width, height } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 900;
   const [step, setStep] = useState<FlowStep>('loading');
   const [rankedGames, setRankedGames] = useState<RankedGame[]>([]);
   const [filteredGames, setFilteredGames] = useState<RankedGame[]>([]);
@@ -268,14 +273,41 @@ export default function RankingFlowModal({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType={isDesktop ? 'fade' : 'slide'}
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <View style={{ flex: 1, backgroundColor: '#111923' }}>
+      <Pressable
+        onPress={onClose}
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: isDesktop ? 'center' : 'flex-end',
+          padding: isDesktop ? 24 : 0,
+          backgroundColor: isDesktop ? 'rgba(2,6,12,0.8)' : '#111923',
+          ...(isDesktop ? ({ backdropFilter: 'blur(16px)' } as any) : null),
+        }}
+      >
+        <Pressable
+          onPress={(event) => event.stopPropagation()}
+          style={{
+            width: '100%',
+            maxWidth: isDesktop ? 720 : undefined,
+            height: isDesktop ? Math.min(820, height - 48) : '100%',
+            overflow: 'hidden',
+            borderRadius: isDesktop ? 24 : 0,
+            borderWidth: isDesktop ? 1 : 0,
+            borderColor: 'rgba(255,255,255,0.1)',
+            backgroundColor: '#111923',
+            ...(isDesktop ? ({ boxShadow: '0 28px 90px rgba(0,0,0,0.58)' } as any) : null),
+          }}
+        >
         <View style={{ flex: 1 }}>
           {/* Header */}
-          <View className="flex-row justify-between items-center px-5 pt-14 pb-4">
+          <View
+            className="flex-row justify-between items-center px-5 pb-4 border-b border-border"
+            style={{ paddingTop: isDesktop ? 20 : 56 }}
+          >
             <Text className="text-white text-lg font-semibold">
               Rank This Game
             </Text>
@@ -406,7 +438,8 @@ export default function RankingFlowModal({
             </View>
           )}
         </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }

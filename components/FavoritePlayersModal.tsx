@@ -2,14 +2,11 @@ import { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  Modal,
   TouchableOpacity,
   TextInput,
   FlatList,
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { X, Search, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -18,6 +15,7 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { useDebounce } from '@/hooks/useDebounce';
 import TeamLogo from './TeamLogo';
 import type { Player, Team } from '@/types/database';
+import ResponsiveModalFrame from './ResponsiveModalFrame';
 
 interface PlayerWithTeam extends Player {
   team: Team | null;
@@ -140,22 +138,13 @@ export default function FavoritePlayersModal({
   }
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
+    <ResponsiveModalFrame
+      onClose={onClose}
+      maxWidth={680}
+      desktopMaxHeight={780}
+      mobileMaxHeight="90%"
+      keyboardAware
     >
-      <View className="flex-1 justify-end bg-black/60">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View className="bg-surface rounded-t-3xl border-t border-border max-w-screen-md w-full self-center" style={{ maxHeight: '90%' }}>
-            <View className="items-center pt-3 pb-1">
-              <View className="w-10 h-1 bg-border rounded-full" />
-            </View>
-
             <View className="flex-row justify-between items-center px-5 pt-2 pb-3">
               <Text className="text-white text-lg font-semibold">
                 Favorite Players
@@ -281,9 +270,6 @@ export default function FavoritePlayersModal({
                 )}
               </TouchableOpacity>
             </View>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+    </ResponsiveModalFrame>
   );
 }

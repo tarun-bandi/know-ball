@@ -2,14 +2,11 @@ import { useState } from 'react';
 import {
   View,
   Text,
-  Modal,
   TextInput,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { X, Camera } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
@@ -17,6 +14,7 @@ import { useToastStore } from '@/lib/store/toastStore';
 import { pickAndUploadAvatar } from '@/lib/uploadAvatar';
 import Avatar from './Avatar';
 import type { UserProfile } from '@/types/database';
+import ResponsiveModalFrame from './ResponsiveModalFrame';
 
 interface EditProfileModalProps {
   profile: UserProfile;
@@ -97,23 +95,13 @@ export default function EditProfileModal({
   }
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
+    <ResponsiveModalFrame
+      onClose={onClose}
+      maxWidth={620}
+      desktopMaxHeight={820}
+      mobileMaxHeight="92%"
+      keyboardAware
     >
-      <View className="flex-1 justify-end bg-black/60">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View className="bg-surface rounded-t-3xl border-t border-border">
-            {/* Handle bar */}
-            <View className="items-center pt-3 pb-1">
-              <View className="w-10 h-1 bg-border rounded-full" />
-            </View>
-
             {/* Header */}
             <View className="flex-row justify-between items-center px-5 pt-2 pb-4">
               <Text className="text-white text-lg font-semibold">
@@ -248,9 +236,6 @@ export default function EditProfileModal({
                 )}
               </TouchableOpacity>
             </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+    </ResponsiveModalFrame>
   );
 }

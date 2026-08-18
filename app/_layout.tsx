@@ -1,6 +1,6 @@
 import '../global.css';
 import { useEffect, useRef } from 'react';
-import { View, StatusBar, Image, ActivityIndicator, TouchableOpacity, Text, Platform } from 'react-native';
+import { View, StatusBar, Image, ActivityIndicator, TouchableOpacity, Text, Platform, useWindowDimensions } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -109,6 +109,8 @@ function usePushNotifications() {
 export default function RootLayout() {
   const { isLoading, setSession, setLoading, setOnboardingCompleted } = useAuthStore();
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const showNativeSecondaryHeader = Platform.OS !== 'web' || width < 900;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -189,7 +191,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="user/[handle]"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Profile',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -198,7 +200,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="list/[id]"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'List',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -207,7 +209,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="notifications"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Notifications',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -216,7 +218,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="tag/[slug]"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Tag',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -225,7 +227,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="watchlist"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Watchlist',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -234,7 +236,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="stats"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Stats & Insights',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -243,7 +245,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="diary"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Diary',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -252,7 +254,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="settings"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Settings',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -261,7 +263,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="rankings"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'My Rankings',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -270,7 +272,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="privacy"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Privacy Policy',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -279,7 +281,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="support"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Support',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',
@@ -288,7 +290,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="player/[id]"
               options={{
-                headerShown: true,
+                headerShown: showNativeSecondaryHeader,
                 title: 'Player',
                 headerStyle: { backgroundColor: '#0d1117' },
                 headerTintColor: '#ffffff',

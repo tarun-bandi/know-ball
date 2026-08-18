@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  Modal,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -13,6 +12,7 @@ import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/lib/store/authStore';
 import CreateListModal from './CreateListModal';
+import ResponsiveModalFrame from './ResponsiveModalFrame';
 import type { List } from '@/types/database';
 
 interface AddToListModalProps {
@@ -93,19 +93,7 @@ export default function AddToListModal({ gameId, onClose }: AddToListModalProps)
   }
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
-    >
-      <View className="flex-1 justify-end bg-black/60">
-        <View className="bg-surface rounded-t-3xl border-t border-border max-h-[70%]">
-          <View className="items-center pt-3 pb-1">
-            <View className="w-10 h-1 bg-border rounded-full" />
-          </View>
-
+    <ResponsiveModalFrame onClose={onClose} maxWidth={620} desktopMaxHeight={640} mobileMaxHeight="72%">
           <View className="flex-row justify-between items-center px-5 pt-2 pb-4">
             <Text className="text-white text-lg font-semibold">
               Add to List
@@ -176,9 +164,6 @@ export default function AddToListModal({ gameId, onClose }: AddToListModalProps)
               }}
             />
           )}
-        </View>
-      </View>
-
       {showCreateList && (
         <CreateListModal
           onClose={() => setShowCreateList(false)}
@@ -188,6 +173,6 @@ export default function AddToListModal({ gameId, onClose }: AddToListModalProps)
           }}
         />
       )}
-    </Modal>
+    </ResponsiveModalFrame>
   );
 }

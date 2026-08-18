@@ -19,6 +19,7 @@ export default function GameOverModal({ winner, reason, isHost, onPlayAgain, onB
 
   return (
     <View className="flex-1 bg-background items-center justify-center px-8">
+      <View style={{ width: '100%', maxWidth: 520, alignItems: 'center' }}>
       {/* Icon */}
       <View
         style={{
@@ -60,6 +61,7 @@ export default function GameOverModal({ winner, reason, isHost, onPlayAgain, onB
           {isHost ? 'Back to Lobby' : 'Leave Game'}
         </Text>
       </TouchableOpacity>
+      </View>
     </View>
   );
 }

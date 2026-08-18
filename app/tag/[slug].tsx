@@ -13,6 +13,7 @@ import { useAuthStore } from '@/lib/store/authStore';
 import GameCard from '@/components/GameCard';
 import type { GameLogWithGame, LogTag } from '@/types/database';
 import { PageContainer } from '@/components/PageContainer';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 
 const PAGE_SIZE = 20;
 
@@ -124,7 +125,8 @@ export default function TagScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <PageContainer className="flex-1">
+      <PageContainer className="flex-1" showDesktopNav>
+      <DesktopContentColumn maxWidth={900} fill>
       <View className="px-4 pt-4 pb-2">
         <Text className="text-white text-xl font-bold">#{tagName}</Text>
         <Text className="text-muted text-sm mt-1">
@@ -166,6 +168,7 @@ export default function TagScreen() {
         }
         showsVerticalScrollIndicator={false}
       />
+      </DesktopContentColumn>
       </PageContainer>
     </View>
   );

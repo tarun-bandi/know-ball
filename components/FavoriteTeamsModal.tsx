@@ -2,13 +2,10 @@ import { useState } from 'react';
 import {
   View,
   Text,
-  Modal,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { X, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -17,6 +14,7 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { useTeams } from '@/hooks/useTeams';
 import TeamLogo from './TeamLogo';
 import type { Sport } from '@/types/database';
+import ResponsiveModalFrame from './ResponsiveModalFrame';
 
 const SPORT_TABS: { key: Sport; label: string }[] = [
   { key: 'nba', label: 'NBA' },
@@ -111,22 +109,7 @@ export default function FavoriteTeamsModal({
   }
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
-    >
-      <View className="flex-1 justify-end bg-black/60">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View className="bg-surface rounded-t-3xl border-t border-border max-w-screen-md w-full self-center" style={{ maxHeight: '85%' }}>
-            <View className="items-center pt-3 pb-1">
-              <View className="w-10 h-1 bg-border rounded-full" />
-            </View>
-
+    <ResponsiveModalFrame onClose={onClose} maxWidth={680} desktopMaxHeight={760} mobileMaxHeight="86%">
             <View className="flex-row justify-between items-center px-5 pt-2 pb-4">
               <Text className="text-white text-lg font-semibold">
                 Favorite Teams
@@ -218,9 +201,6 @@ export default function FavoriteTeamsModal({
                 )}
               </TouchableOpacity>
             </View>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+    </ResponsiveModalFrame>
   );
 }

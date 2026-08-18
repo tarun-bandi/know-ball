@@ -8,6 +8,8 @@ import StatBar from '@/components/StatBar';
 import ErrorState from '@/components/ErrorState';
 import type { WatchMode } from '@/types/database';
 import { PageContainer } from '@/components/PageContainer';
+import DesktopPageHeader from '@/components/DesktopPageHeader';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 
 interface StatsData {
   totalGames: number;
@@ -221,7 +223,14 @@ export default function StatsScreen() {
         />
       }
     >
-      <PageContainer>
+      <PageContainer showDesktopNav>
+      <DesktopPageHeader
+        eyebrow="Your numbers"
+        title="Stats & insights"
+        description="A season-level view of how, when, and what you watch."
+        maxWidth={980}
+      />
+      <DesktopContentColumn maxWidth={980}>
       {/* Quick Stats Grid */}
       <View className="px-4 pt-5">
         <View className="flex-row gap-3 mb-3">
@@ -321,6 +330,7 @@ export default function StatsScreen() {
           ))
         )}
       </View>
+      </DesktopContentColumn>
       </PageContainer>
     </ScrollView>
   );

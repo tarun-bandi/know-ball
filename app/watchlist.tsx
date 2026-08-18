@@ -9,6 +9,8 @@ import PlayoffBadge from '@/components/PlayoffBadge';
 import ErrorState from '@/components/ErrorState';
 import type { GameWithTeams } from '@/types/database';
 import { PageContainer } from '@/components/PageContainer';
+import DesktopPageHeader from '@/components/DesktopPageHeader';
+import DesktopContentColumn from '@/components/DesktopContentColumn';
 
 interface WatchlistItem {
   game: GameWithTeams;
@@ -89,7 +91,14 @@ export default function WatchlistScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <PageContainer className="flex-1">
+      <PageContainer className="flex-1" showDesktopNav>
+      <DesktopPageHeader
+        eyebrow="Saved for later"
+        title="Watchlist"
+        description="Games you bookmarked to revisit, watch, or log."
+        maxWidth={980}
+      />
+      <DesktopContentColumn maxWidth={980} fill>
       <FlatList
         data={items}
         keyExtractor={(item) => item.game.id}
@@ -162,6 +171,7 @@ export default function WatchlistScreen() {
         }
         showsVerticalScrollIndicator={false}
       />
+      </DesktopContentColumn>
       </PageContainer>
     </View>
   );
