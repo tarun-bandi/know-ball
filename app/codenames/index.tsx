@@ -1,64 +1,193 @@
-import { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Dimensions, LayoutAnimation, UIManager, Platform } from 'react-native';
+import { useCallback, useState } from 'react';
+import {
+  ActivityIndicator,
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  UIManager,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Clock3,
+  Crown,
+  KeyRound,
+  Skull,
+  Sparkles,
+  Users,
+} from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import Animated, {
-  FadeIn,
-  FadeInDown,
-  FadeInUp,
-} from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useCodenamesMultiplayerStore, getAnonId } from '@/lib/store/codenamesMultiplayerStore';
 import { createRoom, joinRoom } from '@/lib/codenamesApi';
 import JoinRoomInput from '@/components/codenames/JoinRoomInput';
+import { stadiumSlate } from '@/lib/theme';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const BLUE = '#5ba8ff';
+const RED = '#ff5d70';
+const INK = '#070b11';
 
-// Mini grid card colors to hint at the game board
-const GRID_COLORS = [
-  '#E03A3E', '#1D428A', '#E03A3E', '#3a3a40', '#1D428A',
-  '#1D428A', '#3a3a40', '#E03A3E', '#1D428A', '#E03A3E',
-  '#3a3a40', '#E03A3E', '#1D428A', '#3a3a40', '#0a0a0a',
-  '#E03A3E', '#1D428A', '#3a3a40', '#E03A3E', '#1D428A',
-  '#1D428A', '#E03A3E', '#3a3a40', '#1D428A', '#3a3a40',
-];
+const PREVIEW_CARDS = [
+  ['LAL', 'blue'], ['BOS', 'neutral'], ['NYK', 'red'], ['MIA', 'neutral'], ['GSW', 'blue'],
+  ['CHI', 'red'], ['DEN', 'blue'], ['PHX', 'neutral'], ['MIL', 'red'], ['DAL', 'blue'],
+  ['CLE', 'neutral'], ['ATL', 'red'], ['SAS', 'blue'], ['BKN', 'assassin'], ['OKC', 'red'],
+  ['HOU', 'blue'], ['ORL', 'neutral'], ['MIN', 'red'], ['MEM', 'blue'], ['TOR', 'neutral'],
+  ['POR', 'red'], ['SAC', 'blue'], ['UTA', 'neutral'], ['IND', 'red'], ['LAC', 'blue'],
+] as const;
 
-function MiniBoard() {
-  // Cap at mobile width so it doesn't blow up on web/tablet
-  const boardWidth = Math.min(SCREEN_WIDTH, 420) - 64;
-  const CARD_SIZE = boardWidth / 5;
-  const GAP = 3;
+const CARD_STYLE = {
+  blue: { background: 'rgba(91,168,255,0.14)', border: 'rgba(91,168,255,0.38)', text: '#a8d2ff' },
+  red: { background: 'rgba(255,93,112,0.13)', border: 'rgba(255,93,112,0.34)', text: '#ffadb7' },
+  neutral: { background: '#171f2a', border: '#2a3645', text: '#aeb9c8' },
+  assassin: { background: '#050608', border: '#434956', text: '#f7f8fa' },
+} as const;
+
+function GamePreview({ isDesktop }: { isDesktop: boolean }) {
+  const { width } = useWindowDimensions();
+  const boardWidth = isDesktop ? 480 : Math.min(width - 52, 430);
+  const gap = isDesktop ? 8 : 6;
+  const cardWidth = (boardWidth - gap * 4 - 4) / 5;
+  const cardHeight = cardWidth * 0.72;
 
   return (
     <Animated.View
-      entering={FadeIn.delay(200).duration(800)}
-      style={{ opacity: 0.08 }}
+      entering={FadeIn.delay(180).duration(600)}
+      style={{
+        width: boardWidth + 36,
+        maxWidth: '100%',
+        borderRadius: isDesktop ? 30 : 24,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.10)',
+        backgroundColor: 'rgba(15,21,29,0.96)',
+        padding: 18,
+        overflow: 'hidden',
+        ...(Platform.OS === 'web'
+          ? ({
+              boxShadow: '0 34px 90px rgba(0,0,0,0.44), inset 0 1px 0 rgba(255,255,255,0.04)',
+            } as any)
+          : {
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 16 },
+              shadowOpacity: 0.42,
+              shadowRadius: 28,
+              elevation: 16,
+            }),
+      }}
     >
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', width: (CARD_SIZE + GAP) * 5, gap: GAP }}>
-        {GRID_COLORS.map((color, i) => (
-          <View
-            key={i}
-            style={{
-              width: CARD_SIZE,
-              height: CARD_SIZE * 0.6,
-              backgroundColor: color,
-              borderRadius: 4,
-            }}
-          />
-        ))}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+        <View>
+          <Text style={{ color: stadiumSlate.textSubtle, fontSize: 10, fontWeight: '900', letterSpacing: 1.7 }}>
+            LIVE BOARD PREVIEW
+          </Text>
+          <Text style={{ color: stadiumSlate.text, fontSize: 18, fontWeight: '900', marginTop: 3, letterSpacing: -0.4 }}>
+            Round 4 · Blue turn
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+          <View style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: BLUE }} />
+          <Text style={{ color: '#a8d2ff', fontSize: 11, fontWeight: '900', letterSpacing: 0.8 }}>THINKING</Text>
+        </View>
+      </View>
+
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }}>
+        {PREVIEW_CARDS.map(([team, role], index) => {
+          const colors = CARD_STYLE[role];
+          return (
+            <Animated.View
+              key={team}
+              entering={FadeInDown.delay(260 + index * 16).duration(320)}
+              style={{
+                width: cardWidth,
+                height: cardHeight,
+                borderRadius: isDesktop ? 12 : 9,
+                borderWidth: 1,
+                borderColor: colors.border,
+                backgroundColor: colors.background,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {role === 'assassin' ? <Skull size={isDesktop ? 17 : 14} color={colors.text} /> : null}
+              <Text
+                style={{
+                  color: colors.text,
+                  fontSize: isDesktop ? 13 : 11,
+                  fontWeight: '900',
+                  letterSpacing: 0.5,
+                  marginTop: role === 'assassin' ? 3 : 0,
+                }}
+              >
+                {team}
+              </Text>
+            </Animated.View>
+          );
+        })}
+      </View>
+
+      <View
+        style={{
+          marginTop: 15,
+          borderRadius: 14,
+          borderWidth: 1,
+          borderColor: 'rgba(91,168,255,0.24)',
+          backgroundColor: 'rgba(91,168,255,0.08)',
+          paddingHorizontal: 14,
+          paddingVertical: 11,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
+          <KeyRound size={15} color={BLUE} />
+          <Text style={{ color: stadiumSlate.textMuted, fontSize: 12, fontWeight: '700' }}>Current clue</Text>
+        </View>
+        <Text style={{ color: stadiumSlate.text, fontSize: 14, fontWeight: '900' }}>Showtime · 3</Text>
       </View>
     </Animated.View>
   );
 }
 
+function Rule({ icon: Icon, title, copy, color }: { icon: any; title: string; copy: string; color: string }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 11, flex: 1, minWidth: 150 }}>
+      <View
+        style={{
+          width: 34,
+          height: 34,
+          borderRadius: 10,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: `${color}16`,
+          borderWidth: 1,
+          borderColor: `${color}30`,
+        }}
+      >
+        <Icon size={16} color={color} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: stadiumSlate.text, fontSize: 12, fontWeight: '900' }}>{title}</Text>
+        <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11, lineHeight: 15, marginTop: 1 }}>{copy}</Text>
+      </View>
+    </View>
+  );
+}
+
 export default function CodenamesLanding() {
   const router = useRouter();
+  const { width, height } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 900;
   const user = useAuthStore((s) => s.user);
   const { setRoom, setMyPlayer, setMyUserId } = useCodenamesMultiplayerStore();
   const [mode, setMode] = useState<'landing' | 'join'>('landing');
@@ -106,132 +235,194 @@ export default function CodenamesLanding() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      {/* Header */}
-      <Animated.View entering={FadeIn.duration(400)} className="flex-row items-center px-4 py-3">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          className="flex-row items-center"
-          activeOpacity={0.7}
-        >
-          <ChevronLeft size={24} color="#ffffff" />
-          <Text style={{ color: '#ffffff', fontSize: 16 }}>Back</Text>
-        </TouchableOpacity>
-      </Animated.View>
-
-      <View className="flex-1 justify-center items-center">
-        {/* Background mini board */}
-        <View style={{ position: 'absolute', top: '10%', alignSelf: 'center' }}>
-          <MiniBoard />
-        </View>
-
-        {/* Title block */}
-        <View style={{ alignItems: 'center', paddingHorizontal: 32, marginBottom: 40, maxWidth: 400 }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: INK,
+        ...(Platform.OS === 'web'
+          ? ({
+              backgroundImage:
+                'radial-gradient(circle at 14% 12%, rgba(255,112,72,0.12), transparent 29%), radial-gradient(circle at 88% 18%, rgba(91,168,255,0.13), transparent 32%), linear-gradient(180deg, #090e15 0%, #070b11 100%)',
+            } as any)
+          : null),
+      }}
+      edges={['top', 'bottom']}
+    >
+      <ScrollView
+        contentContainerStyle={{ minHeight: Math.max(height, 680) }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ width: '100%', maxWidth: 1240, alignSelf: 'center', paddingHorizontal: isDesktop ? 30 : 20 }}>
           <Animated.View
-            entering={FadeInDown.delay(100).duration(500).springify().damping(14)}
+            entering={FadeIn.duration(350)}
+            style={{ minHeight: isDesktop ? 82 : 66, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
           >
-            <Text
-              className="text-center"
-              style={{ color: '#4ea1ff', fontSize: 13, letterSpacing: 4, fontWeight: '600' }}
+            <Pressable
+              onPress={() => router.replace('/(tabs)/feed')}
+              accessibilityRole="button"
+              accessibilityLabel="Back"
+              style={({ hovered, pressed }: any) => ({
+                height: 42,
+                borderRadius: 13,
+                paddingHorizontal: 12,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.09)',
+                backgroundColor: hovered || pressed ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.035)',
+              })}
             >
-              NBA
-            </Text>
+              <ArrowLeft size={17} color={stadiumSlate.textMuted} />
+              <Text style={{ color: stadiumSlate.text, fontSize: 13, fontWeight: '800' }}>Back</Text>
+            </Pressable>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
+              <Sparkles size={14} color={stadiumSlate.accent} />
+              <Text style={{ color: stadiumSlate.textSubtle, fontSize: 10, fontWeight: '900', letterSpacing: 1.5 }}>
+                KNOW BALL · PARTY MODE
+              </Text>
+            </View>
           </Animated.View>
 
-          <Animated.Text
-            entering={FadeInDown.delay(200).duration(600).springify().damping(12)}
-            style={{ color: '#ffffff', fontSize: 52, lineHeight: 54, letterSpacing: -1.5, marginTop: 2, fontWeight: '700', textAlign: 'center' }}
+          <View
+            style={{
+              minHeight: isDesktop ? Math.max(height - 112, 650) : undefined,
+              paddingTop: isDesktop ? 24 : 34,
+              paddingBottom: isDesktop ? 56 : 42,
+              flexDirection: isDesktop ? 'row' : 'column',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: isDesktop ? 66 : 42,
+            }}
           >
-            CODENAMES
-          </Animated.Text>
-
-          <Animated.Text
-            entering={FadeIn.delay(400).duration(600)}
-            style={{ color: '#8fa1b3', fontSize: 15, lineHeight: 22, textAlign: 'center', marginTop: 20 }}
-          >
-            Guess the players. Don't hit the assassin.{'\n'}
-            Two teams, one spymaster each.
-          </Animated.Text>
-        </View>
-
-        {/* Actions */}
-        <View style={{ width: '100%', maxWidth: 400, paddingHorizontal: 32, alignSelf: 'center' }}>
-          {mode === 'landing' ? (
-            <View className="items-center" style={{ gap: 12 }}>
-              <Animated.View
-                entering={FadeInUp.delay(450).duration(500).springify().damping(14)}
-                className="w-full"
-              >
-                <TouchableOpacity
-                  onPress={handleCreate}
-                  disabled={creating}
-                  activeOpacity={0.7}
-                  style={{
-                    backgroundColor: '#4ea1ff',
-                    borderRadius: 14,
-                    paddingVertical: 18,
-                    alignItems: 'center',
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 8,
-                    elevation: 6,
-                  }}
-                >
-                  {creating ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 17, letterSpacing: 1.5 }}>
-                      CREATE ROOM
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </Animated.View>
-
-              {createError ? (
-                <Text style={{ color: '#ff6b76', fontSize: 13, textAlign: 'center' }}>{createError}</Text>
-              ) : null}
-
-              <Animated.View
-                entering={FadeInUp.delay(550).duration(500).springify().damping(14)}
-                className="w-full"
-              >
-                <TouchableOpacity
-                  onPress={() => switchMode('join')}
-                  activeOpacity={0.7}
-                  style={{
-                    borderRadius: 14,
-                    paddingVertical: 18,
-                    alignItems: 'center',
-                    borderWidth: 1.5,
-                    borderColor: '#3a3a40',
-                    backgroundColor: '#111923',
-                  }}
-                >
-                  <Text style={{ color: '#9a9aa0', fontSize: 17, letterSpacing: 1.5, fontWeight: '600' }}>
-                    JOIN ROOM
+            <View style={{ width: isDesktop ? '48%' : '100%', maxWidth: 570 }}>
+              <Animated.View entering={FadeInDown.delay(60).duration(500)}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 17 }}>
+                  <View style={{ width: 22, height: 3, borderRadius: 99, backgroundColor: BLUE }} />
+                  <View style={{ width: 22, height: 3, borderRadius: 99, backgroundColor: RED }} />
+                  <Text style={{ color: stadiumSlate.textMuted, fontSize: 11, fontWeight: '900', letterSpacing: 1.3 }}>
+                    THE BASKETBALL WORD GAME
                   </Text>
-                </TouchableOpacity>
+                </View>
+
+                <Text
+                  style={{
+                    color: stadiumSlate.text,
+                    fontSize: isDesktop ? 72 : 48,
+                    lineHeight: isDesktop ? 70 : 48,
+                    fontWeight: '900',
+                    letterSpacing: isDesktop ? -3.6 : -2.2,
+                  }}
+                >
+                  NBA{isDesktop ? '\n' : ' '}CODENAMES
+                </Text>
+
+                <Text
+                  style={{
+                    color: stadiumSlate.textMuted,
+                    fontSize: isDesktop ? 18 : 16,
+                    lineHeight: isDesktop ? 28 : 24,
+                    marginTop: 20,
+                    maxWidth: 510,
+                  }}
+                >
+                  Give the perfect clue, connect the right teams, and prove your group actually knows ball. Just don&apos;t pick the assassin.
+                </Text>
               </Animated.View>
 
-              {/* Practical info */}
-              <Animated.Text
-                entering={FadeIn.delay(700).duration(600)}
-                className="text-center mt-1"
-                style={{ color: '#555', fontSize: 12 }}
+              <Animated.View
+                entering={FadeIn.delay(260).duration(500)}
+                style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 15, marginTop: 26 }}
               >
-                4–8 players · ~15 min
-              </Animated.Text>
+                <Rule icon={Crown} title="Pick a spymaster" copy="One clue. One number." color={stadiumSlate.accent} />
+                <Rule icon={Users} title="Read your team" copy="Connect the NBA dots." color={BLUE} />
+                <Rule icon={Skull} title="Dodge the trap" copy="One bad pick ends it." color={RED} />
+              </Animated.View>
+
+              <View style={{ marginTop: 34, width: '100%', maxWidth: 500 }}>
+                {mode === 'landing' ? (
+                  <Animated.View entering={FadeInUp.delay(320).duration(500)}>
+                    <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 11 }}>
+                      <Pressable
+                        onPress={handleCreate}
+                        disabled={creating}
+                        accessibilityRole="button"
+                        style={({ hovered, pressed }: any) => ({
+                          flex: 1,
+                          minHeight: 58,
+                          borderRadius: 16,
+                          paddingHorizontal: 18,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 10,
+                          backgroundColor: hovered || pressed ? '#ff805d' : stadiumSlate.accent,
+                          transform: [{ translateY: pressed ? 1 : 0 }],
+                          ...(Platform.OS === 'web'
+                            ? ({ boxShadow: '0 14px 34px rgba(255,112,72,0.20)' } as any)
+                            : null),
+                        })}
+                      >
+                        {creating ? (
+                          <ActivityIndicator color={INK} />
+                        ) : (
+                          <>
+                            <Text style={{ color: INK, fontSize: 14, fontWeight: '900', letterSpacing: 0.5 }}>CREATE A ROOM</Text>
+                            <ArrowRight size={17} color={INK} strokeWidth={2.6} />
+                          </>
+                        )}
+                      </Pressable>
+
+                      <Pressable
+                        onPress={() => switchMode('join')}
+                        accessibilityRole="button"
+                        style={({ hovered, pressed }: any) => ({
+                          flex: 1,
+                          minHeight: 58,
+                          borderRadius: 16,
+                          paddingHorizontal: 18,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 9,
+                          borderWidth: 1,
+                          borderColor: hovered || pressed ? 'rgba(91,168,255,0.50)' : 'rgba(255,255,255,0.12)',
+                          backgroundColor: hovered || pressed ? 'rgba(91,168,255,0.10)' : 'rgba(255,255,255,0.045)',
+                        })}
+                      >
+                        <KeyRound size={16} color={BLUE} />
+                        <Text style={{ color: stadiumSlate.text, fontSize: 14, fontWeight: '900', letterSpacing: 0.4 }}>JOIN WITH CODE</Text>
+                      </Pressable>
+                    </View>
+
+                    {createError ? (
+                      <Text style={{ color: RED, fontSize: 13, fontWeight: '700', marginTop: 10 }}>{createError}</Text>
+                    ) : null}
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 18, marginTop: 16 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+                        <Users size={14} color={stadiumSlate.textSubtle} />
+                        <Text style={{ color: stadiumSlate.textSubtle, fontSize: 12, fontWeight: '700' }}>4–8 players</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+                        <Clock3 size={14} color={stadiumSlate.textSubtle} />
+                        <Text style={{ color: stadiumSlate.textSubtle, fontSize: 12, fontWeight: '700' }}>About 15 min</Text>
+                      </View>
+                    </View>
+                  </Animated.View>
+                ) : (
+                  <JoinRoomInput onJoin={handleJoin} onCancel={() => switchMode('landing')} />
+                )}
+              </View>
             </View>
-          ) : (
-            <JoinRoomInput
-              onJoin={handleJoin}
-              onCancel={() => switchMode('landing')}
-            />
-          )}
+
+            <View style={{ width: isDesktop ? 520 : '100%', maxWidth: 520, alignItems: 'center' }}>
+              <GamePreview isDesktop={isDesktop} />
+            </View>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
