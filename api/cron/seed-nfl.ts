@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import { fetchAndCacheNflBoxScore, type NflBoxScoreSyncGame } from '../../lib/server/nflBoxScores';
 
 const ESPN_NFL_BASE = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
 
@@ -10,6 +11,8 @@ const NFL_WEEK_TO_ROUND: Record<number, string> = {
   4: 'super_bowl',
   5: 'super_bowl',
 };
+
+const BOX_SCORE_CONCURRENCY = 4;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -78,17 +81,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 1. Load NFL team map: provider_team_id → internal UUID
     const { data: teams, error: teamsErr } = await supabase
       .from('teams')
-      .select('id, provider_team_id')
+      .select('id, provider_team_id, abbreviation')
       .eq('sport', 'nfl')
-      .returns<{ id: string; provider_team_id: number }[]>();
+      .returns<{ id: string; provider_team_id: number; abbreviation: string }[]>();
 
     if (teamsErr) {
       return res.status(500).json({ error: `Failed to load NFL teams: ${teamsErr.message}` });
     }
 
     const teamIdMap = new Map<number, string>();
+    const teamAbbreviationMap = new Map<number, string>();
     for (const row of teams ?? []) {
       teamIdMap.set(row.provider_team_id, row.id);
+      teamAbbreviationMap.set(row.provider_team_id, row.abbreviation);
     }
 
     if (teamIdMap.size === 0) {
@@ -133,6 +138,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // 4. Map to DB rows
     const skipped: string[] = [];
+    const boxScoreContextByEventId = new Map<number, Omit<NflBoxScoreSyncGame, 'id'>>();
     const rows = events.flatMap((event: any) => {
       const comp = event.competitions?.[0];
       if (!comp) return [];
@@ -164,9 +170,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const homeRecord: string | null = home.records?.[0]?.summary ?? null;
       const awayRecord: string | null = away.records?.[0]?.summary ?? null;
 
+      const providerGameId = parseInt(event.id, 10);
+      boxScoreContextByEventId.set(providerGameId, {
+        providerGameId,
+        homeTeamId,
+        awayTeamId,
+        homeTeamAbbreviation: teamAbbreviationMap.get(parseInt(home.team.id, 10)) ?? home.team.abbreviation,
+        awayTeamAbbreviation: teamAbbreviationMap.get(parseInt(away.team.id, 10)) ?? away.team.abbreviation,
+      });
+
       return [{
         provider: 'espn' as const,
-        provider_game_id: parseInt(event.id, 10),
+        provider_game_id: providerGameId,
         season_id: seasonId,
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
@@ -188,13 +203,64 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     // 5. Upsert
+    let upsertedGames: Array<{
+      id: string;
+      provider_game_id: number;
+      status: 'scheduled' | 'live' | 'final';
+    }> = [];
     if (rows.length > 0) {
-      const { error: upsertErr } = await supabase
+      const { data: upsertedData, error: upsertErr } = await supabase
         .from('games')
-        .upsert(rows, { onConflict: 'provider,provider_game_id' });
+        .upsert(rows, { onConflict: 'provider,provider_game_id' })
+        .select('id, provider_game_id, status');
 
       if (upsertErr) {
         return res.status(500).json({ error: `Games upsert failed: ${upsertErr.message}` });
+      }
+      upsertedGames = (upsertedData ?? []) as typeof upsertedGames;
+    }
+
+    // 6. Cache player box scores for newly completed games. This shares the
+    // same daily cron as schedule ingestion so Hobby deployments stay within
+    // Vercel's two-cron limit.
+    const finalGames = upsertedGames.filter((game) => game.status === 'final');
+    const finalGameIds = finalGames.map((game) => game.id);
+    const existingGameIds = new Set<string>();
+
+    if (finalGameIds.length > 0) {
+      const { data: existingBoxScores, error: existingError } = await supabase
+        .from('box_scores')
+        .select('game_id')
+        .in('game_id', finalGameIds);
+      if (existingError) {
+        console.warn(`Failed to inspect NFL box score cache: ${existingError.message}`);
+      } else {
+        for (const row of existingBoxScores ?? []) existingGameIds.add(row.game_id);
+      }
+    }
+
+    const gamesToCache = finalGames.flatMap((game) => {
+      if (existingGameIds.has(game.id)) return [];
+      const context = boxScoreContextByEventId.get(game.provider_game_id);
+      return context ? [{ ...context, id: game.id }] : [];
+    });
+
+    let cachedGames = 0;
+    let cachedPlayers = 0;
+    let boxScoreFailures = 0;
+    for (let index = 0; index < gamesToCache.length; index += BOX_SCORE_CONCURRENCY) {
+      const batch = gamesToCache.slice(index, index + BOX_SCORE_CONCURRENCY);
+      const results = await Promise.allSettled(
+        batch.map((game) => fetchAndCacheNflBoxScore(supabase, game)),
+      );
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value.playerCount > 0) {
+          cachedGames += 1;
+          cachedPlayers += result.value.playerCount;
+        } else if (result.status === 'rejected') {
+          boxScoreFailures += 1;
+          console.warn(`NFL box score sync failed: ${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
+        }
       }
     }
 
@@ -203,6 +269,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       season: seasonYear,
       upserted: rows.length,
       skipped: skipped.length,
+      boxScores: {
+        games: cachedGames,
+        players: cachedPlayers,
+        failed: boxScoreFailures,
+      },
     });
   } catch (err: any) {
     return res.status(500).json({ error: err.message ?? 'Unknown error' });

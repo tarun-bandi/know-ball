@@ -36,9 +36,10 @@ import type { GameWithTeams, GameLogWithGame, BoxScore, Sport, PeriodScores } fr
 import { PageContainer } from '@/components/PageContainer';
 import { usePlayByPlay, type PlayByPlayAction } from '@/hooks/usePlayByPlay';
 import { useGameStats } from '@/hooks/useGameStats';
+import { useNflBoxScores } from '@/hooks/useNflBoxScores';
 import { gamePath, isGameUuid, parseGameSlug, formatGameDateForSlug } from '@/lib/gameRoutes';
 import { stadiumSlate } from '@/lib/theme';
-import { GameScoreHero, GameStatsOverview, RemoteBoxScore } from '@/components/game/GameStatsPanels';
+import { GameScoreHero, GameStatsLoading, GameStatsOverview, RemoteBoxScore } from '@/components/game/GameStatsPanels';
 
 interface PredictionTally {
   [teamId: string]: number;
@@ -1036,6 +1037,12 @@ export default function GameDetailScreen() {
     data?.game.status,
     statsSport,
   );
+  const nflBoxScoresQuery = useNflBoxScores(
+    data?.game.provider_game_id,
+    data?.game.status,
+    statsSport,
+    data?.boxScores.length ?? 0,
+  );
 
   useEffect(() => {
     if (Platform.OS !== 'web' || !data?.game || !id) return;
@@ -1063,6 +1070,9 @@ export default function GameDetailScreen() {
   const { game, logs, myLog, boxScores, isBookmarked, playerNameMap, myPrediction, predictionTally, myRanking } = data;
   const gamePlayedOrLive = game.status === 'final' || game.status === 'live';
   const sport: Sport = game.sport ?? 'nba';
+  const displayedBoxScores = sport === 'nfl'
+    ? (nflBoxScoresQuery.data?.boxScores ?? boxScores)
+    : boxScores;
 
   return (
     <>
@@ -1353,8 +1363,10 @@ export default function GameDetailScreen() {
                   isLoading={gameStatsQuery.isLoading}
                   error={gameStatsQuery.error}
                 />
+              ) : sport === 'nfl' && nflBoxScoresQuery.isLoading && displayedBoxScores.length === 0 ? (
+                <GameStatsLoading label="Loading player box scores…" />
               ) : (
-                <BoxScoreSection boxScores={boxScores} game={game} playerNameMap={playerNameMap} />
+                <BoxScoreSection boxScores={displayedBoxScores} game={game} playerNameMap={playerNameMap} />
               )}
             </View>
           )}
