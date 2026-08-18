@@ -17,9 +17,7 @@ export async function fetchAndCacheNflBoxScore(
   supabase: SupabaseClient<any>,
   game: NflBoxScoreSyncGame,
 ): Promise<NflBoxScoreSyncResult> {
-  const upstream = await fetch(`${ESPN_NFL_SUMMARY}?event=${game.providerGameId}`, {
-    headers: { 'User-Agent': 'know-ball/1.0' },
-  });
+  const upstream = await fetch(`${ESPN_NFL_SUMMARY}?event=${game.providerGameId}`);
 
   if (!upstream.ok) {
     throw new Error(`ESPN NFL summary returned ${upstream.status}`);
