@@ -318,31 +318,33 @@ export default function SearchScreen() {
       </View>
 
       {/* Mode toggle */}
-      <View className="flex-row px-4 py-3 gap-2">
-        {(['games', 'users', 'players'] as const).map((mode) => (
-          <TouchableOpacity
-            key={mode}
-            testID={`search_mode_${mode}`}
-            onPress={() => {
-              setSearchMode(mode);
-              if (mode !== 'games') {
-                setSelectedTeam1(null);
-                setSelectedTeam2(null);
-                setPickingOpponent(false);
-                setShowTeamPicker(false);
-              }
-            }}
-            className="px-4 py-1.5 rounded-full border border-border bg-background"
-            style={searchMode === mode ? { backgroundColor: '#ff6a3d', borderColor: '#ff6a3d' } : undefined}
-          >
-            <Text
-              className="text-sm font-medium capitalize text-muted"
-              style={searchMode === mode ? { color: '#07090d' } : undefined}
+      <View className="px-4 pt-3 pb-4">
+        <View className="self-start flex-row rounded-full border border-border bg-surface p-1">
+          {(['games', 'users', 'players'] as const).map((mode) => (
+            <TouchableOpacity
+              key={mode}
+              testID={`search_mode_${mode}`}
+              onPress={() => {
+                setSearchMode(mode);
+                if (mode !== 'games') {
+                  setSelectedTeam1(null);
+                  setSelectedTeam2(null);
+                  setPickingOpponent(false);
+                  setShowTeamPicker(false);
+                }
+              }}
+              className="rounded-full px-5 py-2"
+              style={searchMode === mode ? { backgroundColor: '#ff6a3d' } : undefined}
             >
-              {mode}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                className="text-sm font-semibold capitalize text-muted"
+                style={searchMode === mode ? { color: '#07090d' } : undefined}
+              >
+                {mode}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
       {/* Games mode: Team grid (idle or picking opponent) */}
@@ -384,7 +386,7 @@ export default function SearchScreen() {
       {/* Games mode: Results */}
       {showGamesResults && (
         <>
-          <View className="px-4 pt-1 pb-3">
+          <View className="px-4 pt-1 pb-4">
             <View className="flex-row items-end justify-between gap-3">
               <View className="flex-1">
                 <Text className="text-white text-2xl font-black tracking-tight">
@@ -408,28 +410,6 @@ export default function SearchScreen() {
               )}
             </View>
 
-            <View className="flex-row mt-4 gap-2">
-              {(['nba', 'nfl'] as const).map((sport) => (
-                <TouchableOpacity
-                  key={sport}
-                  onPress={() => {
-                    setSelectedSport(sport);
-                    setSelectedSeasonYear(null);
-                    setSelectedTeam1(null);
-                    setSelectedTeam2(null);
-                  }}
-                  className="px-4 py-2 rounded-full border border-border bg-surface"
-                  style={selectedSport === sport ? { backgroundColor: '#ff6a3d', borderColor: '#ff6a3d' } : undefined}
-                >
-                  <Text
-                    className="text-xs font-bold uppercase text-muted"
-                    style={selectedSport === sport ? { color: '#07090d' } : undefined}
-                  >
-                    {sport}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
           </View>
 
           {selectedTeam1 && (
@@ -442,44 +422,72 @@ export default function SearchScreen() {
             />
           )}
 
-          {/* Season filter pills */}
-          {uniqueSeasonYears.length > 0 && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="px-4 pb-3 pt-1"
-              contentContainerStyle={{ gap: 6, alignItems: 'center' }}
-              style={{ flexGrow: 0 }}
-            >
-              <TouchableOpacity
-                onPress={() => setSelectedSeasonYear(null)}
-                className="px-3 py-1.5 rounded-full border border-border bg-background"
-                style={selectedSeasonYear === null ? { backgroundColor: '#ff6a3d', borderColor: '#ff6a3d' } : undefined}
-              >
-                <Text
-                  className="text-sm font-medium text-muted"
-                  style={selectedSeasonYear === null ? { color: '#07090d' } : undefined}
-                >
-                  All
-                </Text>
-              </TouchableOpacity>
-              {uniqueSeasonYears.map((year) => (
+          <View className="mx-4 mb-4 rounded-2xl border border-border bg-surface p-2">
+            <View className="flex-row rounded-xl bg-background p-1">
+              {(['nba', 'nfl'] as const).map((sport) => (
                 <TouchableOpacity
-                  key={year}
-                  onPress={() => setSelectedSeasonYear(year)}
-                  className="px-3 py-1.5 rounded-full border border-border bg-background"
-                  style={selectedSeasonYear === year ? { backgroundColor: '#ff6a3d', borderColor: '#ff6a3d' } : undefined}
+                  key={sport}
+                  onPress={() => {
+                    setSelectedSport(sport);
+                    setSelectedSeasonYear(null);
+                    setSelectedTeam1(null);
+                    setSelectedTeam2(null);
+                  }}
+                  className="flex-1 items-center rounded-lg py-2.5"
+                  style={selectedSport === sport ? { backgroundColor: '#ff6a3d' } : undefined}
                 >
                   <Text
-                    className="text-sm font-medium text-muted"
-                    style={selectedSeasonYear === year ? { color: '#07090d' } : undefined}
+                    className="text-xs font-bold uppercase tracking-wide text-muted"
+                    style={selectedSport === sport ? { color: '#07090d' } : undefined}
                   >
-                    {formatSeasonLabel(year)}
+                    {sport}
                   </Text>
                 </TouchableOpacity>
               ))}
-            </ScrollView>
-          )}
+            </View>
+
+            {uniqueSeasonYears.length > 0 && (
+              <View className="pt-3 pb-1">
+                <Text className="px-1 pb-2 text-[10px] font-bold uppercase tracking-widest text-muted">
+                  Season
+                </Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 8, alignItems: 'center', paddingHorizontal: 4, paddingBottom: 2 }}
+                  style={{ flexGrow: 0 }}
+                >
+                  <TouchableOpacity
+                    onPress={() => setSelectedSeasonYear(null)}
+                    className="rounded-lg border border-border bg-background px-3.5 py-2"
+                    style={selectedSeasonYear === null ? { backgroundColor: '#ff6a3d', borderColor: '#ff6a3d' } : undefined}
+                  >
+                    <Text
+                      className="text-xs font-semibold text-muted"
+                      style={selectedSeasonYear === null ? { color: '#07090d' } : undefined}
+                    >
+                      All games
+                    </Text>
+                  </TouchableOpacity>
+                  {uniqueSeasonYears.map((year) => (
+                    <TouchableOpacity
+                      key={year}
+                      onPress={() => setSelectedSeasonYear(year)}
+                      className="rounded-lg border border-border bg-background px-3.5 py-2"
+                      style={selectedSeasonYear === year ? { backgroundColor: '#ff6a3d', borderColor: '#ff6a3d' } : undefined}
+                    >
+                      <Text
+                        className="text-xs font-semibold text-muted"
+                        style={selectedSeasonYear === year ? { color: '#07090d' } : undefined}
+                      >
+                        {formatSeasonLabel(year)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+          </View>
 
           {gamesQuery.isLoading ? (
             <View className="flex-1 items-center justify-center">
