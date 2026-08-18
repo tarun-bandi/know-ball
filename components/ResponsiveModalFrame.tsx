@@ -87,6 +87,7 @@ export default function ResponsiveModalFrame({
           justifyContent: isDesktop ? 'center' : 'flex-end',
           alignItems: 'center',
           padding: isDesktop ? 24 : 0,
+          zIndex: 10000,
           backgroundColor: 'rgba(2,6,12,0.78)',
           ...(isDesktop
             ? ({
@@ -99,7 +100,12 @@ export default function ResponsiveModalFrame({
         {keyboardAware ? (
           <KeyboardAvoidingView
             behavior={isDesktop ? undefined : Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ width: '100%', maxWidth: isDesktop ? maxWidth : undefined }}
+            style={{
+              width: '100%',
+              maxWidth: isDesktop ? maxWidth : undefined,
+              flex: 1,
+              justifyContent: isDesktop ? 'center' : 'flex-end',
+            }}
           >
             {frame}
           </KeyboardAvoidingView>
