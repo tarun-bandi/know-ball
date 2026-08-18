@@ -8,6 +8,7 @@ export type Json =
 
 export type Sport = 'nba' | 'nfl' | 'world_cup';
 export type SeasonType = 'regular' | 'playoffs';
+export type GamePhase = 'preseason' | 'regular' | 'postseason';
 export type GameStatus = 'scheduled' | 'live' | 'final';
 export type WatchMode = 'live' | 'replay' | 'condensed' | 'highlights';
 export type PlayoffRound = 'first_round' | 'conf_semis' | 'conf_finals' | 'finals';
@@ -192,6 +193,7 @@ export interface Database {
           period: number | null;
           time: string | null;
           postseason: boolean;
+          phase: GamePhase;
           playoff_round: string | null;
           sport: Sport;
           period_scores: PeriodScores | null;
@@ -229,6 +231,7 @@ export interface Database {
           period?: number | null;
           time?: string | null;
           postseason?: boolean;
+          phase?: GamePhase;
           playoff_round?: string | null;
           sport?: Sport;
           period_scores?: PeriodScores | null;
@@ -256,6 +259,8 @@ export interface Database {
           status?: GameStatus;
           period?: number | null;
           time?: string | null;
+          postseason?: boolean;
+          phase?: GamePhase;
           sport?: Sport;
           period_scores?: PeriodScores | null;
           home_q1?: number | null;
@@ -806,6 +811,7 @@ export interface Database {
     };
     Enums: {
       season_type: SeasonType;
+      game_phase: GamePhase;
       game_status: GameStatus;
       watch_mode: WatchMode;
     };

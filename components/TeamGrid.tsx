@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { View, Text, FlatList, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useTeams } from '@/hooks/useTeams';
 import TeamLogo from '@/components/TeamLogo';
@@ -24,12 +24,21 @@ const SPORT_TABS: { key: Sport; label: string }[] = [
 
 interface TeamGridProps {
   query: string;
+  sport: 'nba' | 'nfl';
+  onSportChange: (sport: 'nba' | 'nfl') => void;
+  showSportTabs?: boolean;
   onSelectTeam: (team: Team) => void;
   excludeTeamId?: string;
 }
 
-export default function TeamGrid({ query, onSelectTeam, excludeTeamId }: TeamGridProps) {
-  const [activeSport, setActiveSport] = useState<Sport>('nba');
+export default function TeamGrid({
+  query,
+  sport: activeSport,
+  onSportChange,
+  showSportTabs = true,
+  onSelectTeam,
+  excludeTeamId,
+}: TeamGridProps) {
   const { data: nbaTeams, isLoading: nbaLoading } = useTeams('nba');
   const { data: nflTeams, isLoading: nflLoading } = useTeams('nfl');
 
@@ -92,23 +101,25 @@ export default function TeamGrid({ query, onSelectTeam, excludeTeamId }: TeamGri
   return (
     <View testID="team_grid" className="flex-1">
       {/* Sport tabs */}
-      <View className="flex-row px-4 mb-2 gap-2">
-        {SPORT_TABS.map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            onPress={() => setActiveSport(tab.key)}
-            className="px-3 py-1 rounded-full border border-border bg-background"
-            style={activeSport === tab.key ? { backgroundColor: '#4ea1ff', borderColor: '#4ea1ff' } : undefined}
-          >
-            <Text
-              className="text-xs font-medium text-muted"
-              style={activeSport === tab.key ? { color: '#0b1118' } : undefined}
+      {showSportTabs && (
+        <View className="flex-row px-4 mb-2 gap-2">
+          {SPORT_TABS.map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              onPress={() => onSportChange(tab.key as 'nba' | 'nfl')}
+              className="px-3 py-1 rounded-full border border-border bg-background"
+              style={activeSport === tab.key ? { backgroundColor: '#4ea1ff', borderColor: '#4ea1ff' } : undefined}
             >
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+              <Text
+                className="text-xs font-medium text-muted"
+                style={activeSport === tab.key ? { color: '#0b1118' } : undefined}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">

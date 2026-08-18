@@ -13,22 +13,45 @@ const NFL_WEEK_TO_ROUND: Record<number, string> = {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function mapStatus(statusDetail: string): 'scheduled' | 'live' | 'final' {
-  const s = statusDetail.toLowerCase();
-  if (s.includes('final')) return 'final';
-  if (s.includes('in progress') || /\d(st|nd|rd|th)/.test(s) || s.includes('halftime') || s.includes('overtime')) {
-    return 'live';
-  }
+function mapStatus(status: any): 'scheduled' | 'live' | 'final' {
+  const state = status?.type?.state;
+  if (status?.type?.completed || state === 'post') return 'final';
+  if (state === 'in') return 'live';
   return 'scheduled';
+}
+
+function formatEspnDate(date: Date): string {
+  return date.toISOString().slice(0, 10).replaceAll('-', '');
+}
+
+function getScoreboardDateRange(): string {
+  const now = new Date();
+  const start = new Date(now);
+  const end = new Date(now);
+  start.setUTCDate(start.getUTCDate() - 14);
+  end.setUTCDate(end.getUTCDate() + 7);
+  return `${formatEspnDate(start)}-${formatEspnDate(end)}`;
 }
 
 function getCurrentNflSeasonYear(): number {
   const now = new Date();
   const month = now.getMonth() + 1; // 1-indexed
   const year = now.getFullYear();
-  // NFL season starts in September — Sep-Dec belongs to current year's season
-  // Jan-Aug belongs to previous year's season
-  return month >= 9 ? year : year - 1;
+  // The new NFL year begins with preseason. Jan-Jun finishes the prior season;
+  // Jul-Dec belongs to the current year's season.
+  return month >= 7 ? year : year - 1;
+}
+
+function mapSeasonPhase(seasonType: number): 'preseason' | 'regular' | 'postseason' {
+  if (seasonType === 1) return 'preseason';
+  if (seasonType === 3) return 'postseason';
+  return 'regular';
+}
+
+function parseScore(score: unknown): number | null {
+  if (score == null || score === '') return null;
+  const parsed = Number.parseInt(String(score), 10);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 // ─── Handler ────────────────────────────────────────────────────────────────
@@ -72,23 +95,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'No NFL teams in DB. Run NFL seed first.' });
     }
 
-    // 2. Ensure current NFL season exists
-    const seasonYear = getCurrentNflSeasonYear();
-    const { data: seasonData, error: seasonErr } = await supabase
-      .from('seasons')
-      .upsert({ year: seasonYear, type: 'regular', sport: 'nfl' }, { onConflict: 'sport,year' })
-      .select('id')
-      .returns<{ id: string }[]>()
-      .single();
-
-    if (seasonErr) {
-      return res.status(500).json({ error: `Season upsert failed: ${seasonErr.message}` });
-    }
-
-    const seasonId = seasonData!.id;
-
-    // 3. Fetch this week's NFL games from ESPN
-    const espnRes = await fetch(`${ESPN_NFL_BASE}/scoreboard`, {
+    // 2. Fetch this week's NFL games from ESPN. ESPN's season metadata is the
+    // source of truth for both the season year and preseason/regular/postseason.
+    const scoreboardUrl = new URL(`${ESPN_NFL_BASE}/scoreboard`);
+    scoreboardUrl.searchParams.set('dates', getScoreboardDateRange());
+    scoreboardUrl.searchParams.set('limit', '100');
+    const espnRes = await fetch(scoreboardUrl, {
       headers: { 'User-Agent': 'know-ball/1.0' },
     });
 
@@ -102,6 +114,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (events.length === 0) {
       return res.status(200).json({ message: 'No NFL games this week', upserted: 0 });
     }
+
+    // 3. Ensure the season represented by ESPN exists.
+    const seasonYear = events.find((event: any) => Number.isInteger(event.season?.year))
+      ?.season.year ?? getCurrentNflSeasonYear();
+    const { data: seasonData, error: seasonErr } = await supabase
+      .from('seasons')
+      .upsert({ year: seasonYear, type: 'regular', sport: 'nfl' }, { onConflict: 'sport,year' })
+      .select('id')
+      .returns<{ id: string }[]>()
+      .single();
+
+    if (seasonErr) {
+      return res.status(500).json({ error: `Season upsert failed: ${seasonErr.message}` });
+    }
+
+    const seasonId = seasonData!.id;
 
     // 4. Map to DB rows
     const skipped: string[] = [];
@@ -121,8 +149,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return [];
       }
 
-      const statusDetail = comp.status?.type?.detail ?? '';
-      const isPostseason = (event.season?.type ?? 0) === 3;
+      const phase = mapSeasonPhase(event.season?.type ?? comp.season?.type ?? 2);
+      const isPostseason = phase === 'postseason';
       const weekNumber: number = event.week?.number ?? 0;
       const playoffRound = isPostseason ? (NFL_WEEK_TO_ROUND[weekNumber] ?? null) : null;
 
@@ -142,13 +170,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         season_id: seasonId,
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
-        home_team_score: parseInt(home.score, 10) || null,
-        away_team_score: parseInt(away.score, 10) || null,
+        home_team_score: parseScore(home.score),
+        away_team_score: parseScore(away.score),
         game_date_utc: new Date(event.date).toISOString(),
-        status: mapStatus(statusDetail),
+        status: mapStatus(comp.status),
         period: comp.status?.period ?? null,
         time: comp.status?.displayClock ?? null,
         postseason: isPostseason,
+        phase,
         playoff_round: playoffRound,
         sport: 'nfl' as const,
         week: weekNumber || null,

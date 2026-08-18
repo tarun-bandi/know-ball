@@ -193,7 +193,13 @@ export const nflProvider: SportProvider = {
   mapStatus(status: string): 'scheduled' | 'live' | 'final' {
     const s = status.toLowerCase();
     if (s.includes('final')) return 'final';
-    if (s.includes('in progress') || /\d(st|nd|rd|th)/.test(s) || s.includes('halftime') || s.includes('overtime')) {
+    if (
+      s.includes('in progress') ||
+      /^\d(st|nd|rd|th)\b/.test(s) ||
+      s.includes('quarter') ||
+      s.includes('halftime') ||
+      s.includes('overtime')
+    ) {
       return 'live';
     }
     return 'scheduled';

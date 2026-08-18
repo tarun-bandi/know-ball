@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { Search as SearchIcon } from 'lucide-react-native';
+import { Search as SearchIcon, SlidersHorizontal, X } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -22,12 +22,13 @@ import TeamLogo from '@/components/TeamLogo';
 import TeamGrid from '@/components/TeamGrid';
 import SelectedTeamsBar from '@/components/SelectedTeamsBar';
 import SearchGameCard from '@/components/SearchGameCard';
-import type { GameWithTeams, Season, UserProfile, Player, Team } from '@/types/database';
+import type { GameWithTeams, Season, UserProfile, Player, Team, Sport } from '@/types/database';
 import { PageContainer } from '@/components/PageContainer';
 
 const PAGE_SIZE = 20;
 
 type SearchMode = 'games' | 'users' | 'players';
+type BrowseSport = Extract<Sport, 'nba' | 'nfl'>;
 
 interface PlayerWithTeam extends Player {
   team: Team | null;
@@ -58,10 +59,11 @@ async function searchPlayersPage(
   };
 }
 
-async function fetchSeasons(): Promise<Season[]> {
+async function fetchSeasons(sport: BrowseSport): Promise<Season[]> {
   const { data, error } = await supabase
     .from('seasons')
     .select('*')
+    .eq('sport', sport)
     .order('year', { ascending: false });
 
   if (error) throw error;
@@ -74,8 +76,9 @@ interface GamesPage {
   loggedGameIds: string[];
 }
 
-async function searchGamesByTeam(
-  teamId1: string,
+async function searchGames(
+  sport: BrowseSport,
+  teamId1: string | null,
   teamId2: string | null,
   seasonIds: string[] | null,
   offset: number,
@@ -90,15 +93,18 @@ async function searchGamesByTeam(
       season:seasons (*)
     `)
     .eq('status', 'final')
+    .eq('sport', sport)
+    .lte('game_date_utc', new Date().toISOString())
     .order('game_date_utc', { ascending: false })
+    .order('id', { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1);
 
-  if (teamId2) {
+  if (teamId1 && teamId2) {
     // Matchup: both teams must be in the game (either side)
     gamesQuery = gamesQuery
       .or(`home_team_id.eq.${teamId1},away_team_id.eq.${teamId1}`)
       .or(`home_team_id.eq.${teamId2},away_team_id.eq.${teamId2}`);
-  } else {
+  } else if (teamId1) {
     // Single team
     gamesQuery = gamesQuery
       .or(`home_team_id.eq.${teamId1},away_team_id.eq.${teamId1}`);
@@ -114,7 +120,7 @@ async function searchGamesByTeam(
   let games = (data ?? []) as unknown as GameWithTeams[];
 
   // For matchup, client-side verify both teams are present (supabase .or() across two calls is additive)
-  if (teamId2) {
+  if (teamId1 && teamId2) {
     games = games.filter((g) => {
       const teams = [g.home_team_id, g.away_team_id];
       return teams.includes(teamId1) && teams.includes(teamId2);
@@ -128,7 +134,8 @@ async function searchGamesByTeam(
       .from('game_logs')
       .select('game_id')
       .eq('user_id', userId)
-      .in('game_id', gameIds);
+      .in('game_id', gameIds)
+      .returns<{ game_id: string }[]>();
     loggedGameIds = (userLogs ?? []).map((l) => l.game_id);
   }
 
@@ -174,10 +181,12 @@ export default function SearchScreen() {
   const { user } = useAuthStore();
   const [query, setQuery] = useState('');
   const [searchMode, setSearchMode] = useState<SearchMode>('games');
+  const [selectedSport, setSelectedSport] = useState<BrowseSport>('nba');
   const [selectedSeasonYear, setSelectedSeasonYear] = useState<number | null>(null);
   const [selectedTeam1, setSelectedTeam1] = useState<Team | null>(null);
   const [selectedTeam2, setSelectedTeam2] = useState<Team | null>(null);
   const [pickingOpponent, setPickingOpponent] = useState(false);
+  const [showTeamPicker, setShowTeamPicker] = useState(false);
   const debouncedQuery = useDebounce(query, 350);
 
   const searchPhase = selectedTeam2
@@ -187,8 +196,8 @@ export default function SearchScreen() {
     : 'idle';
 
   const { data: seasons } = useQuery({
-    queryKey: ['seasons'],
-    queryFn: fetchSeasons,
+    queryKey: ['seasons', selectedSport],
+    queryFn: () => fetchSeasons(selectedSport),
   });
 
   // Deduplicate seasons by year for the filter pills
@@ -202,10 +211,11 @@ export default function SearchScreen() {
     : null;
 
   const gamesQuery = useInfiniteQuery({
-    queryKey: ['games-search', selectedTeam1?.id, selectedTeam2?.id, selectedSeasonYear],
+    queryKey: ['games-search', selectedSport, selectedTeam1?.id, selectedTeam2?.id, selectedSeasonYear],
     queryFn: ({ pageParam = 0 }) =>
-      searchGamesByTeam(
-        selectedTeam1!.id,
+      searchGames(
+        selectedSport,
+        selectedTeam1?.id ?? null,
         selectedTeam2?.id ?? null,
         selectedSeasonIds,
         pageParam,
@@ -213,7 +223,7 @@ export default function SearchScreen() {
       ),
     getNextPageParam: (lastPage) => lastPage.nextOffset,
     initialPageParam: 0,
-    enabled: searchMode === 'games' && selectedTeam1 != null,
+    enabled: searchMode === 'games',
   });
 
   const usersQuery = useInfiniteQuery({
@@ -244,6 +254,8 @@ export default function SearchScreen() {
       setQuery('');
     } else {
       setSelectedTeam1(team);
+      setSelectedSport(team.sport as BrowseSport);
+      setShowTeamPicker(false);
       setQuery('');
     }
   }
@@ -252,6 +264,7 @@ export default function SearchScreen() {
     setSelectedTeam1(null);
     setSelectedTeam2(null);
     setPickingOpponent(false);
+    setShowTeamPicker(false);
   }
 
   function handleClearTeam2() {
@@ -264,9 +277,9 @@ export default function SearchScreen() {
   }
 
   const showGrid =
-    searchMode === 'games' && (searchPhase === 'idle' || pickingOpponent);
+    searchMode === 'games' && (pickingOpponent || (searchPhase === 'idle' && showTeamPicker));
   const showGamesResults =
-    searchMode === 'games' && searchPhase !== 'idle' && !pickingOpponent;
+    searchMode === 'games' && !pickingOpponent && !(searchPhase === 'idle' && showTeamPicker);
 
   return (
     <View className="flex-1 bg-background">
@@ -283,8 +296,8 @@ export default function SearchScreen() {
                 ? pickingOpponent
                   ? 'Filter opponent...'
                   : searchPhase === 'idle'
-                  ? 'Filter teams...'
-                  : 'Search games...'
+                  ? 'Filter by team...'
+                  : 'Change team filter...'
                 : searchMode === 'users'
                 ? 'Search users by name or handle'
                 : 'Search players by name'
@@ -292,6 +305,11 @@ export default function SearchScreen() {
             placeholderTextColor="#9aa6b5"
             value={query}
             onChangeText={setQuery}
+            onFocus={() => {
+              if (searchMode === 'games' && searchPhase === 'idle') {
+                setShowTeamPicker(true);
+              }
+            }}
             autoCapitalize="none"
             autoCorrect={false}
             returnKeyType="search"
@@ -311,6 +329,7 @@ export default function SearchScreen() {
                 setSelectedTeam1(null);
                 setSelectedTeam2(null);
                 setPickingOpponent(false);
+                setShowTeamPicker(false);
               }
             }}
             className="px-4 py-1.5 rounded-full border border-border bg-background"
@@ -328,23 +347,100 @@ export default function SearchScreen() {
 
       {/* Games mode: Team grid (idle or picking opponent) */}
       {showGrid && (
-        <TeamGrid
-          query={query}
-          onSelectTeam={handleSelectTeam}
-          excludeTeamId={pickingOpponent ? selectedTeam1?.id : undefined}
-        />
+        <View className="flex-1">
+          <View className="flex-row items-center justify-between px-4 pt-1 pb-3">
+            <View>
+              <Text className="text-white text-lg font-bold">
+                {pickingOpponent ? 'Choose an opponent' : 'Filter by team'}
+              </Text>
+              <Text className="text-muted text-xs mt-0.5">
+                {pickingOpponent ? `Only ${selectedSport.toUpperCase()} teams` : 'Pick a team to narrow the game feed'}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                setPickingOpponent(false);
+                setShowTeamPicker(false);
+                setQuery('');
+                Keyboard.dismiss();
+              }}
+              className="h-9 w-9 rounded-full bg-surface border border-border items-center justify-center"
+              accessibilityLabel="Close team filter"
+            >
+              <X size={17} color="#9aa6b5" />
+            </TouchableOpacity>
+          </View>
+          <TeamGrid
+            query={query}
+            sport={selectedSport}
+            onSportChange={setSelectedSport}
+            showSportTabs={!pickingOpponent}
+            onSelectTeam={handleSelectTeam}
+            excludeTeamId={pickingOpponent ? selectedTeam1?.id : undefined}
+          />
+        </View>
       )}
 
       {/* Games mode: Results */}
       {showGamesResults && (
         <>
-          <SelectedTeamsBar
-            team1={selectedTeam1!}
-            team2={selectedTeam2}
-            onClearTeam1={handleClearTeam1}
-            onClearTeam2={handleClearTeam2}
-            onPickOpponent={handlePickOpponent}
-          />
+          <View className="px-4 pt-1 pb-3">
+            <View className="flex-row items-end justify-between gap-3">
+              <View className="flex-1">
+                <Text className="text-white text-2xl font-black tracking-tight">
+                  {selectedTeam1 ? 'Games' : 'Recent games'}
+                </Text>
+                <Text className="text-muted text-sm mt-1">
+                  {selectedTeam1
+                    ? `${selectedTeam1.full_name}${selectedTeam2 ? ` vs ${selectedTeam2.full_name}` : ''}`
+                    : `Latest ${selectedSport.toUpperCase()} finals, ready to log`}
+                </Text>
+              </View>
+              {!selectedTeam1 && (
+                <TouchableOpacity
+                  onPress={() => setShowTeamPicker(true)}
+                  className="flex-row items-center gap-1.5 rounded-full bg-surface border border-border px-3 py-2"
+                  activeOpacity={0.75}
+                >
+                  <SlidersHorizontal size={14} color="#ff6a3d" />
+                  <Text className="text-white text-xs font-semibold">Team</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View className="flex-row mt-4 gap-2">
+              {(['nba', 'nfl'] as const).map((sport) => (
+                <TouchableOpacity
+                  key={sport}
+                  onPress={() => {
+                    setSelectedSport(sport);
+                    setSelectedSeasonYear(null);
+                    setSelectedTeam1(null);
+                    setSelectedTeam2(null);
+                  }}
+                  className="px-4 py-2 rounded-full border border-border bg-surface"
+                  style={selectedSport === sport ? { backgroundColor: '#ff6a3d', borderColor: '#ff6a3d' } : undefined}
+                >
+                  <Text
+                    className="text-xs font-bold uppercase text-muted"
+                    style={selectedSport === sport ? { color: '#07090d' } : undefined}
+                  >
+                    {sport}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {selectedTeam1 && (
+            <SelectedTeamsBar
+              team1={selectedTeam1}
+              team2={selectedTeam2}
+              onClearTeam1={handleClearTeam1}
+              onClearTeam2={handleClearTeam2}
+              onPickOpponent={handlePickOpponent}
+            />
+          )}
 
           {/* Season filter pills */}
           {uniqueSeasonYears.length > 0 && (

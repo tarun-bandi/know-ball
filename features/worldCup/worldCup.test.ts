@@ -44,6 +44,7 @@ function game(
     period: null,
     time: null,
     postseason: false,
+    phase: 'regular',
     playoff_round: null,
     sport: 'world_cup',
     period_scores: null,
