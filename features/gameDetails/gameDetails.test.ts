@@ -1,5 +1,6 @@
 import { buildGameSlug, gamePath, parseGameSlug } from '@/lib/gameRoutes';
 import { normalizeEspnGameSummary } from '@/lib/espnGameSummary';
+import { getTeamAccentColor } from '@/lib/teamColors';
 
 describe('game detail routes', () => {
   const game = {
@@ -22,6 +23,13 @@ describe('game detail routes', () => {
       homeAbbreviation: 'HOU',
     });
     expect(parseGameSlug('not-a-game')).toBeNull();
+  });
+});
+
+describe('game detail team colorways', () => {
+  it('uses each NFL team palette instead of NBA fallback colors', () => {
+    expect(getTeamAccentColor('GB', 'nfl')).toBe('#203731');
+    expect(getTeamAccentColor('PIT', 'nfl')).toBe('#FFB612');
   });
 });
 

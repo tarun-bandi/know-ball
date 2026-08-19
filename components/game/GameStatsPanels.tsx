@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import TeamLogo from '@/components/TeamLogo';
+import { getTeamAccentColor } from '@/lib/teamColors';
 import { stadiumSlate } from '@/lib/theme';
 import type { GameWithTeams, Sport } from '@/types/database';
 import type {
@@ -106,8 +107,8 @@ export function GameScoreHero({
   const awayWon = stats?.awayTeam.winner ?? Number(awayScore) > Number(homeScore);
   const homeWon = stats?.homeTeam.winner ?? Number(homeScore) > Number(awayScore);
   const status = stats?.statusDetail || (game.status === 'final' ? 'Final' : game.status);
-  const awayColor = stats?.awayTeam.color ?? '#552583';
-  const homeColor = stats?.homeTeam.color ?? '#ce1141';
+  const awayColor = stats?.awayTeam.color ?? getTeamAccentColor(game.away_team.abbreviation, sport);
+  const homeColor = stats?.homeTeam.color ?? getTeamAccentColor(game.home_team.abbreviation, sport);
 
   const teamBlock = (
     side: 'away' | 'home',
