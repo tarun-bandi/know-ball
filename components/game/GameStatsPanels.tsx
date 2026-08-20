@@ -109,6 +109,7 @@ export function GameScoreHero({
   const status = stats?.statusDetail || (game.status === 'final' ? 'Final' : game.status);
   const awayColor = stats?.awayTeam.color ?? getTeamAccentColor(game.away_team.abbreviation, sport);
   const homeColor = stats?.homeTeam.color ?? getTeamAccentColor(game.home_team.abbreviation, sport);
+  const eventLabel = game.event_label ?? stats?.eventLabel;
 
   const teamBlock = (
     side: 'away' | 'home',
@@ -177,13 +178,13 @@ export function GameScoreHero({
 
       <View style={{ paddingHorizontal: isDesktop ? 36 : 18, paddingTop: isDesktop ? 28 : 20, paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <Text style={{ color: stadiumSlate.textSubtle, fontSize: 10, fontWeight: '900', letterSpacing: 1.8 }}>
-            {(game.sport ?? 'nba').toUpperCase()}{game.postseason ? ' PLAYOFFS' : ''}
+          <Text numberOfLines={1} style={{ flex: 1, color: eventLabel ? stadiumSlate.accentSoft : stadiumSlate.textSubtle, fontSize: eventLabel ? 12 : 10, fontWeight: '900', letterSpacing: eventLabel ? 0.2 : 1.8 }}>
+            {eventLabel ?? `${(game.sport ?? 'nba').toUpperCase()}${game.postseason ? ' PLAYOFFS' : ''}`}
           </Text>
           <View style={{ borderRadius: 999, paddingHorizontal: 11, paddingVertical: 6, backgroundColor: game.status === 'live' ? 'rgba(255,77,109,0.16)' : 'rgba(255,255,255,0.065)', borderWidth: 1, borderColor: game.status === 'live' ? 'rgba(255,77,109,0.35)' : 'rgba(255,255,255,0.08)' }}>
             <Text style={{ color: game.status === 'live' ? stadiumSlate.danger : stadiumSlate.textMuted, fontSize: 10, fontWeight: '900', letterSpacing: 1.1, textTransform: 'uppercase' }}>{status}</Text>
           </View>
-          <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '700' }}>{gameDateLabel(game.game_date_utc)}</Text>
+          <Text style={{ color: stadiumSlate.textSubtle, fontSize: 11, fontWeight: '700', flexShrink: 0 }}>{gameDateLabel(game.game_date_utc)}</Text>
         </View>
 
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: isDesktop ? 30 : 24, gap: isDesktop ? 30 : 10 }}>

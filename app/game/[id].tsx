@@ -40,52 +40,10 @@ import { useNflBoxScores } from '@/hooks/useNflBoxScores';
 import { gamePath, isGameUuid, parseGameSlug, formatGameDateForSlug } from '@/lib/gameRoutes';
 import { stadiumSlate } from '@/lib/theme';
 import { GameScoreHero, GameStatsLoading, GameStatsOverview, RemoteBoxScore } from '@/components/game/GameStatsPanels';
+import { GameHighlights } from '@/components/game/GameHighlights';
 
 interface PredictionTally {
   [teamId: string]: number;
-}
-
-const PRIMETIME_MAP: Record<string, string> = {
-  NBC: 'Sunday Night Football',
-  ESPN: 'Monday Night Football',
-  ABC: 'Monday Night Football',
-  'Prime Video': 'Thursday Night Football',
-  NFLN: 'Thursday Night Football',
-};
-
-const PLAYOFF_ROUND_LABELS: Record<string, string> = {
-  wild_card: 'Wild Card',
-  divisional: 'Divisional',
-  conf_championship: 'Championship',
-  super_bowl: 'Super Bowl',
-};
-
-function getGameDetailLabel(game: GameWithTeams): string | null {
-  if (game.sport === 'nba') return null; // NBA already shows date in the center
-
-  // NFL playoff
-  if (game.postseason && game.playoff_round) {
-    const roundLabel = PLAYOFF_ROUND_LABELS[game.playoff_round] ?? game.playoff_round;
-    if (game.playoff_round === 'super_bowl') return 'Super Bowl';
-    const conference = game.home_team?.conference ?? '';
-    return conference ? `${conference} ${roundLabel}` : roundLabel;
-  }
-
-  // NFL primetime — include week & year for context
-  if (game.broadcast) {
-    const primetime = PRIMETIME_MAP[game.broadcast];
-    if (primetime) {
-      const suffix = game.week ? ` · Week ${game.week}, ${game.season?.year ?? ''}`.trim() : '';
-      return `${primetime}${suffix}`;
-    }
-  }
-
-  // NFL regular season
-  if (game.week) {
-    return `Week ${game.week}, ${game.season?.year ?? ''}`.trim();
-  }
-
-  return null;
 }
 
 interface GameDetail {
@@ -736,6 +694,7 @@ function DetailsSection({ game }: { game: GameWithTeams }) {
     const label = getProvider(sport).getPlayoffRoundLabel(game.playoff_round);
     details.push({ label: 'Round', value: label });
   }
+  if (game.event_label) details.push({ label: 'Event', value: game.event_label });
 
   return (
     <View className="mx-4 mt-4 bg-surface border border-border rounded-2xl p-4">
@@ -1297,8 +1256,12 @@ export default function GameDetailScreen() {
           );
         })()}
 
-        {/* Watch Highlights */}
-        {game.status === 'final' && (
+        {game.status === 'final' && gameStatsQuery.data?.highlights?.length ? (
+          <GameHighlights highlights={gameStatsQuery.data.highlights} isDesktop={isDesktop} />
+        ) : null}
+
+        {/* External fallback for games where ESPN has no playable clips. */}
+        {game.status === 'final' && !gameStatsQuery.data?.highlights?.length && !gameStatsQuery.isLoading && (
           <TouchableOpacity
             className="mx-4 mt-3 bg-surface border border-border rounded-xl py-4 flex-row items-center justify-center gap-2"
             onPress={() => Linking.openURL(getHighlightsUrl(game))}

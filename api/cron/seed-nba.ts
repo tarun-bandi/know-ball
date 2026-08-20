@@ -1,5 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import {
+  getEspnEventHeadline,
+  mapNbaPlayoffRound,
+  mapNbaSeasonPhase,
+  normalizeEspnEventLabel,
+} from '../../lib/espnGameMetadata';
 
 const ESPN_SCOREBOARD_URL =
   'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard';
@@ -36,6 +42,7 @@ interface EspnCompetition {
   status: EspnStatus;
   broadcasts: EspnBroadcast[];
   venue: EspnVenue;
+  notes?: { headline?: string }[];
 }
 
 interface EspnEvent {
@@ -214,6 +221,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const status = event.status;
       const broadcast = comp.broadcasts?.[0]?.names?.join(', ') ?? null;
       const arena = comp.venue?.fullName ?? null;
+      const eventHeadline = getEspnEventHeadline(comp);
 
       return [
         {
@@ -229,6 +237,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           period: status.period || null,
           time: status.displayClock || null,
           postseason: event.season.type === 3,
+          phase: mapNbaSeasonPhase(event.season.type),
+          playoff_round: mapNbaPlayoffRound(eventHeadline),
+          event_label: normalizeEspnEventLabel(eventHeadline, event.date),
+          sport: 'nba' as const,
           broadcast,
           arena,
         },

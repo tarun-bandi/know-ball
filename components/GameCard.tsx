@@ -26,6 +26,7 @@ import ReactionPicker, { REACTION_EMOJI, REACTION_CONFIG } from './ReactionPicke
 import { gameUrl } from '@/lib/urls';
 import { getTeamAccentColor, withAlpha, ensureTextContrast } from '@/lib/teamColors';
 import { stadiumSlate } from '@/lib/theme';
+import { getGameLabel } from '@/lib/gameLabels';
 import type { GameLogWithGame, ReactionType } from '@/types/database';
 
 interface GameCardProps {
@@ -40,62 +41,6 @@ const WATCH_MODE_LABEL: Record<string, string> = {
   condensed: 'Condensed',
   highlights: 'Highlights',
 };
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
-const PRIMETIME_MAP: Record<string, string> = {
-  NBC: 'Sunday Night Football',
-  ESPN: 'Monday Night Football',
-  ABC: 'Monday Night Football',
-  'Prime Video': 'Thursday Night Football',
-  NFLN: 'Thursday Night Football',
-};
-
-const PLAYOFF_ROUND_LABELS: Record<string, string> = {
-  wild_card: 'Wild Card',
-  divisional: 'Divisional',
-  conf_championship: 'Championship',
-  super_bowl: 'Super Bowl',
-};
-
-function getGameLabel(game: GameLogWithGame['game']): string | null {
-  if (!game) return null;
-
-  // NBA: show formatted date
-  if (game.sport === 'nba') {
-    return formatDate(game.game_date_utc);
-  }
-
-  // NFL playoff
-  if (game.postseason && game.playoff_round) {
-    const roundLabel = PLAYOFF_ROUND_LABELS[game.playoff_round] ?? game.playoff_round;
-    if (game.playoff_round === 'super_bowl') return 'Super Bowl';
-    const conference = game.home_team?.conference ?? '';
-    return conference ? `${conference} ${roundLabel}` : roundLabel;
-  }
-
-  // NFL primetime — include week & year for context
-  if (game.broadcast) {
-    const primetime = PRIMETIME_MAP[game.broadcast];
-    if (primetime) {
-      const suffix = game.week ? ` · Week ${game.week}, ${game.season?.year ?? ''}`.trim() : '';
-      return `${primetime}${suffix}`;
-    }
-  }
-
-  // NFL regular season
-  if (game.week) {
-    return `Week ${game.week}, ${game.season?.year ?? ''}`.trim();
-  }
-
-  return null;
-}
 
 /** Get top 2 reactions sorted by count (excluding 'like') */
 function getTopReactions(reactions?: Record<ReactionType, number>): { type: ReactionType; count: number }[] {

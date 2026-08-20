@@ -66,6 +66,17 @@ export interface GameStatsLeaderGroup {
   leaders: GameStatsLeader[];
 }
 
+export interface GameStatsHighlight {
+  id: string;
+  title: string;
+  description: string | null;
+  duration: number | null;
+  videoUrl: string;
+  hlsUrl: string | null;
+  thumbnailUrl: string | null;
+  externalUrl: string | null;
+}
+
 export interface GameStatsResponse {
   providerGameId: string;
   source: 'espn';
@@ -83,5 +94,7 @@ export interface GameStatsResponse {
   officials: string[];
   broadcast: string | null;
   seriesSummary: string | null;
+  eventLabel: string | null;
+  highlights: GameStatsHighlight[];
   fetchedAt: string;
 }

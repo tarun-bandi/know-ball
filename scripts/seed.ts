@@ -12,6 +12,12 @@
 
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
+import {
+  getEspnEventHeadline,
+  mapNbaPlayoffRound,
+  mapNbaSeasonPhase,
+  normalizeEspnEventLabel,
+} from '../lib/espnGameMetadata';
 
 dotenv.config();
 
@@ -60,6 +66,7 @@ interface EspnCompetition {
   status: EspnStatus;
   broadcasts: EspnBroadcast[];
   venue: EspnVenue;
+  notes?: { headline?: string }[];
 }
 
 interface EspnEvent {
@@ -239,6 +246,7 @@ async function seedGames(season: number, days: number | null = null) {
         const status = event.status;
         const broadcast = comp.broadcasts?.[0]?.names?.join(', ') ?? null;
         const arena = comp.venue?.fullName ?? null;
+        const eventHeadline = getEspnEventHeadline(comp);
 
         return [
           {
@@ -254,6 +262,10 @@ async function seedGames(season: number, days: number | null = null) {
             period: status.period || null,
             time: status.displayClock || null,
             postseason: event.season.type === 3,
+            phase: mapNbaSeasonPhase(event.season.type),
+            playoff_round: mapNbaPlayoffRound(eventHeadline),
+            event_label: normalizeEspnEventLabel(eventHeadline, event.date),
+            sport: 'nba' as const,
             broadcast,
             arena,
           },

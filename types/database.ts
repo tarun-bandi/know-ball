@@ -210,6 +210,7 @@ export interface Database {
           arena: string | null;
           attendance: number | null;
           highlights_url: string | null;
+          event_label: string | null;
           week: number | null;
           broadcast: string | null;
           home_team_record: string | null;
@@ -248,6 +249,7 @@ export interface Database {
           arena?: string | null;
           attendance?: number | null;
           highlights_url?: string | null;
+          event_label?: string | null;
           week?: number | null;
           broadcast?: string | null;
           home_team_record?: string | null;
@@ -276,6 +278,7 @@ export interface Database {
           arena?: string | null;
           attendance?: number | null;
           highlights_url?: string | null;
+          event_label?: string | null;
           playoff_round?: string | null;
           week?: number | null;
           broadcast?: string | null;

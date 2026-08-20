@@ -63,6 +63,10 @@ export default function SearchGameCard({ game, isLogged, onPress }: SearchGameCa
         </View>
       </View>
 
+      {game.event_label ? (
+        <Text className="text-accent text-xs font-semibold mb-3">{game.event_label}</Text>
+      ) : null}
+
       {/* Away team row */}
       <View className="flex-row items-center justify-between mb-3">
         <View className="flex-row items-center gap-3 flex-1">

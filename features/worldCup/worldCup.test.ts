@@ -61,6 +61,7 @@ function game(
     arena: null,
     attendance: null,
     highlights_url: null,
+    event_label: null,
     week: null,
     broadcast: null,
     home_team_record: null,

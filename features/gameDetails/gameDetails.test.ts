@@ -1,5 +1,6 @@
 import { buildGameSlug, gamePath, parseGameSlug } from '@/lib/gameRoutes';
 import { normalizeEspnGameSummary } from '@/lib/espnGameSummary';
+import { mapNbaPlayoffRound, normalizeEspnEventLabel } from '@/lib/espnGameMetadata';
 import { getTeamAccentColor } from '@/lib/teamColors';
 
 describe('game detail routes', () => {
@@ -40,7 +41,11 @@ describe('ESPN game summary normalization', () => {
         competitions: [{
           date: '2026-04-25T00:00Z',
           status: { type: { state: 'post', shortDetail: 'Final/OT' } },
-          series: [{ summary: 'LAL win series 2-1' }],
+          notes: [{ headline: 'NBA FINALS - GAME 5' }],
+          series: [
+            { type: 'regular', summary: 'Season series tied 1-1' },
+            { type: 'playoff', summary: 'LAL win series 4-1' },
+          ],
           broadcasts: [{ media: { shortName: 'Prime Video' } }],
           competitors: [
             {
@@ -91,6 +96,20 @@ describe('ESPN game summary normalization', () => {
         attendance: 18055,
         officials: [{ displayName: 'Zach Zarba' }],
       },
+      videos: [{
+        id: 987,
+        headline: 'Game 5 highlights',
+        description: 'The best moments from Game 5.',
+        duration: 142,
+        thumbnail: 'http://cdn.espn.com/thumb.jpg',
+        links: {
+          source: {
+            HD: { href: 'http://cdn.espn.com/game-5.mp4' },
+            HLS: { href: 'https://cdn.espn.com/game-5.m3u8' },
+          },
+          web: { href: 'http://www.espn.com/video/clip?id=987' },
+        },
+      }],
     }, '401869400');
 
     expect(result.status).toBe('final');
@@ -105,5 +124,23 @@ describe('ESPN game summary normalization', () => {
     expect(result.leaders[0].leaders[0].athleteName).toBe('LeBron James');
     expect(result.venue).toBe('Toyota Center (Houston)');
     expect(result.attendance).toBe(18055);
+    expect(result.seriesSummary).toBe('LAL win series 4-1');
+    expect(result.eventLabel).toBe('2026 NBA Finals · Game 5');
+    expect(result.highlights).toEqual([expect.objectContaining({
+      id: '987',
+      title: 'Game 5 highlights',
+      videoUrl: 'https://cdn.espn.com/game-5.mp4',
+      thumbnailUrl: 'https://cdn.espn.com/thumb.jpg',
+    })]);
+  });
+});
+
+describe('NBA event metadata', () => {
+  it('creates readable playoff labels and round keys from ESPN notes', () => {
+    expect(normalizeEspnEventLabel('NBA FINALS - GAME 5', '2017-06-13T01:00:00Z'))
+      .toBe('2017 NBA Finals · Game 5');
+    expect(normalizeEspnEventLabel('EASTERN CONFERENCE FINALS - GAME 7', '2018-05-28T00:30:00Z'))
+      .toBe('2018 Eastern Conference Finals · Game 7');
+    expect(mapNbaPlayoffRound('WESTERN CONFERENCE SEMIFINALS - GAME 2')).toBe('conf_semis');
   });
 });

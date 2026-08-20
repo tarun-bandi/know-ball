@@ -1,11 +1,13 @@
 import type {
   GameStatsLeaderGroup,
+  GameStatsHighlight,
   GameStatsPlayerGroup,
   GameStatsResponse,
   GameStatsTeam,
   GameStatsTeamSummary,
   RemoteGameStatus,
 } from '@/types/gameStats';
+import { getEspnEventHeadline, normalizeEspnEventLabel } from '@/lib/espnGameMetadata';
 
 function color(value: unknown, fallback: string): string {
   const raw = typeof value === 'string' ? value.replace('#', '') : '';
@@ -39,6 +41,40 @@ function teamFrom(value: any, competitor?: any): GameStatsTeam {
 function periodLabel(index: number): string {
   if (index < 4) return `Q${index + 1}`;
   return index === 4 ? 'OT' : `OT${index - 3}`;
+}
+
+function httpsUrl(value: unknown): string | null {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  const normalized = value.trim().replace(/^http:\/\//i, 'https://');
+  return normalized.startsWith('https://') ? normalized : null;
+}
+
+function normalizeHighlights(videos: unknown): GameStatsHighlight[] {
+  if (!Array.isArray(videos)) return [];
+
+  const seen = new Set<string>();
+  return videos.flatMap((video: any, index: number) => {
+    const videoUrl = httpsUrl(video?.links?.source?.HD?.href)
+      ?? httpsUrl(video?.links?.source?.href)
+      ?? httpsUrl(video?.links?.mobile?.source?.href)
+      ?? httpsUrl(video?.links?.mobile?.progressiveDownload?.href);
+    if (!videoUrl || seen.has(videoUrl)) return [];
+    seen.add(videoUrl);
+
+    return [{
+      id: String(video?.id ?? `video-${index}`),
+      title: String(video?.headline ?? video?.title ?? 'Game video'),
+      description: typeof video?.description === 'string' ? video.description : null,
+      duration: typeof video?.duration === 'number' ? video.duration : null,
+      videoUrl,
+      hlsUrl: httpsUrl(video?.links?.source?.HLS?.HD?.href)
+        ?? httpsUrl(video?.links?.source?.HLS?.href),
+      thumbnailUrl: httpsUrl(video?.thumbnail)
+        ?? httpsUrl(video?.images?.[0]?.url)
+        ?? httpsUrl(video?.posterImages?.default?.href),
+      externalUrl: httpsUrl(video?.links?.web?.href),
+    }];
+  }).slice(0, 8);
 }
 
 export function normalizeEspnGameSummary(raw: any, providerGameId: string): GameStatsResponse {
@@ -120,13 +156,17 @@ export function normalizeEspnGameSummary(raw: any, providerGameId: string): Game
   const broadcast = competition?.broadcasts?.[0]?.media?.shortName
     ?? raw?.broadcasts?.[0]?.media?.shortName
     ?? null;
+  const series = Array.isArray(competition?.series) ? competition.series : [];
+  const playoffSeries = series.find((entry: any) => entry?.type === 'playoff') ?? series[0];
+  const eventHeadline = getEspnEventHeadline(competition);
+  const gameDate = competition?.date ?? raw?.header?.competitions?.[0]?.date ?? null;
 
   return {
     providerGameId,
     source: 'espn',
     status: normalizeStatus(statusType.state),
     statusDetail: String(statusType.shortDetail ?? statusType.detail ?? statusType.description ?? ''),
-    date: competition?.date ?? raw?.header?.competitions?.[0]?.date ?? null,
+    date: gameDate,
     awayTeam,
     homeTeam,
     periods,
@@ -137,7 +177,9 @@ export function normalizeEspnGameSummary(raw: any, providerGameId: string): Game
     attendance: typeof raw?.gameInfo?.attendance === 'number' ? raw.gameInfo.attendance : null,
     officials: (raw?.gameInfo?.officials ?? []).map((official: any) => String(official?.displayName ?? official?.fullName ?? '')).filter(Boolean),
     broadcast,
-    seriesSummary: competition?.series?.[0]?.summary ?? competition?.series?.[0]?.description ?? null,
+    seriesSummary: playoffSeries?.summary ?? playoffSeries?.description ?? null,
+    eventLabel: normalizeEspnEventLabel(eventHeadline, gameDate),
+    highlights: normalizeHighlights(raw?.videos),
     fetchedAt: new Date().toISOString(),
   };
 }
