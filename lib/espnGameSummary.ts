@@ -7,7 +7,7 @@ import type {
   GameStatsTeamSummary,
   RemoteGameStatus,
 } from '@/types/gameStats';
-import { getEspnEventHeadline, normalizeEspnEventLabel } from '@/lib/espnGameMetadata';
+import { getEspnEventHeadline, normalizeEspnEventLabel } from './espnGameMetadata';
 
 function color(value: unknown, fallback: string): string {
   const raw = typeof value === 'string' ? value.replace('#', '') : '';
